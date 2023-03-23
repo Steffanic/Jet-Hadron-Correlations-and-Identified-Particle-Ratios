@@ -55,11 +55,16 @@ class JetHadron(
         )
         # let's turn the sparses into lists of sparses to use all files
         self.JH, self.MixedEvent, self.Trigger = [], [], []
+        self.EventPlaneAngleHist = None
         for file in rootFiles:
             fileJH, fileME, fileT = self.get_sparses(file)
             self.JH.append(fileJH)
             self.MixedEvent.append(fileME)
             self.Trigger.append(fileT)
+            if self.EventPlaneAngleHist is None:
+                self.EventPlaneAngleHist = self.get_event_plane_angle_hist(file)
+            else:
+                self.EventPlaneAngleHist.Add(self.get_event_plane_angle_hist(file))
 
         self.assert_sparses_filled()
 
@@ -141,8 +146,11 @@ class JetHadron(
         self.ME_norm_sliding_window_result = None
 
         if self.analysisType in ["central", "semicentral"]:
-            # get the correlation functions
-            # an array of TH2s, one for each pTassoc, pTtrig, event plane angle bin
+            # Define all the arrays that will hold various objects for each bin
+            self.N_trigs = np.zeros(
+                (len(self.pTtrigBinEdges) - 1, len(self.eventPlaneAngleBinEdges)),
+                dtype=object,
+            )
             self.SEcorrs = np.zeros(
                 (
                     len(self.pTtrigBinEdges) - 1,
@@ -289,6 +297,10 @@ class JetHadron(
             self.YieldErrsAS = self.init_pTtrig_pTassoc_dict()
 
         else:
+            self.N_trigs = np.zeros(
+                (len(self.pTtrigBinEdges) - 1),
+                dtype=object,
+            )
             self.SEcorrs = np.zeros(
                 (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
                 dtype=object,
@@ -459,6 +471,9 @@ class JetHadron(
                 self.set_pT_epAngle_bin(i, j, k)
                 self.assert_sparses_filled()
 
+                # fill the N_trigs array 
+                if hists_to_fill is None or hists_to_fill.get("Ntrigs"):
+                    self.fill_Ntrigs(i, j, k)
                 # get the SE correlation function
                 if hists_to_fill is None or hists_to_fill.get("SE"):
                     self.fill_SE_correlation_function(i, j, k)
@@ -602,6 +617,15 @@ class JetHadron(
                 )
 
         print("\a")
+
+    @print_function_name_with_description_on_call(description="")
+    def fill_N_trigs(self, i,j,k):
+        Ntrigs = self.get_N_trig()
+        if self.analysisType in ["central", "semicentral"]:
+            self.N_trigs[i, j, k] = Ntrigs
+        elif self.analysisType == "pp":
+            self.N_trigs[i, j] = Ntrigs
+        del Ntrigs
 
     @print_function_name_with_description_on_call(description="")
     def fill_SE_correlation_function(self, i, j, k):
@@ -859,6 +883,19 @@ class JetHadron(
         # turn on errors with sumw2
 
         return fhnJH, fhnMixedEvent, fhnTrigger
+
+    def get_event_plane_angle_hist(self, f):
+        if self.analysisType in ["central", "semicentral"]:
+            centralityString = (
+                "Central" if self.analysisType == "central" else "SemiCentral"
+            )
+            anaList = f.Get(
+                f"AliAnalysisTaskJetH_tracks_caloClusters_dEdxtrackBias5R2{centralityString}q"
+            )
+        else:
+            anaList = f.Get("AliAnalysisTaskJetH_tracks_caloClusters_biased")
+        fHistEventPlane = anaList.FindObject("fHistEventPlane")
+        return fHistEventPlane
 
     def assert_sparses_filled(self):
         for sparse_ind in range(len(self.JH)):

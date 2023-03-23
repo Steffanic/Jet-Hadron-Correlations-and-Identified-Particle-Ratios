@@ -2,10 +2,9 @@ import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.axes3d import Axes3D
-
-
 import matplotlib.cm as cm
 from matplotlib.pyplot import Axes
+from abc import ABC, abstractmethod
 
 
 def print_function_name_with_description_on_call(description):
@@ -92,7 +91,8 @@ def plot_TH1(hist, title, xlabel, ylabel, ax: Axes, logy=False):
     return ax
 
 
-class PlotMixin:
+class PlotMixin(ABC):
+
     @print_function_name_with_description_on_call(description="")
     def plot_everything(self):
         font = {"family": "normal", "weight": "bold", "size": 22}
@@ -626,6 +626,9 @@ class PlotMixin:
         self.plot_yield_for_species("proton")
         self.plot_yield_for_species("electron")
 
+        self.plot_Ntrig()
+        self.plot_event_plane_angle()
+
         if self.analysisType in ["central", "semicentral"]:
             self.plot_RPFs()
             self.plot_RPFs(withSignal=True)
@@ -633,7 +636,28 @@ class PlotMixin:
 
     @print_function_name_with_description_on_call(description="")
     def plot_Ntrig(self):
-        pass
+        '''
+        Plot the number of triggers for each event plane angle
+        '''
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+        ax.errorbar(self.pTtrigBinCenters, self.Ntrig, yerr=np.sqrt(self.Ntrig), fmt="o")
+        ax.set_xlabel("Trigger $p_T$ (GeV/c)") 
+        ax.set_ylabel("$N_{trigger}$")
+        ax.set_title(f"Ntrig, {self.analysis_type}")
+        fig.savefig(f"{self.base_save_path}Ntrig.png") # type:ignore
+        plt.close(fig)
+
+    @print_function_name_with_description_on_call(description="")
+    def plot_event_plane_angle(self):
+        '''
+        Plot the event plane angle for each run
+        '''
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+        plot_TH1(self.EventPlaneAngleHist, f"Event Plane Angle, {self.analysis_type}", "Event Plane Angle", "Counts", ax=ax) # type:ignore
+        fig.savefig(f"{self.base_save_path}EventPlaneAngle.png") # type:ignore
+        plt.close(fig)
+
+
 
     @print_function_name_with_description_on_call(description="")
     def plot_dPhi_against_pp_reference(PbPbAna, ppAna, i, j):
@@ -1835,8 +1859,7 @@ class PlotMixin:
             norm_errorsNS = self.BGSubtractedAccCorrectedSEdPhiSigNScorrsminVals[i, j]
             # set pt ep angle bin
             self.set_pT_epAngle_bin(i, j, k)
-            # get the number of triggers
-            N_trig = self.get_N_trig()
+            
             dPhiSigminusBGNSax.fill_between(
                 x_binsNS,
                 bin_contentNS - norm_errorsNS,
@@ -2296,7 +2319,7 @@ class PlotMixin:
     ):
         self.set_pT_epAngle_bin(i, j, k)
 
-        N_trig = self.get_N_trig()
+        N_trig = self.N_trigs[i,j,k] # self.get_N_trig()
         self.set_pT_epAngle_bin(i, j, 3)
 
         if self.analysisType in ["central", "semicentral"]:
@@ -2521,10 +2544,6 @@ class PlotMixin:
     def plot_normalized_background_subtracted_dPhi_for_species(
         self, i, j, k, species, axSigminusBGNormINCSpecies, BGErrorINC
     ):
-        self.set_pT_epAngle_bin(i, j, k)
-
-        N_trig = self.get_N_trig()
-        self.set_pT_epAngle_bin(i, j, 3)
 
         if self.analysisType in ["central", "semicentral"]:
             dPhiSigminusBGNormINC, dPhiSigminusBGNormINCax = plt.subplots(
