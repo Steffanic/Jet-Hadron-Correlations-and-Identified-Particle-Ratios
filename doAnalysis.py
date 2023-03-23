@@ -64,19 +64,19 @@ def get_bin_errors_as_array(th1, forFitting=True):
     return bin_errors
 
 if __name__=="__main__":
-    f = ROOT.TFile('/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_merged_ab.root')
-    fpp = ROOT.TFile('/home/steffanic/Projects/Thesis/TrainOutputpp/AnalysisResults.root')
+    flist = [ROOT.TFile(f'/home/steffanic/Projects/Thesis/TrainOutputq/AnalysisResults_alihaddcomp0{i}.root') for i in range(1,8)]
+    fpplist = [ROOT.TFile('/home/steffanic/Projects/Thesis/TrainOutputpp/AnalysisResults.root')]
     DO_PP = True
     DO_CENTRAL = True
     DO_SEMI_CENTRAL = True
-    DO_PLOTTING=False
+    DO_PLOTTING=True
 
 
     if DO_PP:
         if exists('jhAnapp.pickle'):
             jhAnapp = pickle.load(open('jhAnapp.pickle', 'rb'))
         else:
-            jhAnapp = JetHadron(fpp, 'pp')
+            jhAnapp = JetHadron(fpplist, 'pp')
             #save a pickle file of the analysis object
             with open('jhAnapp.pickle', 'wb') as handle:
                 pickle.dump(jhAnapp, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -88,7 +88,7 @@ if __name__=="__main__":
         if exists('jhAnaCentral.pickle'):
             jhAnaCentral = pickle.load(open('jhAnaCentral.pickle', 'rb'))
         else:
-            jhAnaCentral = JetHadron(f, 'central')
+            jhAnaCentral = JetHadron(flist, 'central')
             #save a pickle file of the analysis object
             with open('jhAnaCentral.pickle', 'wb') as handle:
                 pickle.dump(jhAnaCentral, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -133,7 +133,7 @@ if __name__=="__main__":
         if exists('jhAnaSemiCentral.pickle'):
             jhAnaSemiCentral = pickle.load(open('jhAnaSemiCentral.pickle', 'rb'))
         else:
-            jhAnaSemiCentral = JetHadron(f, 'semicentral')
+            jhAnaSemiCentral = JetHadron(flist, 'semicentral')
             #save a pickle file of the analysis object
             with open('jhAnaSemiCentral.pickle', 'wb') as handle:
                 pickle.dump(jhAnaSemiCentral, handle, protocol=pickle.HIGHEST_PROTOCOL)
