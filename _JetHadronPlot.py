@@ -41,33 +41,57 @@ def TH2toArray(hist):
     return x_centers, y_centers, z, zerr
 
 
-def plot_TH2(hist, title, xlabel, ylabel, zlabel, cmap="viridis", plotStyle="colz"):
+def plot_TH2(hist, title, xlabel, ylabel, zlabel, cmap="viridis", plotStyle="bar3d"):
     xedges, yedges, z, _ = TH2toArray(hist)
     X, Y = np.meshgrid(xedges, yedges)
-    fig = plt.figure(figsize=(10, 6))
+    fig = plt.figure(figsize=(9, 6))
 
     # compute difference between element i and i-1 in xedges
     # this is the width of the bin
-
-    dx = np.diff(xedges)
-    dy = np.diff(yedges)
 
     if plotStyle == "colz":
         plt.pcolormesh(X, Y, z.T, cmap=cmap)
         plt.colorbar(label=zlabel)
     elif plotStyle == "bar3d":
         ax: Axes3D = fig.add_subplot(111, projection="3d")
-        x, y, Z = X.ravel(), Y.ravel(), z.T.ravel()
+        # tight layout
+
+        # make a bar3d plot with bars at xedges, yedges with height z
+        # x, y, z are all 1D arrays
+        x = []
+        y = []
+        for i in range(len(xedges)):
+            for j in range(len(yedges)):
+                x.append(xedges[i])
+                y.append(yedges[j])
+        x, y, Z = np.array(x), np.array(y), z.ravel()
+        bin_width_x, bin_width_y = x[len(yedges) + 1] - x[0], y[1] - y[0]
+        dx, dy = (
+            np.ones_like(x) * bin_width_x / 2,
+            np.ones_like(y) * bin_width_y / 2,
+        )
         cmap = cm.get_cmap("jet")  # Get desired colormap - you can change this!
         max_height = np.max(Z)  # get range of colorbars so we can normalize
         min_height = np.min(Z)
         # scale each z to [0,1], and get their rgb values
         rgba = [cmap((k - min_height) / max_height) for k in Z]
-
-        ax.bar3d(x, y, np.zeros_like(Z), dx, dy, Z, color=rgba, zsort="average")
+        ax.bar3d(
+            x,
+            y,
+            np.ones_like(Z)*(min_height*0.8), # shift the bars down so they are visible
+            dx,
+            dy,
+            Z-min_height*0.8,
+            color=rgba,
+            zsort="average",
+            shade=False,
+            edgecolor="black",
+        )
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
+    ax.set_zlabel(zlabel, labelpad=20)
+    plt.tight_layout()
     return plt.gcf()
 
 
@@ -91,10 +115,10 @@ def plot_TH1(hist, title, xlabel, ylabel, ax: Axes, logy=False):
     return ax
 
 
-class PlotMixin(ABC):
-
+class PlotMixin:
     @print_function_name_with_description_on_call(description="")
     def plot_everything(self):
+
         font = {"family": "normal", "weight": "bold", "size": 22}
 
         matplotlib.rc("font", **font)
@@ -573,34 +597,43 @@ class PlotMixin(ABC):
                         for ax in axSigminusBGNormINCElectron
                     ]
                     axSigminusBGNormINCElectron[-1].legend()
-
+                figBG.tight_layout()
                 figBG.savefig(
                     f"{self.base_save_path}dPhiBG{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
                 )  # type:ignore
+                figSIG.tight_layout()
                 figSIG.savefig(
                     f"{self.base_save_path}dPhiSig{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
                 )  # type:ignore
+                figSigminusBGNS.tight_layout()
                 figSigminusBGNS.savefig(
                     f"{self.base_save_path}dPhiSig-BGNS{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
                 )  # type:ignore
+                figSigminusBGAS.tight_layout()
                 figSigminusBGAS.savefig(
                     f"{self.base_save_path}dPhiSig-BGAS{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
                 )  # type:ignore
+                figSigminusBGINC.tight_layout()
                 figSigminusBGINC.savefig(
                     f"{self.base_save_path}dPhiSig-BG{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
                 )  # type:ignore
+                figSigminusBGNormINC.tight_layout()
                 figSigminusBGNormINC.savefig(
                     f"{self.base_save_path}dPhiSig-BG-Norm{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
                 )  # type:ignore
+                figSigminusBGNormINCPion.tight_layout()
                 figSigminusBGNormINCPion.savefig(
                     f"{self.base_save_path}dPhiSig-BG-Norm-pion{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
                 )  # type:ignore
+                figSigminusBGNormINCProton.tight_layout()
                 figSigminusBGNormINCProton.savefig(
                     f"{self.base_save_path}dPhiSig-BG-Norm-proton{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
                 )  # type:ignore
+                figSigminusBGNormINCKaon.tight_layout()
                 figSigminusBGNormINCKaon.savefig(
                     f"{self.base_save_path}dPhiSig-BG-Norm-kaon{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
                 )  # type:ignore
+                figSigminusBGNormINCElectron.tight_layout()
                 figSigminusBGNormINCElectron.savefig(
                     f"{self.base_save_path}dPhiSig-BG-Norm-electron{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
                 )  # type:ignore
@@ -627,46 +660,86 @@ class PlotMixin(ABC):
         self.plot_yield_for_species("electron")
 
         self.plot_Ntrig()
-        self.plot_event_plane_angle()
 
         if self.analysisType in ["central", "semicentral"]:
             self.plot_RPFs()
             self.plot_RPFs(withSignal=True)
             self.plot_optimal_parameters()
 
+        if self.analysisType in ["central", "semicentral"]:
+            self.plot_event_plane_angle()
+
     @print_function_name_with_description_on_call(description="")
     def plot_Ntrig(self):
-        '''
+        """
         Plot the number of triggers for each event plane angle
-        '''
+        """
         fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-        ax.errorbar(self.pTtrigBinCenters, self.Ntrig, yerr=np.sqrt(self.Ntrig), fmt="o")
-        ax.set_xlabel("Trigger $p_T$ (GeV/c)") 
+        if self.analysisType =='pp':
+            ax.errorbar(
+                self.pTtrigBinCenters,
+                [self.N_trigs[i] for i in range(len(self.pTtrigBinCenters))],
+                yerr=np.sqrt(
+                    np.array([self.N_trigs[i] for i in range(len(self.pTtrigBinCenters))])
+                ),
+                xerr=np.array(self.pTtrigBinWidths)/2,
+                fmt="o",
+            )
+        else:
+            for k in range(len(self.eventPlaneAngleBinEdges)):
+                ax.errorbar(
+                    self.pTtrigBinCenters,
+                    [self.N_trigs[i][k] for i in range(len(self.pTtrigBinCenters))],
+                    yerr=np.sqrt(
+                        np.array(
+                            [self.N_trigs[i][k] for i in range(len(self.pTtrigBinCenters))]
+                        )
+                    ),
+                    xerr=np.array(self.pTtrigBinWidths)/2,
+                    fmt="o" if k==3 else "+" if k==0 else "x" if k==1 else "d" if k==2 else "o",
+                    label = "in" if k==0 else "mid" if k==1 else "out" if k==2 else "inclusive"
+                )
+        ax.set_xlabel("Trigger $p_T$ (GeV/c)")
         ax.set_ylabel("$N_{trigger}$")
-        ax.set_title(f"Ntrig, {self.analysis_type}")
-        fig.savefig(f"{self.base_save_path}Ntrig.png") # type:ignore
+        ax.set_title(f"Ntrig, {self.analysisType}")
+        ax.legend()
+        fig.tight_layout()
+        fig.savefig(f"{self.base_save_path}Ntrig.png")  # type:ignore
         plt.close(fig)
 
     @print_function_name_with_description_on_call(description="")
     def plot_event_plane_angle(self):
-        '''
+        """
         Plot the event plane angle for each run
-        '''
+        """
         fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-        plot_TH1(self.EventPlaneAngleHist, f"Event Plane Angle, {self.analysis_type}", "Event Plane Angle", "Counts", ax=ax) # type:ignore
-        fig.savefig(f"{self.base_save_path}EventPlaneAngle.png") # type:ignore
+        epAngle = self.EventPlaneAngleHist[0]
+        for i in range(len(self.EventPlaneAngleHist)):
+            if self.EventPlaneAngleHist[i] == None:
+                continue
+            epAngle.Add(self.EventPlaneAngleHist[i])
+        if epAngle==None:
+            plt.close(fig)
+            return 
+        plot_TH1(
+            epAngle,
+            f"Event Plane Angle, {self.analysisType}",
+            "Event Plane Angle",
+            "Counts",
+            ax=ax,
+        )  # type:ignore
+        fig.savefig(f"{self.base_save_path}EventPlaneAngle.png")  # type:ignore
         plt.close(fig)
-
-
 
     @print_function_name_with_description_on_call(description="")
     def plot_dPhi_against_pp_reference(PbPbAna, ppAna, i, j):
         figSigminusBGNormINC, axSigminusBGNormINC = plt.subplots(
             1, 4, figsize=(20, 10), sharex=True, sharey=True
         )
-        figSigminusBGNormINC.suptitle("Per-Trigger dPhi Signal - BG compared to pp")
+        figSigminusBGNormINC.suptitle("Per-Trigger $\Delta\phi$ Signal - BG compared to pp")
         figSigminusBGNormINC.tight_layout()
         figSigminusBGNormINC.subplots_adjust(wspace=0, hspace=0)
+
         for k in range(4):
             n_binsNormINC = (
                 PbPbAna.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs[i, j, k]
@@ -678,6 +751,17 @@ class PlotMixin(ABC):
             bin_errorsNormINCPbPb = np.zeros(n_binsNormINC)  # type:ignore
             bin_contentNormINCpp = np.zeros(n_binsNormINC)  # type:ignore
             bin_errorsNormINCpp = np.zeros(n_binsNormINC)  # type:ignore
+            norm_errorsNormINC = (
+                ppAna.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminVals[i, j]
+            )  # type:ignore
+            RPFErrors = np.array(
+                [
+                    PbPbAna.RPFObjs[i, j].simultaneous_fit_err(
+                        x_binsNormINC[l], x_binsNormINC[1] - x_binsNormINC[0], *PbPbAna.RPFObjs[i, j].popt
+                    )
+                    for l in range(len(x_binsNormINC))
+                ]
+            ) 
             PbPbAna.set_pT_epAngle_bin(i, j, k)
             ppAna.set_pT_epAngle_bin(i, j, k)
             N_trig_PbPb = PbPbAna.get_N_trig()
@@ -718,8 +802,8 @@ class PlotMixin(ABC):
                 )  # type:ignore
             if k == 3:
                 # divide bin content by 3
-                bin_contentNormINCPbPb = bin_contentNormINCPbPb / 3
-                bin_errorsNormINCPbPb = bin_errorsNormINCPbPb / 3
+                bin_contentNormINCPbPb = bin_contentNormINCPbPb 
+                bin_errorsNormINCPbPb = bin_errorsNormINCPbPb 
 
             axSigminusBGNormINC[k].errorbar(
                 x_binsNormINC,
@@ -728,6 +812,28 @@ class PlotMixin(ABC):
                 fmt="o",
                 label=f"PbPb, N_trig={N_trig_PbPb}",
             )
+            axSigminusBGNormINC[k].fill_between(
+                x_binsNormINC,
+                bin_contentNormINCPbPb - RPFErrors[:, k] / N_trig_PbPb
+                if k != 3
+                else bin_contentNormINCPbPb
+                - np.sqrt(np.sum(RPFErrors ** 2, axis=1) ) / N_trig_PbPb,
+                bin_contentNormINCPbPb + RPFErrors[:, k] / N_trig_PbPb
+                if k != 3
+                else bin_contentNormINCPbPb
+                + np.sqrt(np.sum(RPFErrors**2, axis=1) ) / N_trig_PbPb,
+                alpha=0.5,
+                color="green",
+                label="RPF fit",
+            )
+            axSigminusBGNormINC[k].fill_between(
+                x_binsNormINC,
+                bin_contentNormINCPbPb - PbPbAna.ME_norm_systematics[i, j, k],
+                bin_contentNormINCPbPb + PbPbAna.ME_norm_systematics[i, j, k],
+                color="red",
+                alpha=0.5,
+                label="ME normalization",
+            )
             axSigminusBGNormINC[k].errorbar(
                 x_binsNormINC,
                 bin_contentNormINCpp,
@@ -735,11 +841,27 @@ class PlotMixin(ABC):
                 fmt="o",
                 label=f"pp, N_trig={N_trig_pp}",
             )
+            axSigminusBGNormINC[k].fill_between(
+                x_binsNormINC,
+                bin_contentNormINCpp - norm_errorsNormINC / N_trig_pp,
+                bin_contentNormINCpp + norm_errorsNormINC / N_trig_pp,
+                alpha=0.5,
+                color="orange",
+                label="Yield normalization",
+            )
+            axSigminusBGNormINC[k].fill_between(
+                x_binsNormINC,
+                bin_contentNormINCpp - ppAna.ME_norm_systematics[i, j],
+                bin_contentNormINCpp + ppAna.ME_norm_systematics[i, j],
+                alpha=0.5,
+                color="red",
+                label="ME normalization",
+            )  # type:ignore
+
             axSigminusBGNormINC[k].set_title(
                 f"{PbPbAna.pTtrigBinEdges[i]}-{PbPbAna.pTtrigBinEdges[i+1]} GeV, {PbPbAna.pTassocBinEdges[j]}-{PbPbAna.pTassocBinEdges[j+1]} GeV, {'in-plane' if k==0 else 'mid-plane' if k==1 else 'out-of-plane' if k==2 else 'inclusive'}"
             )
-            axSigminusBGNormINC[k].legend()
-            axSigminusBGNormINC[k].set_xlabel("dPhi")
+            axSigminusBGNormINC[k].set_xlabel("$\Delta\phi$")
             # zoom the y axis in to the plotted points
             axSigminusBGNormINC[k].set_ylim(
                 1.1 * min(bin_contentNormINCPbPb.min(), bin_contentNormINCpp.min()),
@@ -749,7 +871,9 @@ class PlotMixin(ABC):
             # Draw a line at 0 to compare to pp
             axSigminusBGNormINC[k].axhline(0, color="black", linestyle="--")
 
-        axSigminusBGNormINC[0].set_ylabel("dPhi Signal - BG")
+        axSigminusBGNormINC[-1].legend()
+        axSigminusBGNormINC[0].set_ylabel("$\\frac{1}{N_{trig}}\\frac{1}{a\\epsilon}\\frac{dN_{meas}-N_{BG}}{d\\Delta\\phi}$")
+        figSigminusBGNormINC.tight_layout()
         figSigminusBGNormINC.savefig(
             f"{PbPbAna.base_save_path}/dPhi_against_pp_reference_{PbPbAna.pTtrigBinEdges[i]}-{PbPbAna.pTtrigBinEdges[i+1]}GeV_{PbPbAna.pTassocBinEdges[j]}-{PbPbAna.pTassocBinEdges[j+1]}GeV.png"
         )
@@ -784,25 +908,31 @@ class PlotMixin(ABC):
         fig, ax = plt.subplots(
             2,
             4,
-            figsize=(20, 6),
+            figsize=(20, 8),
             sharey="row",
             sharex=True,
             gridspec_kw={"height_ratios": [0.8, 0.2]},
         )
         # remove margins between plots
         fig.subplots_adjust(wspace=0, hspace=0)
+        self.set_pT_epAngle_bin(i, j, 0)
 
-        ax[0][0].plot(full_x, fit_y[:, 0], label="RPF Fit")
+        N_trig = self.get_N_trig()
+        self.set_pT_epAngle_bin(i, j, 3)
+
+        ax[0][0].plot(full_x, fit_y[:, 0]/N_trig, label="RPF Fit")
+        normalized_err = np.sqrt(fit_y[:,0]**2/N_trig**5 + fit_y_err[:,0]**2/N_trig**2)
         ax[0][0].fill_between(
             full_x,
-            fit_y[:, 0] - fit_y_err[:, 0],
-            fit_y[:, 0] + fit_y_err[:, 0],
+            fit_y[:, 0]/N_trig - normalized_err,
+            fit_y[:, 0]/N_trig + normalized_err,
             alpha=0.5,
         )
+        normalized_data_err = np.sqrt(self.get_bin_contents_as_array(inPlane, False)**2/N_trig**5 + self.get_bin_errors_as_array(inPlane, False)**2/N_trig**2)
         ax[0][0].errorbar(
             full_x,
-            self.get_bin_contents_as_array(inPlane, False),
-            yerr=self.get_bin_errors_as_array(inPlane, False),
+            self.get_bin_contents_as_array(inPlane, False)/N_trig,
+            yerr=normalized_data_err,
             fmt="o",
             ms=2,
             label="Background",
@@ -821,17 +951,24 @@ class PlotMixin(ABC):
         )
         ax[1][0].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.5)
 
-        ax[0][1].plot(full_x, fit_y[:, 1], label="RPF Fit")
+        self.set_pT_epAngle_bin(i, j, 1)
+
+        N_trig = self.get_N_trig()
+        self.set_pT_epAngle_bin(i, j, 3)
+
+        ax[0][1].plot(full_x, fit_y[:, 1]/N_trig, label="RPF Fit")
+        normalized_err = np.sqrt(fit_y[:,1]**2/N_trig**5 + fit_y_err[:,1]**2/N_trig**2)
         ax[0][1].fill_between(
             full_x,
-            fit_y[:, 1] - fit_y_err[:, 1],
-            fit_y[:, 1] + fit_y_err[:, 1],
+            fit_y[:, 1]/N_trig - normalized_err,
+            fit_y[:, 1]/N_trig + normalized_err,
             alpha=0.5,
         )
+        normalized_data_err = np.sqrt(self.get_bin_contents_as_array(midPlane, False)**2/N_trig**5 + self.get_bin_errors_as_array(midPlane, False)**2/N_trig**2)
         ax[0][1].errorbar(
             full_x,
-            self.get_bin_contents_as_array(midPlane, False),
-            yerr=self.get_bin_errors_as_array(midPlane, False),
+            self.get_bin_contents_as_array(midPlane, False)/N_trig,
+            yerr=normalized_data_err,
             fmt="o",
             ms=2,
             label="Background",
@@ -849,18 +986,23 @@ class PlotMixin(ABC):
             )
         )
         ax[1][1].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.5)
+        self.set_pT_epAngle_bin(i, j, 2)
 
-        ax[0][2].plot(full_x, fit_y[:, 2], label="RPF Fit")
+        N_trig = self.get_N_trig()
+        self.set_pT_epAngle_bin(i, j, 3)
+        ax[0][2].plot(full_x, fit_y[:, 2]/N_trig, label="RPF Fit")
+        normalized_err = np.sqrt(fit_y[:,2]**2/N_trig**5 + fit_y_err[:,2]**2/N_trig**2)
         ax[0][2].fill_between(
             full_x,
-            fit_y[:, 2] - fit_y_err[:, 2],
-            fit_y[:, 2] + fit_y_err[:, 2],
+            fit_y[:, 2]/N_trig - normalized_err,
+            fit_y[:, 2]/N_trig + normalized_err,
             alpha=0.5,
         )
+        normalized_data_err = np.sqrt(self.get_bin_contents_as_array(outPlane, False)**2/N_trig**5 + self.get_bin_errors_as_array(outPlane, False)**2/N_trig**2)
         ax[0][2].errorbar(
             full_x,
-            self.get_bin_contents_as_array(outPlane, False),
-            yerr=self.get_bin_errors_as_array(outPlane, False),
+            self.get_bin_contents_as_array(outPlane, False)/N_trig,
+            yerr=normalized_data_err,
             fmt="o",
             ms=2,
             label="Background",
@@ -878,125 +1020,125 @@ class PlotMixin(ABC):
             )
         )
         ax[1][2].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.5)
+        self.set_pT_epAngle_bin(i, j, 3)
 
-        ax[0][3].plot(full_x, np.sum(fit_y, axis=1) / 3, label="RPF Fit")
+        N_trig = self.get_N_trig()
+        self.set_pT_epAngle_bin(i, j, 3)
+        ax[0][3].plot(full_x, (np.sum(fit_y, axis=1))/N_trig, label="RPF Fit")
+        normalized_err = np.sqrt(np.sum(fit_y, axis=1)**2/N_trig**5 + np.sum(fit_y_err**2, axis=1)/N_trig**2)
         ax[0][3].fill_between(
             full_x,
-            np.sum(fit_y, axis=1) / 3 - np.sqrt(np.sum(fit_y_err**2, axis=1) / 9),
-            np.sum(fit_y, axis=1) / 3 + np.sqrt(np.sum(fit_y_err**2, axis=1)) / 9,
+            (np.sum(fit_y, axis=1) )/N_trig - normalized_err,
+            (np.sum(fit_y, axis=1) )/N_trig + normalized_err,
             alpha=0.5,
         )
+        normalized_data_err = np.sqrt((self.get_bin_contents_as_array(inPlane, False) + self.get_bin_contents_as_array(midPlane, False) + self.get_bin_contents_as_array(outPlane, False))**2/N_trig**5 + (self.get_bin_errors_as_array(inPlane, False)**2 + self.get_bin_errors_as_array(midPlane, False)**2 + self.get_bin_errors_as_array(outPlane, False)**2)/N_trig**2)
         ax[0][3].errorbar(
             full_x,
-            (
+            ((
                 self.get_bin_contents_as_array(inPlane, False)
                 + self.get_bin_contents_as_array(midPlane, False)
                 + self.get_bin_contents_as_array(outPlane, False)
             )
-            / 3,
-            yerr=np.sqrt(
-                (
-                    self.get_bin_errors_as_array(inPlane, False) ** 2
-                    + self.get_bin_errors_as_array(midPlane, False) ** 2
-                    + self.get_bin_errors_as_array(outPlane, False) ** 2
-                )
-                / 9
-            ),
+            )/N_trig,
+            yerr=normalized_data_err,
             fmt="o",
             ms=2,
             label="Background",
         )
+        
         ratVal = (
             (
-                (
-                    self.get_bin_contents_as_array(inPlane, False)
-                    + self.get_bin_contents_as_array(midPlane, False)
-                    + self.get_bin_contents_as_array(outPlane, False)
-                )
-                / 3
-                - np.sum(fit_y, axis=1) / 3
-            )
-            / np.sum(fit_y, axis=1)
-            / 3
-        )
-        ratErr = (
-            1
-            / np.sum(fit_y, axis=1)
-            / 3
-            * np.sqrt(
-                (
-                    np.sqrt(
-                        (
-                            self.get_bin_errors_as_array(inPlane, False) ** 2
-                            + self.get_bin_errors_as_array(midPlane, False) ** 2
-                            + self.get_bin_errors_as_array(outPlane, False) ** 2
-                        )
-                        / 9
-                    )
-                    / np.sum(fit_y, axis=1)
-                    / 3
-                )
-                ** 2
-                + (
-                    np.sum(fit_y, axis=1) / 3
-                    - np.sqrt(np.sum(fit_y_err**2, axis=1) / 9)
-                )
-                ** 2
-                * np.sqrt(np.sum(fit_y_err**2, axis=1))
-                / 9
-            )
-        )
+                self.get_bin_contents_as_array(inPlane, False)
+                - fit_y[:, 0]
+            ) / fit_y[:, 0]
+                + 
+            (
+            self.get_bin_contents_as_array(midPlane, False)
+                - fit_y[:, 1]
+            ) / fit_y[:, 1]
+                + 
+            (
+            self.get_bin_contents_as_array(outPlane, False)
+                - fit_y[:, 2]
+            ) / fit_y[:, 2]
+            ) / 3
+
+        ratErr = 1/3 * np.sqrt(
+            self.get_bin_contents_as_array(inPlane, False)**2/fit_y[:, 0]**4 * fit_y_err[:, 0]**2 
+            +
+            self.get_bin_contents_as_array(midPlane, False)**2/fit_y[:, 1]**4 * fit_y_err[:, 1]**2
+            +
+            self.get_bin_contents_as_array(outPlane, False)**2/fit_y[:, 2]**4 * fit_y_err[:, 2]**2
+            + 
+            1/fit_y[:, 0]**2 * self.get_bin_errors_as_array(inPlane, False)**2
+            +
+            1/fit_y[:, 1]**2 * self.get_bin_errors_as_array(midPlane, False)**2
+            +
+            1/fit_y[:, 2]**2 * self.get_bin_errors_as_array(outPlane, False)**2 
+         )
+        
         ax[1][3].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.5)
 
         if withSignal:
             inPlaneSig = self.dPhiSigcorrs[i, j, 0]  # type:ignore
             midPlaneSig = self.dPhiSigcorrs[i, j, 1]  # type:ignore
             outPlaneSig = self.dPhiSigcorrs[i, j, 2]  # type:ignore
+            self.set_pT_epAngle_bin(i, j, 0)
+
+            N_trig = self.get_N_trig()
+            self.set_pT_epAngle_bin(i, j, 3)
+            normalized_data_err = np.sqrt(self.get_bin_contents_as_array(inPlaneSig, False)**2/N_trig**5 + self.get_bin_errors_as_array(inPlaneSig, False)**2/N_trig**2)
             ax[0][0].errorbar(
                 full_x,
-                self.get_bin_contents_as_array(inPlaneSig, False),
-                yerr=self.get_bin_errors_as_array(inPlaneSig, False),
+                self.get_bin_contents_as_array(inPlaneSig, False)/N_trig,
+                yerr=normalized_data_err,
                 fmt="o",
                 ms=2,
                 label="Signal",
             )
             # plot (data-fit)/fit on axRatio
             # error will be 1/fit*sqrt(data_err**2+(data/fit)**2*fit_err**2)
+            self.set_pT_epAngle_bin(i, j, 1)
 
+            N_trig = self.get_N_trig()
+            self.set_pT_epAngle_bin(i, j, 3)
+            normalized_data_err = np.sqrt(self.get_bin_contents_as_array(midPlaneSig, False)**2/N_trig**5 + self.get_bin_errors_as_array(midPlaneSig, False)**2/N_trig**2)
             ax[0][1].errorbar(
                 full_x,
-                self.get_bin_contents_as_array(midPlaneSig, False),
-                yerr=self.get_bin_errors_as_array(midPlaneSig, False),
+                self.get_bin_contents_as_array(midPlaneSig, False)/N_trig,
+                yerr=normalized_data_err,
                 fmt="o",
                 ms=2,
                 label="Signal",
             )
+            self.set_pT_epAngle_bin(i, j, 2)
 
+            N_trig = self.get_N_trig()
+            self.set_pT_epAngle_bin(i, j, 3)
+            normalized_data_err = np.sqrt(self.get_bin_contents_as_array(outPlaneSig, False)**2/N_trig**5 + self.get_bin_errors_as_array(outPlaneSig, False)**2/N_trig**2)
             ax[0][2].errorbar(
                 full_x,
-                self.get_bin_contents_as_array(outPlaneSig, False),
-                yerr=self.get_bin_errors_as_array(outPlaneSig, False),
+                self.get_bin_contents_as_array(outPlaneSig, False)/N_trig,
+                yerr=normalized_data_err,
                 fmt="o",
                 ms=2,
                 label="Signal",
             )
+            self.set_pT_epAngle_bin(i, j, 3)
 
+            N_trig = self.get_N_trig()
+            self.set_pT_epAngle_bin(i, j, 3)
+            normalized_data_err = np.sqrt((self.get_bin_contents_as_array(inPlaneSig, False) + self.get_bin_contents_as_array(midPlaneSig, False) + self.get_bin_contents_as_array(outPlaneSig, False))**2/N_trig**5 + (self.get_bin_errors_as_array(inPlaneSig, False)**2 + self.get_bin_errors_as_array(midPlaneSig, False)**2 + self.get_bin_errors_as_array(outPlaneSig, False)**2)/N_trig**2)
             ax[0][3].errorbar(
                 full_x,
-                (
+                ((
                     self.get_bin_contents_as_array(inPlaneSig, False)
                     + self.get_bin_contents_as_array(midPlaneSig, False)
                     + self.get_bin_contents_as_array(outPlaneSig, False)
                 )
-                / 3,
-                yerr=np.sqrt(
-                    (
-                        self.get_bin_errors_as_array(inPlaneSig, False) ** 2
-                        + self.get_bin_errors_as_array(midPlaneSig, False) ** 2
-                        + self.get_bin_errors_as_array(outPlaneSig, False) ** 2
-                    )
-                    / 9
-                ),
+                )/N_trig,
+                yerr=normalized_data_err,
                 fmt="o",
                 ms=2,
                 label="Signal",
@@ -1007,15 +1149,17 @@ class PlotMixin(ABC):
         [x.set_xlabel(r"$\Delta\phi$") for x in ax[1]]
         [x.autoscale(enable=True, axis="y", tight=True) for x in ax[1]]
         [x.autoscale(enable=True, axis="y", tight=True) for x in ax[0]]
-        ax[0][0].set_ylabel(r"$\frac{1}{a*\epsilon}\frac{dN}{d\Delta\phi}$")
+        ax[0][0].set_ylabel(r"$\frac{1}{N_trig}\frac{1}{a*\epsilon}\frac{dN}{d\Delta\phi}$")
         ax[0][0].set_title(f"In-Plane")
         ax[0][1].set_title(f"Mid-Plane")
         ax[0][2].set_title(f"Out-of-Plane")
         ax[0][3].set_title(f"Inclusive")
-
+        # add text to the axes that says "inclusive = (in+mid+out)/3"
+        #ax[0][3].text( 0.1, 0.1, "Inclusive = (In+Mid+Out)", transform = ax[0][3].transAxes,)
         fig.suptitle(
             f"RPF fit for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, Chi2/NDF = {self.RPFObjs[i,j].chi2OverNDF}"
         )  # type:ignore
+        fig.tight_layout()
         fig.savefig(
             f"{self.base_save_path}RPF{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}{'withSig' if withSignal else ''}.png"
         )  # type:ignore
@@ -1043,9 +1187,10 @@ class PlotMixin(ABC):
         Berr = optimal_param_errors[:, :, 0]
         for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
             ax[i].errorbar(
-                self.pTassocBinEdges[:-1] + 1 / 2 * np.diff(self.pTassocBinEdges),
+                self.pTassocBinCenters,
                 B[i],
                 yerr=Berr[i],
+                xerr=np.array(self.pTassocBinWidths)/2, 
                 fmt="o",
                 ms=2,
             )  # type:ignore
@@ -1054,6 +1199,7 @@ class PlotMixin(ABC):
             ax[i].set_title(
                 f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
             )  # type:ignore
+        fig.tight_layout()
         fig.suptitle(r"$B$ vs $p_{T,assoc}$")
         fig.savefig(f"{self.base_save_path}B_vs_pTassoc.png")  # type:ignore
         plt.close(fig)
@@ -1064,9 +1210,10 @@ class PlotMixin(ABC):
         v1err = optimal_param_errors[:, :, 1]
         for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
             ax[i].errorbar(
-                self.pTassocBinEdges[:-1] + 1 / 2 * np.diff(self.pTassocBinEdges),
+                self.pTassocBinCenters,
                 v1[i],
                 yerr=v1err[i],
+                xerr=np.array(self.pTassocBinWidths)/2, 
                 fmt="o",
                 ms=2,
             )  # type:ignore
@@ -1075,7 +1222,9 @@ class PlotMixin(ABC):
             ax[i].set_title(
                 f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
             )  # type:ignore
+            
         fig.suptitle(r"$v_1$ vs $p_{T,assoc}$")
+        fig.tight_layout()
         fig.savefig(f"{self.base_save_path}v1_vs_pTassoc.png")  # type:ignore
         plt.close(fig)
         # now plot v2 vs ptassoc
@@ -1085,9 +1234,10 @@ class PlotMixin(ABC):
         v2err = optimal_param_errors[:, :, 2]
         for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
             ax[i].errorbar(
-                self.pTassocBinEdges[:-1] + 1 / 2 * np.diff(self.pTassocBinEdges),
+                self.pTassocBinCenters,
                 v2[i],
                 yerr=v2err[i],
+                xerr=np.array(self.pTassocBinWidths)/2, 
                 fmt="o",
                 ms=2,
             )  # type:ignore
@@ -1097,6 +1247,7 @@ class PlotMixin(ABC):
                 f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
             )  # type:ignore
         fig.suptitle(r"$v_2$ vs $p_{T,assoc}$")
+        fig.tight_layout()
         fig.savefig(f"{self.base_save_path}v2_vs_pTassoc.png")  # type:ignore
         plt.close(fig)
         # now plot v3 vs ptassoc
@@ -1106,9 +1257,10 @@ class PlotMixin(ABC):
         v3err = optimal_param_errors[:, :, 3]
         for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
             ax[i].errorbar(
-                self.pTassocBinEdges[:-1] + 1 / 2 * np.diff(self.pTassocBinEdges),
+                self.pTassocBinCenters,
                 v3[i],
                 yerr=v3err[i],
+                xerr=np.array(self.pTassocBinWidths)/2, 
                 fmt="o",
                 ms=2,
             )  # type:ignore
@@ -1118,6 +1270,7 @@ class PlotMixin(ABC):
                 f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
             )  # type:ignore
         fig.suptitle(r"$v_3$ vs $p_{T,assoc}$")
+        fig.tight_layout()
         fig.savefig(f"{self.base_save_path}v3_vs_pTassoc.png")  # type:ignore
         plt.close(fig)
         # now plot v4 vs ptassoc
@@ -1127,9 +1280,10 @@ class PlotMixin(ABC):
         v4err = optimal_param_errors[:, :, 4]
         for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
             ax[i].errorbar(
-                self.pTassocBinEdges[:-1] + 1 / 2 * np.diff(self.pTassocBinEdges),
+                self.pTassocBinCenters,
                 v4[i],
-                yerr=v4err[i],
+                yerr=v4err[i],\
+                xerr=np.array(self.pTassocBinWidths)/2, 
                 fmt="o",
                 ms=2,
             )  # type:ignore
@@ -1139,6 +1293,7 @@ class PlotMixin(ABC):
                 f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
             )  # type:ignore
         fig.suptitle(r"$v_4$ vs $p_{T,assoc}$")
+        fig.tight_layout()
         fig.savefig(f"{self.base_save_path}v4_vs_pTassoc.png")  # type:ignore
         plt.close(fig)
         # now plot va2 vs ptassoc
@@ -1148,9 +1303,10 @@ class PlotMixin(ABC):
         va2err = optimal_param_errors[:, :, 5]
         for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
             ax[i].errorbar(
-                self.pTassocBinEdges[:-1] + 1 / 2 * np.diff(self.pTassocBinEdges),
+                self.pTassocBinCenters,
                 va2[i],
                 yerr=va2err[i],
+                xerr=np.array(self.pTassocBinWidths)/2, 
                 fmt="o",
                 ms=2,
             )  # type:ignore
@@ -1160,6 +1316,7 @@ class PlotMixin(ABC):
                 f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
             )  # type:ignore
         fig.suptitle(r"$v_{a2}$ vs $p_{T,assoc}$")
+        fig.tight_layout()
         fig.savefig(f"{self.base_save_path}va2_vs_pTassoc.png")  # type:ignore
         plt.close(fig)
         # now plot va4 vs ptassoc
@@ -1169,9 +1326,10 @@ class PlotMixin(ABC):
         va4err = optimal_param_errors[:, :, 6]
         for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
             ax[i].errorbar(
-                self.pTassocBinEdges[:-1] + 1 / 2 * np.diff(self.pTassocBinEdges),
+                self.pTassocBinCenters,
                 va4[i],
                 yerr=va4err[i],
+                xerr=np.array(self.pTassocBinWidths)/2, 
                 fmt="o",
                 ms=2,
             )  # type:ignore
@@ -1181,6 +1339,7 @@ class PlotMixin(ABC):
                 f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
             )  # type:ignore
         fig.suptitle(r"$v_{a4}$ vs $p_{T,assoc}$")
+        fig.tight_layout()
         fig.savefig(f"{self.base_save_path}va4_vs_pTassoc.png")  # type:ignore
 
     @print_function_name_with_description_on_call(description="")
@@ -1202,7 +1361,8 @@ class PlotMixin(ABC):
             cmap="jet",
         )  # type:ignore
         correlation_func.savefig(
-            f"{self.base_save_path}{self.epString}/CorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
+            f"{self.base_save_path}{self.epString}/CorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png",
+            dpi=300,
         )  # type:ignore
         plt.close(correlation_func)
 
@@ -1215,7 +1375,8 @@ class PlotMixin(ABC):
             cmap="jet",
         )  # type:ignore
         normMEcorrelation_function.savefig(
-            f"{self.base_save_path}{self.epString}/NormalizedMixedEventCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
+            f"{self.base_save_path}{self.epString}/NormalizedMixedEventCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png",
+            dpi=300,
         )  # type:ignore
         plt.close(normMEcorrelation_function)
 
@@ -1228,7 +1389,8 @@ class PlotMixin(ABC):
             cmap="jet",
         )  # type:ignore
         accCorrectedCorrelationFunction.savefig(
-            f"{self.base_save_path}{self.epString}/AcceptanceCorrectedCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
+            f"{self.base_save_path}{self.epString}/AcceptanceCorrectedCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png",
+            dpi=300,
         )  # type:ignore
         plt.close(accCorrectedCorrelationFunction)
 
@@ -1241,7 +1403,8 @@ class PlotMixin(ABC):
             cmap="jet",
         )  # type:ignore
         normAccCorrectedCorrelationFunction.savefig(
-            f"{self.base_save_path}{self.epString}/NormalizedAcceptanceCorrectedCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
+            f"{self.base_save_path}{self.epString}/NormalizedAcceptanceCorrectedCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png",
+            dpi=300,
         )  # type:ignore
         plt.close(normAccCorrectedCorrelationFunction)
 
@@ -1281,6 +1444,7 @@ class PlotMixin(ABC):
             "Counts",
             ax=pionTPCsignalax,
         )  # type:ignore
+        pionTPCsignal.tight_layout()
         pionTPCsignal.savefig(
             f"{self.base_save_path}pionTPCsignal{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
         )  # type:ignore
@@ -1321,6 +1485,7 @@ class PlotMixin(ABC):
                 "Counts",
                 ax=pionTPCsignalax,
             )
+        pionTPCsignal.tight_layout()
         pionTPCsignal.savefig(
             f"{self.base_save_path}pionTPCnSigma_{particleType}TOFcut{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
         )  # type:ignore
@@ -1341,8 +1506,10 @@ class PlotMixin(ABC):
                 r"$n\sigma$",
                 r"$\frac{1}{N_{trig} a \epsilon}\frac{d^2(N_{meas}-N_{BG})}{d\Delta\phi dn\sigma}$",
             )
+            pionTPCnSigma_vs_dphi.tight_layout()
             pionTPCnSigma_vs_dphi.savefig(
-                f"{self.base_save_path}{self.epString}/pionTPCnSigma_vs_dphi_{species}{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
+                f"{self.base_save_path}{self.epString}/pionTPCnSigma_vs_dphi_{species}{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png",
+                dpi=300,
             )  # type:ignore
             plt.close(pionTPCnSigma_vs_dphi)
 
@@ -1359,15 +1526,20 @@ class PlotMixin(ABC):
                 r"$n\sigma$",
                 r"$\frac{1}{N_{trig} a \epsilon}\frac{d^2(N_{meas}-N_{BG})}{d\Delta\phi dn\sigma}$",
             )
+            pionTPCnSigma_vs_dphi.tight_layout()
             pionTPCnSigma_vs_dphi.savefig(
-                f"{self.base_save_path}pionTPCnSigma_vs_dphi_{species}{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
+                f"{self.base_save_path}pionTPCnSigma_vs_dphi_{species}{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png",
+                dpi=300,
             )
 
     @print_function_name_with_description_on_call(description="")
     def plot_SE_correlation_function(self, i, j, k):
         if self.analysisType in ["central", "semicentral"]:
+            # get SEcorrs and rebin
+            SEcorr = self.SEcorrs[i, j, k].Clone()
+            SEcorr.Rebin2D(2, 4)
             correlation_func = plot_TH2(
-                self.SEcorrs[i, j, k],
+                SEcorr,
                 f"Correlation Function\n{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}",
                 "$\\Delta \\eta$",
                 "$\\Delta \\phi$",
@@ -1375,12 +1547,16 @@ class PlotMixin(ABC):
                 cmap="jet",
             )  # type:ignore
             correlation_func.savefig(
-                f"{self.base_save_path}{self.epString}/CorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
+                f"{self.base_save_path}{self.epString}/CorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png",
+                dpi=300,
             )  # type:ignore
             plt.close(correlation_func)
         elif self.analysisType == "pp":
+            # get SEcorrs and rebin
+            SEcorr = self.SEcorrs[i, j].Clone()
+            SEcorr.Rebin2D(2, 4)
             correlation_func = plot_TH2(
-                self.SEcorrs[i, j],
+                SEcorr,
                 f"Correlation Function\n{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}",
                 "$\\Delta \\eta$",
                 "$\\Delta \\phi$",
@@ -1388,15 +1564,19 @@ class PlotMixin(ABC):
                 cmap="jet",
             )  # type:ignore
             correlation_func.savefig(
-                f"{self.base_save_path}{self.epString}/CorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
+                f"{self.base_save_path}{self.epString}/CorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png",
+                dpi=300,
             )  # type:ignore
             plt.close(correlation_func)
 
     @print_function_name_with_description_on_call(description="")
     def plot_ME_correlation_function(self, i, j, k):
         if self.analysisType in ["central", "semicentral"]:
+            # get MEcorrs and rebin
+            MEcorr = self.NormMEcorrs[i, j, k].Clone()
+            MEcorr.Rebin2D(2, 4)
             normMEcorrelation_function = plot_TH2(
-                self.NormMEcorrs[i, j, k],
+                MEcorr,
                 f"Normalized Mixed Event Correlation Function\n{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}",
                 "$\\Delta \\eta$",
                 "$\\Delta \\phi$",
@@ -1404,12 +1584,16 @@ class PlotMixin(ABC):
                 cmap="jet",
             )  # type:ignore
             normMEcorrelation_function.savefig(
-                f"{self.base_save_path}{self.epString}/NormalizedMixedEventCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
+                f"{self.base_save_path}{self.epString}/NormalizedMixedEventCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png",
+                dpi=300,
             )  # type:ignore
             plt.close(normMEcorrelation_function)
         elif self.analysisType == "pp":
+            # get MEcorrs and rebin
+            MEcorr = self.NormMEcorrs[i, j].Clone()
+            MEcorr.Rebin2D(2, 4)
             normMEcorrelation_function = plot_TH2(
-                self.NormMEcorrs[i, j],
+                MEcorr,
                 f"Normalized Mixed Event Correlation Function\n{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}",
                 "$\\Delta \\eta$",
                 "$\\Delta \\phi$",
@@ -1417,15 +1601,19 @@ class PlotMixin(ABC):
                 cmap="jet",
             )  # type:ignore
             normMEcorrelation_function.savefig(
-                f"{self.base_save_path}{self.epString}/NormalizedMixedEventCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
+                f"{self.base_save_path}{self.epString}/NormalizedMixedEventCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png",
+                dpi=300,
             )  # type:ignore
             plt.close(normMEcorrelation_function)
 
     @print_function_name_with_description_on_call(description="")
     def plot_acceptance_corrected_SE_correlation_function(self, i, j, k):
         if self.analysisType in ["central", "semicentral"]:
+            # get SEcorrs and rebin
+            AccCorrSEcorr = self.AccCorrectedSEcorrs[i, j, k].Clone()
+            AccCorrSEcorr.Rebin2D(2, 4)
             accCorrectedCorrelationFunction = plot_TH2(
-                self.AccCorrectedSEcorrs[i, j, k],
+                AccCorrSEcorr,
                 f"Acceptance Corrected Correlation Function\n{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}",
                 "$\\Delta \\eta$",
                 "$\\Delta \\phi$",
@@ -1433,12 +1621,16 @@ class PlotMixin(ABC):
                 cmap="jet",
             )  # type:ignore
             accCorrectedCorrelationFunction.savefig(
-                f"{self.base_save_path}{self.epString}/AcceptanceCorrectedCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
+                f"{self.base_save_path}{self.epString}/AcceptanceCorrectedCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png",
+                dpi=300,
             )  # type:ignore
             plt.close(accCorrectedCorrelationFunction)
         elif self.analysisType == "pp":
+            # get SEcorrs and rebin
+            AccCorrSEcorr = self.AccCorrectedSEcorrs[i, j].Clone()
+            AccCorrSEcorr.Rebin2D(2, 4)
             accCorrectedCorrelationFunction = plot_TH2(
-                self.AccCorrectedSEcorrs[i, j],
+                AccCorrSEcorr,
                 f"Acceptance Corrected Correlation Function\n{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}",
                 "$\\Delta \\eta$",
                 "$\\Delta \\phi$",
@@ -1447,15 +1639,19 @@ class PlotMixin(ABC):
             )  # type:ignore
 
             accCorrectedCorrelationFunction.savefig(
-                f"{self.base_save_path}{self.epString}/AcceptanceCorrectedCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
+                f"{self.base_save_path}{self.epString}/AcceptanceCorrectedCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png",
+                dpi=300,
             )  # type:ignore
             plt.close(accCorrectedCorrelationFunction)
 
     @print_function_name_with_description_on_call(description="")
     def plot_normalized_acceptance_corrected_correlation_function(self, i, j, k):
         if self.analysisType in ["central", "semicentral"]:
+            # get SEcorrs and rebin
+            NormAccCorrectedSEcorr = self.NormAccCorrectedSEcorrs[i, j, k].Clone()
+            NormAccCorrectedSEcorr.Rebin2D(2, 4)
             normAccCorrectedCorrelationFunction = plot_TH2(
-                self.NormAccCorrectedSEcorrs[i, j, k],
+                NormAccCorrectedSEcorr,
                 f"Normalized Acceptance Corrected Correlation Function\n{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}",
                 "$\\Delta \\eta$",
                 "$\\Delta \\phi$",
@@ -1463,12 +1659,16 @@ class PlotMixin(ABC):
                 cmap="jet",
             )  # type:ignore
             normAccCorrectedCorrelationFunction.savefig(
-                f"{self.base_save_path}{self.epString}/NormalizedAcceptanceCorrectedCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
+                f"{self.base_save_path}{self.epString}/NormalizedAcceptanceCorrectedCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png",
+                dpi=300,
             )  # type:ignore
             plt.close(normAccCorrectedCorrelationFunction)
         elif self.analysisType == "pp":
+            # get SEcorrs and rebin
+            NormAccCorrectedSEcorr = self.NormAccCorrectedSEcorrs[i, j].Clone()
+            NormAccCorrectedSEcorr.Rebin2D(2, 4)
             normAccCorrectedCorrelationFunction = plot_TH2(
-                self.NormAccCorrectedSEcorrs[i, j],
+                NormAccCorrectedSEcorr,
                 f"Normalized Acceptance Corrected Correlation Function\n{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}",
                 "$\\Delta \\eta$",
                 "$\\Delta \\phi$",
@@ -1477,7 +1677,8 @@ class PlotMixin(ABC):
             )  # type:ignore
 
             normAccCorrectedCorrelationFunction.savefig(
-                f"{self.base_save_path}{self.epString}/NormalizedAcceptanceCorrectedCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
+                f"{self.base_save_path}{self.epString}/NormalizedAcceptanceCorrectedCorrelationFunction{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png",
+                dpi=300,
             )  # type:ignore
             plt.close(normAccCorrectedCorrelationFunction)
 
@@ -1859,7 +2060,7 @@ class PlotMixin(ABC):
             norm_errorsNS = self.BGSubtractedAccCorrectedSEdPhiSigNScorrsminVals[i, j]
             # set pt ep angle bin
             self.set_pT_epAngle_bin(i, j, k)
-            
+
             dPhiSigminusBGNSax.fill_between(
                 x_binsNS,
                 bin_contentNS - norm_errorsNS,
@@ -2319,7 +2520,7 @@ class PlotMixin(ABC):
     ):
         self.set_pT_epAngle_bin(i, j, k)
 
-        N_trig = self.N_trigs[i,j,k] # self.get_N_trig()
+        N_trig = self.get_N_trig()
         self.set_pT_epAngle_bin(i, j, 3)
 
         if self.analysisType in ["central", "semicentral"]:
@@ -2368,11 +2569,11 @@ class PlotMixin(ABC):
                 bin_contentNormINC - BGErrorINC[:, k] / N_trig
                 if k != 3
                 else bin_contentNormINC
-                - np.sqrt(np.sum((BGErrorINC) ** 2, axis=1) / 9) / N_trig,
+                - np.sqrt(np.sum((BGErrorINC) ** 2, axis=1) ) / N_trig,
                 bin_contentNormINC + BGErrorINC[:, k] / N_trig
                 if k != 3
                 else bin_contentNormINC
-                + np.sqrt(np.sum(BGErrorINC**2, axis=1) / 9) / N_trig,
+                + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / N_trig,
                 alpha=0.5,
                 color="green",
                 label="RPF fit",
@@ -2396,6 +2597,7 @@ class PlotMixin(ABC):
             dPhiSigminusBGNormINCax.set_title(
                 f"Normalized Background subtracted $\\Delta \\phi${self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}"
             )  # type:ignore
+            dPhiSigminusBGNormINC.tight_layout()
             dPhiSigminusBGNormINC.savefig(
                 f"{self.base_save_path}{self.epString}/dPhiSig-BG-Norm{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
             )  # type:ignore
@@ -2412,11 +2614,11 @@ class PlotMixin(ABC):
                 bin_contentNormINC - BGErrorINC[:, k] / N_trig
                 if k != 3
                 else bin_contentNormINC
-                - np.sqrt(np.sum(BGErrorINC**2, axis=1) / 9) / N_trig,
+                - np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / N_trig,
                 bin_contentNormINC + BGErrorINC[:, k] / N_trig
                 if k != 3
                 else bin_contentNormINC
-                + np.sqrt(np.sum(BGErrorINC**2, axis=1) / 9) / N_trig,
+                + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / N_trig,
                 alpha=0.5,
                 color="green",
                 label="RPF fit",
@@ -2507,6 +2709,7 @@ class PlotMixin(ABC):
             dPhiSigminusBGNormINCax.set_title(
                 f"Normalized background subtracted $\\Delta \\phi${self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}"
             )  # type:ignore
+            dPhiSigminusBGNormINC.tight_layout()
             dPhiSigminusBGNormINC.savefig(
                 f"{self.base_save_path}{self.epString}/dPhiSig-BG-Norm{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
             )  # type:ignore
@@ -2544,7 +2747,10 @@ class PlotMixin(ABC):
     def plot_normalized_background_subtracted_dPhi_for_species(
         self, i, j, k, species, axSigminusBGNormINCSpecies, BGErrorINC
     ):
+        self.set_pT_epAngle_bin(i, j, k)
 
+        N_trig = self.get_N_trig()
+        self.set_pT_epAngle_bin(i, j, 3)
         if self.analysisType in ["central", "semicentral"]:
             dPhiSigminusBGNormINC, dPhiSigminusBGNormINCax = plt.subplots(
                 1, 1, figsize=(10, 6)
@@ -2615,6 +2821,7 @@ class PlotMixin(ABC):
             dPhiSigminusBGNormINCax.set_title(
                 f"Normalized Background subtracted $\\Delta \\phi${self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}"
             )  # type:ignore
+            dPhiSigminusBGNormINC.tight_layout()
             dPhiSigminusBGNormINC.savefig(
                 f"{self.base_save_path}{self.epString}/dPhiSig-BG-Norm{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
             )  # type:ignore
@@ -2728,6 +2935,7 @@ class PlotMixin(ABC):
             dPhiSigminusBGNormINCax.set_title(
                 f"Normalized background subtracted $\\Delta \\phi${self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}"
             )  # type:ignore
+            dPhiSigminusBGNormINC.tight_layout()
             dPhiSigminusBGNormINC.savefig(
                 f"{self.base_save_path}{self.epString}/dPhiSig-BG-Norm{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}.png"
             )  # type:ignore
@@ -2787,12 +2995,14 @@ class PlotMixin(ABC):
             N_trigs = np.array(N_trigs)
             N_trigs = N_trigs + 1e-4
             if self.analysisType in ["central", "semicentral"]:  # type:ignore
+                
                 n_bins = (
                     self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs[i, j, 3]
                     .GetXaxis()
                     .GetNbins()
                 )  # type:ignore
                 x_bins = np.zeros(n_bins)
+                per_bin_RPF_error = np.zeros((n_bins, len(self.pTassocBinCenters)))
                 for l in range(n_bins):
                     x_bins[l] = (
                         self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs[i, j, 3]
@@ -2800,7 +3010,7 @@ class PlotMixin(ABC):
                         .GetBinCenter(l + 1)
                     )  # type:ignore
                 for l in range(n_bins):
-                    per_bin_RPF_error = [
+                    per_bin_RPF_error[l] = [
                         np.sqrt(
                             np.sum(
                                 self.RPFObjs[i, j].simultaneous_fit_err(
@@ -2810,15 +3020,19 @@ class PlotMixin(ABC):
                                 )
                                 ** 2
                             )
-                            / 9
                         )
                         / N_trigs[j]
                         for j in range(len(self.pTassocBinCenters))
                     ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
+                per_bin_sig_to_inc_ratio = [
+                    np.sum([self.get_bin_contents_as_array(self.dPhiSigcorrsForSpecies[species][i,j,k], forFitting=False) / self.get_bin_contents_as_array(self.dPhiSigcorrs[i,j,k], forFitting=False) for k in range(4)]) for j in range(len(self.pTassocBinCenters)) # type:ignore 
+                ] # type:ignore
                 RPFError = [
-                    np.sum(per_bin_RPF_error[j])
+                    np.sum(per_bin_RPF_error[j]*per_bin_sig_to_inc_ratio[j])
                     for j in range(len(self.pTassocBinCenters))
                 ]  # type:ignore
+
+
                 axYield.fill_between(
                     self.pTassocBinCenters,
                     np.array(self.Yields[species][i, :], dtype=float) - RPFError,
@@ -2870,6 +3084,7 @@ class PlotMixin(ABC):
                 )  # type:ignore
 
         axYield.legend()
+        yieldFig.tight_layout()
         yieldFig.savefig(f"{self.base_save_path}Yield_{species}.png")  # type:ignore
         plt.close(yieldFig)
 
@@ -2977,6 +3192,7 @@ class PlotMixin(ABC):
                     label="ME normalization" if i == 2 else "",
                 )  # type:ignore
         axYieldNS.legend()
+        yieldFigNS.tight_layout()
         yieldFigNS.savefig(f"{self.base_save_path}YieldNS_{species}.png")  # type:ignore
         plt.close(yieldFigNS)
 
@@ -3085,6 +3301,7 @@ class PlotMixin(ABC):
                     label="ME normalization" if i == 2 else "",
                 )  # type:ignore
         axYieldAS.legend()
+        yieldFigAS.tight_layout()
         yieldFigAS.savefig(f"{self.base_save_path}YieldAS_{species}.png")  # type:ignore
         plt.close(yieldFigAS)
 

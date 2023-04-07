@@ -14,7 +14,7 @@ class RPF:
         self.simultaneous_fit_err = lambda dPhi, dPhiErr, B, v1, v2, v3, v4, va2, va4: np.hstack([self.in_plane_err(dPhi, dPhiErr, B, v1, v2, v3, v4, va2, va4), self.mid_plane_err(dPhi, dPhiErr, B, v1, v2, v3, v4, va2, va4), self.out_of_plane_err(dPhi, dPhiErr, B, v1, v2, v3, v4, va2, va4)])
         # 9 params in fit
         self.p0 = p0 # B, v1, v2, v3, v4, va2, va4
-        self.bounds = [[0.0, -2.0, -0.2, -0.1, -0.1, 0.005, 0.0], [1e6, 2.0, 0.2, 0.1, 0.10, 0.10, 0.10]] # B, v1, v2, v3, v4, va2, va4
+        self.bounds = [[0.0, -0.0001, -0.2, -0.2, -0.1, 0.0005, 0.0], [1e6, 0.0001, 0.2, 0.1, 0.10, 0.40, 0.10]] # B, v1, v2, v3, v4, va2, va4
         self.popt = None
         self.pcov = np.zeros((7,7))
         self.chi2OverNDF = None
@@ -142,12 +142,10 @@ class RPF:
 
     def fit(self, x, y, yerr):
         from scipy.optimize import curve_fit
-        try:
-            popt, pcov = curve_fit(self.simultaneous_fit, x, y, sigma=[yerr_i or 1 for yerr_i in yerr], p0=self.p0, bounds=self.bounds,absolute_sigma=False)
-        except RuntimeError:
-            print("RuntimeError")
-            popt = self.p0
-            pcov = np.zeros((len(self.p0), len(self.p0)))
+
+        popt, pcov = curve_fit(self.simultaneous_fit, x, y, sigma=[yerr_i or 1 for yerr_i in yerr], p0=self.p0, bounds=self.bounds,absolute_sigma=True, maxfev=1000000)
+
+
         NDF = len(y) - len(popt) - 1
         chi2 = []
         for i in range(len(x)):

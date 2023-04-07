@@ -389,7 +389,6 @@ class AnalysisMixin:
         # rebin dPhi
         if rebin:
             dPhi = dPhi.Rebin(2)
-        del tempHist
         return dPhi.Clone()
 
     def get_dPhi_projection_in_dEta_dpionTPCnSigma_range(
@@ -417,7 +416,6 @@ class AnalysisMixin:
         # rebin dPhi
         if rebin:
             dPhi = dPhi.Rebin(2)
-        del tempHist
         return dPhi.Clone()
 
     def get_dPhi_dpionTPCnSigma_projection_in_dEta_range(
@@ -445,7 +443,6 @@ class AnalysisMixin:
         # rebin dPhi
         if rebin:
             dPhidpionTPCnSigma = dPhidpionTPCnSigma.RebinX(2)
-        del tempHist
         return dPhidpionTPCnSigma.Clone()
 
     def get_dEta_projection_NS(self):
@@ -455,7 +452,6 @@ class AnalysisMixin:
         tempHist = self.get_acceptance_corrected_correlation_function()
         tempHist.GetYaxis().SetRangeUser(-np.pi / 2, np.pi / 2)
         dEta = tempHist.ProjectionX().Clone()
-        del tempHist
         return dEta
 
     def get_BG_subtracted_AccCorrectedSEdPhiSigNScorr(self, i, j, k):
@@ -684,7 +680,7 @@ class AnalysisMixin:
                 dPhiBGRPFErr = dPhiBGRPFErrs[:, k]  # type:ignore
 
             if k == 3:
-                dPhiBGRPF = np.array(np.sum(dPhiBGRPFs, axis=1)) / 3
+                dPhiBGRPF = np.array(np.sum(dPhiBGRPFs, axis=1)) 
                 dPhiBGRPFErr = np.array(np.sqrt(np.sum(dPhiBGRPFErrs**2, axis=1)))
             if k not in [0, 1, 2, 3]:
                 raise Exception(f"k must be 0, 1, 2, or 3, got {k=}")
@@ -708,7 +704,7 @@ class AnalysisMixin:
 
             BGSubtracteddPhiSigHist.Sumw2()
             # get the number of triggers
-            N_trig = self.N_trigs[i,k]# self.get_N_trig()
+            N_trig = self.get_N_trig()
             # normalize the dPhi distribution
             BGSubtracteddPhiSigHist.Scale(1 / N_trig)  # type:ignore
             # return the background subtracted signal
@@ -736,7 +732,7 @@ class AnalysisMixin:
             # return the background subtracted signal
             BGSubtracteddPhiSigHist.Sumw2()
             # get the number of triggers
-            N_trig = self.N_trigs[i] # self.get_N_trig()
+            N_trig = self.get_N_trig()
             # normalize the dPhi distribution
             BGSubtracteddPhiSigHist.Scale(1 / N_trig)  # type:ignore
             # return the background subtracted signal
@@ -812,8 +808,12 @@ class AnalysisMixin:
             BGSubtracteddPhiSig = dPhiSigBinContents - dPhiBGRPF * (
                 dPhiSigBinContents / dPhiSigInclusiveBinContents
             )
+
+            dPhiSigErr = (1-dPhiBGRPF/dPhiSigInclusiveBinContents)**2*dPhiSigBinErrors**2
+            dPhiBGRPFErr = (dPhiSigBinContents/dPhiSigInclusiveBinContents)**2*dPhiBGRPFErr**2
+            dPhiSigInclusiveErr = (dPhiBGRPF*dPhiSigBinContents/dPhiSigInclusiveBinContents**2)**2*dPhiSigInclusiveBinErrors**2
             # get the error on the background subtracted signal
-            BGSubtracteddPhiSigErr = np.sqrt(dPhiSigBinErrors**2)
+            BGSubtracteddPhiSigErr = np.sqrt(dPhiSigErr + dPhiSigInclusiveErr)
 
             # create a new histogram to hold the background subtracted signal
             BGSubtracteddPhiSigHist = TH1D(
@@ -830,7 +830,7 @@ class AnalysisMixin:
 
             BGSubtracteddPhiSigHist.Sumw2()
             # get the number of triggers
-            N_trig = self.N_trigs[i,k] # self.get_N_trig()
+            N_trig = self.get_N_trig()
             # normalize the dPhi distribution
             BGSubtracteddPhiSigHist.Scale(1 / N_trig)  # type:ignore
             # return the background subtracted signal
@@ -861,7 +861,7 @@ class AnalysisMixin:
             # return the background subtracted signal
             BGSubtracteddPhiSigHist.Sumw2()
             # get the number of triggers
-            N_trig = self.N_trigs[i] # self.get_N_trig()
+            N_trig = self.get_N_trig()
             # normalize the dPhi distribution
             BGSubtracteddPhiSigHist.Scale(1 / N_trig)  # type:ignore
             # return the background subtracted signal
@@ -899,7 +899,7 @@ class AnalysisMixin:
         """
         if self.analysisType in ["central", "semicentral"]:  # type:ignore
             # get the normalized background subtracted dPhi distribution for a given species
-            BGSubtracteddPhiSigdpionTPCnSigmaHist = (
+            BGSubtracteddPhiSigHist = (
                 self.get_normalized_background_subtracted_dPhi_for_species(
                     i, j, k, species
                 )
@@ -907,24 +907,24 @@ class AnalysisMixin:
         elif self.analysisType == "pp":  # type:ignore
             # get the normalized background subtracted dPhi distribution for a given species
             (
-                BGSubtracteddPhiSigdpionTPCnSigmaHist,
+                BGSubtracteddPhiSigHist,
                 minValErr,
             ) = self.get_normalized_background_subtracted_dPhi_for_species(
                 i, j, k, species
             )  # type:ignore
         # get the yield for a given species
-        bin_width = BGSubtracteddPhiSigdpionTPCnSigmaHist.GetBinWidth(1)
+        bin_width = BGSubtracteddPhiSigHist.GetBinWidth(1)
         if region is None:
             yield_ = np.sum(
-                BGSubtracteddPhiSigdpionTPCnSigmaHist.GetBinContent(l) * bin_width
-                for l in range(1, BGSubtracteddPhiSigdpionTPCnSigmaHist.GetNbinsX() + 1)
+                BGSubtracteddPhiSigHist.GetBinContent(l) * bin_width
+                for l in range(1, BGSubtracteddPhiSigHist.GetNbinsX() + 1)
             )
             yield_err_ = np.sqrt(
                 np.sum(
-                    (BGSubtracteddPhiSigdpionTPCnSigmaHist.GetBinError(l) * bin_width)
+                    (BGSubtracteddPhiSigHist.GetBinError(l) * bin_width)
                     ** 2
                     for l in range(
-                        1, BGSubtracteddPhiSigdpionTPCnSigmaHist.GetNbinsX() + 1
+                        1, BGSubtracteddPhiSigHist.GetNbinsX() + 1
                     )
                 )
             )
@@ -933,18 +933,18 @@ class AnalysisMixin:
             (
                 low_bin,
                 high_bin,
-            ) = BGSubtracteddPhiSigdpionTPCnSigmaHist.GetXaxis().FindBin(
+            ) = BGSubtracteddPhiSigHist.GetXaxis().FindBin(
                 self.dPhiSigNS[0]
-            ), BGSubtracteddPhiSigdpionTPCnSigmaHist.GetXaxis().FindBin(
+            ), BGSubtracteddPhiSigHist.GetXaxis().FindBin(
                 self.dPhiSigNS[1]
             )
             yield_ = np.sum(
-                BGSubtracteddPhiSigdpionTPCnSigmaHist.GetBinContent(l) * bin_width
+                BGSubtracteddPhiSigHist.GetBinContent(l) * bin_width
                 for l in range(low_bin, high_bin + 1)
             )
             yield_err_ = np.sqrt(
                 np.sum(
-                    (BGSubtracteddPhiSigdpionTPCnSigmaHist.GetBinError(l) * bin_width)
+                    (BGSubtracteddPhiSigHist.GetBinError(l) * bin_width)
                     ** 2
                     for l in range(low_bin, high_bin + 1)
                 )
@@ -953,18 +953,18 @@ class AnalysisMixin:
             (
                 low_bin,
                 high_bin,
-            ) = BGSubtracteddPhiSigdpionTPCnSigmaHist.GetXaxis().FindBin(
+            ) = BGSubtracteddPhiSigHist.GetXaxis().FindBin(
                 self.dPhiSigAS[0]
-            ), BGSubtracteddPhiSigdpionTPCnSigmaHist.GetXaxis().FindBin(
+            ), BGSubtracteddPhiSigHist.GetXaxis().FindBin(
                 self.dPhiSigAS[1]
             )
             yield_ = np.sum(
-                BGSubtracteddPhiSigdpionTPCnSigmaHist.GetBinContent(l) * bin_width
+                BGSubtracteddPhiSigHist.GetBinContent(l) * bin_width
                 for l in range(low_bin, high_bin + 1)
             )
             yield_err_ = np.sqrt(
                 np.sum(
-                    (BGSubtracteddPhiSigdpionTPCnSigmaHist.GetBinError(l) * bin_width)
+                    (BGSubtracteddPhiSigHist.GetBinError(l) * bin_width)
                     ** 2
                     for l in range(low_bin, high_bin + 1)
                 )

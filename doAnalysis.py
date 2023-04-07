@@ -1,8 +1,8 @@
-# The entire data flow for my analysis 
+# The entire data flow for my analysis
 
 # 1. Read in the data
 
-# The data are stored in a ROOT file AnalysisResults.root 
+# The data are stored in a ROOT file AnalysisResults.root
 
 # The central data are stored in an AliEmcalList called AliAnalysisTaskJetH_tracks_caloClusters_dEdxtrackBias5R2Centralq
 
@@ -14,7 +14,7 @@
 
 # 2. Subtract mixed event data from central data over dEta, dPhi
 
-# This should be the correlation function 
+# This should be the correlation function
 
 # store the correlation function in a THnSparse called fhnJHCorr along with the associated track data
 
@@ -25,79 +25,144 @@ import ROOT
 from JetHadron import JetHadron
 from RPF import RPF
 from matplotlib.colors import LogNorm
-from itertools import product    
+from itertools import product
 from fpdf import FPDF
 from templateFit import templateFit
 
- 
-fhnJH_axis_labels = {key:val for key, val in enumerate(['V0 centrality (%)', 'Jet p_{T}', 'Track p_{T}', '#Delta#eta', '#Delta#phi', 'Leading Jet', 'Event plane angle','TPC Pion Signal Delta'])}
-fhnMixedEvent_axis_labels = {key:val for key, val in enumerate(['V0 centrality (%)', 'Jet p_{T}', 'Track p_{T}', '#Delta#eta', '#Delta#phi', 'Leading Jet', 'Event plane angle', 'Z vertex (cm)', 'deltaR'])}
-fhnTrigger_axis_labels = {key:val for key, val in enumerate(['V0 centrality (%)', 'Jet p_{T}', 'Event plane angle'])}
+
+fhnJH_axis_labels = {
+    key: val
+    for key, val in enumerate(
+        [
+            "V0 centrality (%)",
+            "Jet p_{T}",
+            "Track p_{T}",
+            "#Delta#eta",
+            "#Delta#phi",
+            "Leading Jet",
+            "Event plane angle",
+            "TPC Pion Signal Delta",
+        ]
+    )
+}
+fhnMixedEvent_axis_labels = {
+    key: val
+    for key, val in enumerate(
+        [
+            "V0 centrality (%)",
+            "Jet p_{T}",
+            "Track p_{T}",
+            "#Delta#eta",
+            "#Delta#phi",
+            "Leading Jet",
+            "Event plane angle",
+            "Z vertex (cm)",
+            "deltaR",
+        ]
+    )
+}
+fhnTrigger_axis_labels = {
+    key: val
+    for key, val in enumerate(["V0 centrality (%)", "Jet p_{T}", "Event plane angle"])
+}
 import pickle
 from os.path import exists
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def get_bin_contents_as_array(th1, forFitting=True):
     bin_contents = []
-    for i in range(1, th1.GetNbinsX()+1):
-        if (th1.GetBinCenter(i) < -np.pi/2 or th1.GetBinCenter(i) > np.pi/2) and forFitting:
+    for i in range(1, th1.GetNbinsX() + 1):
+        if (
+            th1.GetBinCenter(i) < -np.pi / 2 or th1.GetBinCenter(i) > np.pi / 2
+        ) and forFitting:
             continue
         bin_contents.append(th1.GetBinContent(i))
     return bin_contents
 
+
 def get_bin_centers_as_array(th1, forFitting=True):
     bin_centers = []
-    for i in range(1, th1.GetNbinsX()+1):
-        if (th1.GetBinCenter(i) < -np.pi/2 or th1.GetBinCenter(i) > np.pi/2) and forFitting:
+    for i in range(1, th1.GetNbinsX() + 1):
+        if (
+            th1.GetBinCenter(i) < -np.pi / 2 or th1.GetBinCenter(i) > np.pi / 2
+        ) and forFitting:
             continue
         bin_centers.append(th1.GetBinCenter(i))
     return bin_centers
 
+
 def get_bin_errors_as_array(th1, forFitting=True):
     bin_errors = []
-    for i in range(1, th1.GetNbinsX()+1):
-        
-        if (th1.GetBinCenter(i) < -np.pi/2 or th1.GetBinCenter(i) > np.pi/2) and forFitting:
+    for i in range(1, th1.GetNbinsX() + 1):
+
+        if (
+            th1.GetBinCenter(i) < -np.pi / 2 or th1.GetBinCenter(i) > np.pi / 2
+        ) and forFitting:
             continue
         bin_errors.append(th1.GetBinError(i))
     return bin_errors
 
-if __name__=="__main__":
-    flist = [ROOT.TFile(f'/home/steffanic/Projects/Thesis/TrainOutputq/AnalysisResults_alihaddcomp0{i}.root') for i in range(1,8)]
-    fpplist = [ROOT.TFile('/home/steffanic/Projects/Thesis/TrainOutputpp/AnalysisResults.root')]
+
+train_output_r_filenames = [
+    "/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_296690_merged.root",
+    "/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_296794_merged.root",
+    "/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_296894_merged.root",
+    "/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_296941_merged.root",
+    "/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_297031_merged.root",
+    "/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_297085_merged.root",
+    "/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_297118_merged.root",
+    "/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_297129_merged.root",
+    "/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_297372_merged.root",
+    "/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_297415_merged.root",
+    "/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_297441_merged.root",
+    "/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_297446_merged.root",
+    "/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_297479_merged.root",
+    "/home/steffanic/Projects/Thesis/TrainOutputr/AnalysisResults_297544_merged.root",
+]
+
+
+if __name__ == "__main__":
+    # turn off ROOT's automatic garbage collection
+    ROOT.TH1.AddDirectory(False)
+    flist = [
+        f"/home/steffanic/Projects/Thesis/TrainOutputq/AnalysisResults_alihaddcomp0{i}.root"
+        for i in range(1, 8)
+    ]  + train_output_r_filenames
+    fpplist = ["/home/steffanic/Projects/Thesis/TrainOutputpp/AnalysisResults.root"]
     DO_PP = True
     DO_CENTRAL = True
     DO_SEMI_CENTRAL = True
-    DO_PLOTTING=True
-
+    DO_PLOTTING = False
+    DO_PICKLING = False
 
     if DO_PP:
-        if exists('jhAnapp.pickle'):
-            jhAnapp = pickle.load(open('jhAnapp.pickle', 'rb'))
+        if exists("jhAnapp.pickle"):
+            jhAnapp = pickle.load(open("jhAnapp.pickle", "rb"))
         else:
-            jhAnapp = JetHadron(fpplist, 'pp')
-            #save a pickle file of the analysis object
-            with open('jhAnapp.pickle', 'wb') as handle:
-                pickle.dump(jhAnapp, handle, protocol=pickle.HIGHEST_PROTOCOL)
-                
+            jhAnapp = JetHadron(fpplist, "pp")
+            # save a pickle file of the analysis object
+            if DO_PICKLING:
+                with open("jhAnapp.pickle", "wb") as handle:
+                    pickle.dump(jhAnapp, handle, protocol=pickle.HIGHEST_PROTOCOL)
         if DO_PLOTTING:
             jhAnapp.plot_everything()
 
     if DO_CENTRAL:
-        if exists('jhAnaCentral.pickle'):
-            jhAnaCentral = pickle.load(open('jhAnaCentral.pickle', 'rb'))
+        if exists("jhAnaCentral.pickle"):
+            jhAnaCentral = pickle.load(open("jhAnaCentral.pickle", "rb"))
         else:
-            jhAnaCentral = JetHadron(flist, 'central')
-            #save a pickle file of the analysis object
-            with open('jhAnaCentral.pickle', 'wb') as handle:
-                pickle.dump(jhAnaCentral, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        
+            jhAnaCentral = JetHadron(flist, "central")
+            # save a pickle file of the analysis object
+            if DO_PICKLING:
+                with open("jhAnaCentral.pickle", "wb") as handle:
+                    pickle.dump(jhAnaCentral, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
         if not jhAnaCentral.RPFObjs.all():
             jhAnaCentral.fit_RPFs()
-        
-        
-        '''
+
+        """
         for i in range(len(jhAnaCentral.pTtrigBinEdges)-1):
             for j in range(len(jhAnaCentral.pTassocBinEdges)-1):
                 print(f"Fitting {i}, {j}")
@@ -110,15 +175,14 @@ if __name__=="__main__":
                 xdata = xdata[negative_supression_mask]
                 tF = templateFit(jhAnaCentral.pTassocBinEdges[j])
                 tF.fit_sum_of_gaussians(xdata, ydata, yerr, title="$\\Delta_{\\pi}$" + f" for {jhAnaCentral.pTtrigBinEdges[i]}-{jhAnaCentral.pTtrigBinEdges[i+1]}, {jhAnaCentral.pTassocBinEdges[j]}-{jhAnaCentral.pTassocBinEdges[j+1]}")
-        '''
+        """
         if DO_PLOTTING:
             jhAnaCentral.plot_everything()
-        for i in range(len(jhAnaCentral.pTtrigBinEdges)-1):
-            for j in range(len(jhAnaCentral.pTassocBinEdges)-1):
-                for k in range(4):
-                    jhAnaCentral.plot_dPhi_against_pp_reference(jhAnapp, i,j)
+        for i in range(len(jhAnaCentral.pTtrigBinEdges) - 1):
+            for j in range(len(jhAnaCentral.pTassocBinEdges) - 1):
+                jhAnaCentral.plot_dPhi_against_pp_reference(jhAnapp, i, j)
 
-        '''
+        """
         pdf = FPDF("L", "in", "Letter")
         pdf.set_margins(0, 0, 0)
         base_path = '/home/steffanic/Projects/Thesis/backend_output/'
@@ -126,28 +190,29 @@ if __name__=="__main__":
             pdf.add_page()
             pdf.image(image, x=0, y=0, w=11, h=3.66)
         pdf.output(base_path + 'central.pdf')
-        '''
-        
-    
+        """
+
     if DO_SEMI_CENTRAL:
-        if exists('jhAnaSemiCentral.pickle'):
-            jhAnaSemiCentral = pickle.load(open('jhAnaSemiCentral.pickle', 'rb'))
+        if exists("jhAnaSemiCentral.pickle"):
+            jhAnaSemiCentral = pickle.load(open("jhAnaSemiCentral.pickle", "rb"))
         else:
-            jhAnaSemiCentral = JetHadron(flist, 'semicentral')
-            #save a pickle file of the analysis object
-            with open('jhAnaSemiCentral.pickle', 'wb') as handle:
-                pickle.dump(jhAnaSemiCentral, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        
+            jhAnaSemiCentral = JetHadron(flist, "semicentral")
+            # save a pickle file of the analysis object
+            if DO_PICKLING:
+                with open("jhAnaSemiCentral.pickle", "wb") as handle:
+                    pickle.dump(
+                        jhAnaSemiCentral, handle, protocol=pickle.HIGHEST_PROTOCOL
+                    )
+
         if not jhAnaSemiCentral.RPFObjs.all():
             jhAnaSemiCentral.fit_RPFs()
 
         if DO_PLOTTING:
             jhAnaSemiCentral.plot_everything()
-        for i in range(len(jhAnaSemiCentral.pTtrigBinEdges)-1):
-            for j in range(len(jhAnaSemiCentral.pTassocBinEdges)-1):
-                for k in range(4):
-                    jhAnaSemiCentral.plot_dPhi_against_pp_reference(jhAnapp, i,j)
-        '''
+        for i in range(len(jhAnaSemiCentral.pTtrigBinEdges) - 1):
+            for j in range(len(jhAnaSemiCentral.pTassocBinEdges) - 1):
+                jhAnaSemiCentral.plot_dPhi_against_pp_reference(jhAnapp, i, j)
+        """
         pdf = FPDF("L", "in", "Letter")
         pdf.set_margins(0, 0, 0)
         base_path = '/home/steffanic/Projects/Thesis/backend_output/'
@@ -155,7 +220,4 @@ if __name__=="__main__":
             pdf.add_page()
             pdf.image(image, x=0, y=0, w=11, h=3.66)
         pdf.output(base_path + 'semicentral.pdf')
-        '''
-
-        
-
+        """

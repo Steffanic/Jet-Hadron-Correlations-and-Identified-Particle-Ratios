@@ -2,8 +2,9 @@ from collections import defaultdict
 from itertools import product
 from typing import Optional
 import numpy as np
-
+import ROOT
 import matplotlib.pyplot as plt
+from functools import partial
 
 
 from time import time
@@ -44,10 +45,12 @@ class JetHadron(
     Class to track and contain all the steps along the way of my analysis for one centrality class
     """
 
-    def __init__(self, rootFiles: list, analysisType, fill_on_init=True):
+    def __init__(self, rootFileNames: list, analysisType, fill_on_init=True):
         """
         Initializes the location to save plots and grabs the main components of the rootFile
         """
+        # turn off ROOT's automatic garbage collection
+        ROOT.TH1.AddDirectory(False)
         assert analysisType in ["central", "semicentral", "pp"]
         self.analysisType = analysisType
         self.base_save_path = (
@@ -55,24 +58,26 @@ class JetHadron(
         )
         # let's turn the sparses into lists of sparses to use all files
         self.JH, self.MixedEvent, self.Trigger = [], [], []
-        self.EventPlaneAngleHist = None
-        for file in rootFiles:
+        self.EventPlaneAngleHist = []
+        first = True
+        for filename in rootFileNames:
+            print(f"Loading file {filename}")
+            file = ROOT.TFile(filename)
             fileJH, fileME, fileT = self.get_sparses(file)
             self.JH.append(fileJH)
             self.MixedEvent.append(fileME)
             self.Trigger.append(fileT)
-            if self.EventPlaneAngleHist is None:
-                self.EventPlaneAngleHist = self.get_event_plane_angle_hist(file)
-            else:
-                self.EventPlaneAngleHist.Add(self.get_event_plane_angle_hist(file))
+            if self.analysisType in ["central", "semicentral"]:
+                self.EventPlaneAngleHist.append(self.get_event_plane_angle_hist(file))
 
+        print("Finished loading files")
         self.assert_sparses_filled()
-
+        
         # define pT bins
         # see http://cds.cern.ch/record/1381321/plots#1 for motivation
         self.pTassocBinEdges = [
-            0.15,
-            0.5,
+            # 0.15,
+            # 0.5,
             1.0,
             1.5,
             2.0,
@@ -83,8 +88,8 @@ class JetHadron(
             10.0,
         ]  # start at 500 MeV, feels like the average background level
         self.pTassocBinCenters = [
-            0.325,
-            0.75,
+            # 0.325,
+            # 0.75,
             1.25,
             1.75,
             2.5,
@@ -94,8 +99,8 @@ class JetHadron(
             8.0,
         ]  # subject to change based on statistics
         self.pTassocBinWidths = [
-            0.35,
-            0.5,
+            # 0.35,
+            # 0.5,
             0.5,
             0.5,
             1,
@@ -104,8 +109,37 @@ class JetHadron(
             1,
             4,
         ]  # subject to change based on statistics
-        self.pTtrigBinEdges = [10, 20, 40, 100]  # subject to change based on statistics
-
+        self.pTtrigBinEdges = [
+            # 10,
+            20,
+            40,
+            60,
+        ]  # subject to change based on statistics
+        self.pTtrigBinCenters = [
+            # 15,
+            30,
+            50,
+        ]  # subject to change based on statistics
+        self.pTtrigBinWidths = [
+            # 10,
+            20,
+            20,
+        ]  # subject to change based on statistics
+        self.central_p0s = {(i,j):[1, 0, 0.02, 0.005, 0.02, 0.05, 0.03,] for i in range(len(self.pTtrigBinCenters)) for j in range(len(self.pTassocBinCenters))}
+        self.central_p0s[(0,0)] = [100042.8, 1e-10, 0.0473, -.000306, 0.02, 0.0513, 0.03,] # pTtrig 20-40, pTassoc 1.0-1.5   
+        self.central_p0s[(0,1)] = [40000.19, 1e-10, 0.0402, -0.0058, 0.02, 0.0906, 0.03,] # pTtrig 20-40, pTassoc 1.5-2.0
+        self.central_p0s[(0,2)] = [4006.86, 1e-10, 0.0414, 0.0015, 0.02, 0.1034, 0.03,] # pTtrig 20-40, pTassoc 2.0-3.0
+        self.central_p0s[(0,3)] = [56.84, 1e-10, 0.0636, -0.00766, 0.02, 0.1237, 0.03,] # pTtrig 20-40, pTassoc 3.0-4.0
+        self.central_p0s[(0,4)] = [8.992, 1e-10, 0.1721, -0.0987, 0.02, 0.233, 0.03,] # pTtrig 20-40, pTassoc 4.0-5.0
+        self.central_p0s[(0,5)] = [2.318, 1e-10, -0.0508, -0.143, 0.02, 0.0876, 0.03,] # pTtrig 20-40, pTassoc  5.0-6.0
+        self.central_p0s[(0,6)] = [2.076, 1e-10, -0.0886, 0.06929, 0.02, 0.0692, 0.03,] # pTtrig 20-40, pTassoc 6.0-10.0
+        self.central_p0s[(1,0)] = [1, 1e-10, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 1.0-1.5
+        self.central_p0s[(1,1)] = [1, 1e-10, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 1.5-2.0
+        self.central_p0s[(1,2)] = [1, 1e-10, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 2.0-3.0
+        self.central_p0s[(1,3)] = [1, 1e-10, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 3.0-4.0
+        self.central_p0s[(1,4)] = [1, 1e-10, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc    4.0-5.0
+        self.central_p0s[(1,5)] = [1, 1e-10, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 5.0-6.0
+        self.central_p0s[(1,6)] = [1, 1e-10, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 6.0-10.0
         # define event plane bins
         self.eventPlaneAngleBinEdges = [0, np.pi / 6, np.pi / 3, np.pi / 2]
 
@@ -149,274 +183,139 @@ class JetHadron(
             # Define all the arrays that will hold various objects for each bin
             self.N_trigs = np.zeros(
                 (len(self.pTtrigBinEdges) - 1, len(self.eventPlaneAngleBinEdges)),
-                dtype=object,
+                dtype=int,
             )
-            self.SEcorrs = np.zeros(
-                (
-                    len(self.pTtrigBinEdges) - 1,
-                    len(self.pTassocBinEdges) - 1,
-                    len(self.eventPlaneAngleBinEdges),
-                ),
-                dtype=object,
+            self.SEcorrs = self.init_pTtrig_pTassoc_eventPlane_array(
+                ROOT.TH2F
             )  # Event plane angle has 4 bins, in-, mid-, out, and inclusive
-            self.NormMEcorrs = np.zeros(
-                (
-                    len(self.pTtrigBinEdges) - 1,
-                    len(self.pTassocBinEdges) - 1,
-                    len(self.eventPlaneAngleBinEdges),
-                ),
-                dtype=object,
+            self.NormMEcorrs = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH2F)
+            self.AccCorrectedSEcorrs = self.init_pTtrig_pTassoc_eventPlane_array(
+                ROOT.TH2F
             )
-            self.AccCorrectedSEcorrs = np.zeros(
-                (
-                    len(self.pTtrigBinEdges) - 1,
-                    len(self.pTassocBinEdges) - 1,
-                    len(self.eventPlaneAngleBinEdges),
-                ),
-                dtype=object,
+            self.NormAccCorrectedSEcorrs = self.init_pTtrig_pTassoc_eventPlane_array(
+                ROOT.TH2F
             )
-            self.NormAccCorrectedSEcorrs = np.zeros(
-                (
-                    len(self.pTtrigBinEdges) - 1,
-                    len(self.pTassocBinEdges) - 1,
-                    len(self.eventPlaneAngleBinEdges),
-                ),
-                dtype=object,
+            self.ME_norm_systematics = self.init_pTtrig_pTassoc_eventPlane_array(float)
+            self.dPhiSigcorrs = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
+            self.dPhiSigcorrsForSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
+                ROOT.TH1F
             )
-            self.ME_norm_systematics = np.zeros(
-                (
-                    len(self.pTtrigBinEdges) - 1,
-                    len(self.pTassocBinEdges) - 1,
-                    len(self.eventPlaneAngleBinEdges),
-                ),
-                dtype=object,
+            self.dPhiBGcorrs = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
+            self.dPhiSigdpionTPCnSigmacorrs = self.init_pTtrig_pTassoc_eventPlane_dict(
+                ROOT.TH2F
             )
-            self.dPhiSigcorrs = np.zeros(
-                (
-                    len(self.pTtrigBinEdges) - 1,
-                    len(self.pTassocBinEdges) - 1,
-                    len(self.eventPlaneAngleBinEdges),
-                ),
-                dtype=object,
-            )  # dPhiSigcorrs is the same as AccCorrectedSEcorrs, but with the signal region only
-            self.dPhiSigcorrsForSpecies = (
-                self.init_pTtrig_pTassoc_eventPlane_dict()
-            )  # dPhiSigcorrs is the same as AccCorrectedSEcorrs, but with the signal region only
-            self.dPhiBGcorrs = np.zeros(
-                (
-                    len(self.pTtrigBinEdges) - 1,
-                    len(self.pTassocBinEdges) - 1,
-                    len(self.eventPlaneAngleBinEdges),
-                ),
-                dtype=object,
+            self.dEtacorrs = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.RPFObjs = self.init_pTtrig_pTassoc_array(object)
+            self.BGSubtractedAccCorrectedSEdPhiSigNScorrs = (
+                self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
             )
-            self.dPhiSigdpionTPCnSigmacorrs = (
-                self.init_pTtrig_pTassoc_eventPlane_dict()
-            )  # dPhiSigcorrs is the same as AccCorrectedSEcorrs, but with the signal region only
-            self.dEtacorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
+            self.BGSubtractedAccCorrectedSEdPhiSigAScorrs = (
+                self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
             )
-            self.RPFObjs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.BGSubtractedAccCorrectedSEdPhiSigNScorrs = np.zeros(
-                (
-                    len(self.pTtrigBinEdges) - 1,
-                    len(self.pTassocBinEdges) - 1,
-                    len(self.eventPlaneAngleBinEdges),
-                ),
-                dtype=object,
-            )
-            self.BGSubtractedAccCorrectedSEdPhiSigAScorrs = np.zeros(
-                (
-                    len(self.pTtrigBinEdges) - 1,
-                    len(self.pTassocBinEdges) - 1,
-                    len(self.eventPlaneAngleBinEdges),
-                ),
-                dtype=object,
-            )
-            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs = np.zeros(
-                (
-                    len(self.pTtrigBinEdges) - 1,
-                    len(self.pTassocBinEdges) - 1,
-                    len(self.eventPlaneAngleBinEdges),
-                ),
-                dtype=object,
+            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs = (
+                self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
             )
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrs = (
-                self.init_pTtrig_pTassoc_eventPlane_dict()
+                self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH2F)
             )
             self.NormalizedBGSubtracteddPhiForSpecies = (
-                self.init_pTtrig_pTassoc_eventPlane_dict()
+                self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
             )
-            self.BGSubtractedAccCorrectedSEdPhidPionSigNScorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
+            self.BGSubtractedAccCorrectedSEdPhidPionSigNScorrs = (
+                self.init_pTtrig_pTassoc_array(ROOT.TH2F)
             )
-            self.BGSubtractedAccCorrectedSEdPhidPionSigAScorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
+            self.BGSubtractedAccCorrectedSEdPhidPionSigAScorrs = (
+                self.init_pTtrig_pTassoc_array(ROOT.TH2F)
             )
-            self.pionTPCsignals = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.dPionNSsignals = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.dPionASsignals = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.pionTPCnSigma_pionTOFcut = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.pionTPCnSigma_protonTOFcut = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.pionTPCnSigma_kaonTOFcut = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.pionTPCnSigma_electronTOFcut = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
+            self.pionTPCsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.dPionNSsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.dPionASsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.pionTPCnSigma_pionTOFcut = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.pionTPCnSigma_protonTOFcut = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.pionTPCnSigma_kaonTOFcut = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.pionTPCnSigma_electronTOFcut = self.init_pTtrig_pTassoc_array(
+                ROOT.TH1F
             )
 
-            self.Yields = self.init_pTtrig_pTassoc_dict()
-            self.YieldsNS = self.init_pTtrig_pTassoc_dict()
-            self.YieldsAS = self.init_pTtrig_pTassoc_dict()
+            self.Yields = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsNS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsAS = self.init_pTtrig_pTassoc_dict(float)
 
-            self.YieldErrs = self.init_pTtrig_pTassoc_dict()
-            self.YieldErrsNS = self.init_pTtrig_pTassoc_dict()
-            self.YieldErrsAS = self.init_pTtrig_pTassoc_dict()
+            self.YieldErrs = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsNS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsAS = self.init_pTtrig_pTassoc_dict(float)
 
         else:
             self.N_trigs = np.zeros(
                 (len(self.pTtrigBinEdges) - 1),
                 dtype=object,
             )
-            self.SEcorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
+            self.SEcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH2F)
+            self.NormMEcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH2F)
+            self.AccCorrectedSEcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH2F)
+            self.NormAccCorrectedSEcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH2F)
+            self.ME_norm_systematics = self.init_pTtrig_pTassoc_array(float)
+            self.dPhiSigcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.dPhiSigcorrsForSpecies = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.dPhiBGcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.dPhiSigdpionTPCnSigmacorrs = self.init_pTtrig_pTassoc_dict(ROOT.TH2F)
+            self.dEtacorrs = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.RPFObjs = self.init_pTtrig_pTassoc_array(object)
+            self.BGSubtractedAccCorrectedSEdPhiSigNScorrs = (
+                self.init_pTtrig_pTassoc_array(ROOT.TH1F)
             )
-            self.NormMEcorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
+            self.BGSubtractedAccCorrectedSEdPhiSigAScorrs = (
+                self.init_pTtrig_pTassoc_array(ROOT.TH1F)
             )
-            self.AccCorrectedSEcorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.NormAccCorrectedSEcorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.ME_norm_systematics = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.dPhiSigcorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.dPhiSigcorrsForSpecies = self.init_pTtrig_pTassoc_dict()
-            self.dPhiBGcorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.dPhiSigdpionTPCnSigmacorrs = self.init_pTtrig_pTassoc_dict()
-            self.dEtacorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.RPFObjs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.BGSubtractedAccCorrectedSEdPhiSigNScorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.BGSubtractedAccCorrectedSEdPhiSigAScorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
+            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs = (
+                self.init_pTtrig_pTassoc_array(ROOT.TH1F)
             )
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrs = (
-                self.init_pTtrig_pTassoc_dict()
+                self.init_pTtrig_pTassoc_dict(ROOT.TH2F)
             )
-            self.NormalizedBGSubtracteddPhiForSpecies = self.init_pTtrig_pTassoc_dict()
-            self.BGSubtractedAccCorrectedSEdPhiSigNScorrsminVals = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
+            self.NormalizedBGSubtracteddPhiForSpecies = self.init_pTtrig_pTassoc_dict(
+                ROOT.TH1F
             )
-            self.BGSubtractedAccCorrectedSEdPhiSigAScorrsminVals = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
+            self.BGSubtractedAccCorrectedSEdPhiSigNScorrsminVals = (
+                self.init_pTtrig_pTassoc_array(float)
             )
-            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminVals = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
+            self.BGSubtractedAccCorrectedSEdPhiSigAScorrsminVals = (
+                self.init_pTtrig_pTassoc_array(float)
             )
-            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrsminVals = (
-                self.init_pTtrig_pTassoc_dict()
+            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminVals = (
+                self.init_pTtrig_pTassoc_array(float)
+            )
+            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrsminVals = self.init_pTtrig_pTassoc_dict(
+                float
             )
             self.NormalizedBGSubtracteddPhiForSpeciesminVals = (
-                self.init_pTtrig_pTassoc_dict()
+                self.init_pTtrig_pTassoc_dict(float)
             )
-            self.BGSubtractedAccCorrectedSEdPhidPionSigNScorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
+            self.BGSubtractedAccCorrectedSEdPhidPionSigNScorrs = (
+                self.init_pTtrig_pTassoc_array(ROOT.TH2F)
             )
-            self.BGSubtractedAccCorrectedSEdPhidPionSigAScorrs = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
+            self.BGSubtractedAccCorrectedSEdPhidPionSigAScorrs = (
+                self.init_pTtrig_pTassoc_array(ROOT.TH2F)
             )
-            self.pionTPCsignals = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.dPionNSsignals = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.dPionASsignals = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.pionTPCnSigma_pionTOFcut = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.pionTPCnSigma_protonTOFcut = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.pionTPCnSigma_kaonTOFcut = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
-            )
-            self.pionTPCnSigma_electronTOFcut = np.zeros(
-                (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1),
-                dtype=object,
+            self.pionTPCsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.dPionNSsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.dPionASsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.pionTPCnSigma_pionTOFcut = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.pionTPCnSigma_protonTOFcut = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.pionTPCnSigma_kaonTOFcut = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.pionTPCnSigma_electronTOFcut = self.init_pTtrig_pTassoc_array(
+                ROOT.TH1F
             )
 
-            self.Yields = self.init_pTtrig_pTassoc_dict()
-            self.YieldsNS = self.init_pTtrig_pTassoc_dict()
-            self.YieldsAS = self.init_pTtrig_pTassoc_dict()
+            self.Yields = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsNS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsAS = self.init_pTtrig_pTassoc_dict(float)
 
-            self.YieldErrs = self.init_pTtrig_pTassoc_dict()
-            self.YieldErrsNS = self.init_pTtrig_pTassoc_dict()
-            self.YieldErrsAS = self.init_pTtrig_pTassoc_dict()
+            self.YieldErrs = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsNS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsAS = self.init_pTtrig_pTassoc_dict(float)
+
+        
 
         if fill_on_init:
             [
@@ -427,26 +326,13 @@ class JetHadron(
                 for i in range(len(self.pTtrigBinEdges) - 1)
             ]
 
+        self.plot_everything()
+
     def return_none(self):
         return None
 
     def return_true(self):
         return True
-
-    def return_zeros_for_pTtrig_pTassoc(self):
-        return np.zeros(
-            (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1), dtype=object
-        )
-
-    def return_zeros_for_pTtrig_pTassoc_eventPlane(self):
-        return np.zeros(
-            (
-                len(self.pTtrigBinEdges) - 1,
-                len(self.pTassocBinEdges) - 1,
-                len(self.eventPlaneAngleBinEdges),
-            ),
-            dtype=object,
-        )
 
     def init_none_dict(self):
         return defaultdict(self.return_none)
@@ -454,11 +340,28 @@ class JetHadron(
     def init_bool_dict(self):
         return defaultdict(self.return_true)
 
-    def init_pTtrig_pTassoc_dict(self):
-        return defaultdict(self.return_zeros_for_pTtrig_pTassoc)
+    def init_pTtrig_pTassoc_dict(self, dtype):
+        return defaultdict(partial(self.init_pTtrig_pTassoc_array, dtype=dtype))
 
-    def init_pTtrig_pTassoc_eventPlane_dict(self):
-        return defaultdict(self.return_zeros_for_pTtrig_pTassoc_eventPlane)
+    def init_pTtrig_pTassoc_eventPlane_dict(self, dtype):
+        return defaultdict(
+            partial(self.init_pTtrig_pTassoc_eventPlane_array, dtype=dtype)
+        )
+
+    def init_pTtrig_pTassoc_eventPlane_array(self, dtype=object):
+        return np.zeros(
+            (
+                len(self.pTtrigBinEdges) - 1,
+                len(self.pTassocBinEdges) - 1,
+                len(self.eventPlaneAngleBinEdges),
+            ),
+            dtype=dtype,
+        )
+
+    def init_pTtrig_pTassoc_array(self, dtype=object):
+        return np.zeros(
+            (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1), dtype=dtype
+        )
 
     @print_function_name_with_description_on_call(description="")
     def fill_hist_arrays(self, i, j, hists_to_fill: "Optional[dict[str, bool]]" = None):
@@ -471,9 +374,9 @@ class JetHadron(
                 self.set_pT_epAngle_bin(i, j, k)
                 self.assert_sparses_filled()
 
-                # fill the N_trigs array 
+                # fill the N_trigs array
                 if hists_to_fill is None or hists_to_fill.get("Ntrigs"):
-                    self.fill_Ntrigs(i, j, k)
+                    self.fill_N_trigs(i, j, k)
                 # get the SE correlation function
                 if hists_to_fill is None or hists_to_fill.get("SE"):
                     self.fill_SE_correlation_function(i, j, k)
@@ -493,7 +396,8 @@ class JetHadron(
                 if hists_to_fill is None or hists_to_fill.get("dPhi"):
                     self.fill_dPhi_correlation_functions(i, j, k)
 
-            self.fit_RPF(i, j)
+            self.fit_RPF(i, j, p0=self.central_p0s[(i,j)])
+            self.plot_RPF(i,j, withSignal=True)
 
             # get the background subtracted correlation function
             for k in range(len(self.eventPlaneAngleBinEdges) - 1):
@@ -523,7 +427,6 @@ class JetHadron(
                     print(
                         f"AS yield for {species} in p_T^assoc bin {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV, p_T^trig bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, event plane angle {self.eventPlaneAngleBinEdges[k]}-{self.eventPlaneAngleBinEdges[k+1]}: {self.get_yield_for_species(i,j,k,species, 'AS')}"
                     )
-
         elif self.analysisType == "pp":
             print(
                 f"Getting correlation function for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV"
@@ -546,6 +449,9 @@ class JetHadron(
                 )
         self.set_has_changed()
         self.assert_sparses_filled()
+        # fill the N_trigs array
+        if hists_to_fill is None or hists_to_fill.get("Ntrigs"):
+            self.fill_N_trigs(i, j, 3)
 
         # get the SE correlation function
         if hists_to_fill is None or hists_to_fill.get("SE"):
@@ -565,7 +471,6 @@ class JetHadron(
 
         if hists_to_fill is None or hists_to_fill.get("dPhi"):
             self.fill_dPhi_correlation_functions(i, j, 3)
-
         dEta = self.get_dEta_projection_NS()
         self.dEtacorrs[i, j] = dEta
         del dEta
@@ -619,12 +524,12 @@ class JetHadron(
         print("\a")
 
     @print_function_name_with_description_on_call(description="")
-    def fill_N_trigs(self, i,j,k):
+    def fill_N_trigs(self, i, j, k):
         Ntrigs = self.get_N_trig()
         if self.analysisType in ["central", "semicentral"]:
-            self.N_trigs[i, j, k] = Ntrigs
+            self.N_trigs[i, k] = Ntrigs
         elif self.analysisType == "pp":
-            self.N_trigs[i, j] = Ntrigs
+            self.N_trigs[i] = Ntrigs
         del Ntrigs
 
     @print_function_name_with_description_on_call(description="")
@@ -638,7 +543,12 @@ class JetHadron(
 
     @print_function_name_with_description_on_call(description="")
     def fill_ME_correlation_function(self, i, j, k):
-        NormMEcorr, ME_norm_error = self.get_normalized_ME_correlation_function()
+        if self.analysisType == "pp" and j >= 2:
+            self.set_pT_assoc_range(2, 6)
+            NormMEcorr, ME_norm_error = self.get_normalized_ME_correlation_function()
+            self.set_pT_epAngle_bin(i, j, k)
+        else:
+            NormMEcorr, ME_norm_error = self.get_normalized_ME_correlation_function()
         if self.analysisType in ["central", "semicentral"]:
             self.NormMEcorrs[i, j, k] = NormMEcorr
             self.ME_norm_systematics[i, j, k] = ME_norm_error
@@ -688,8 +598,6 @@ class JetHadron(
         ).Clone()
         if self.analysisType in ["central", "semicentral"]:
             self.dPhiBGcorrs[i, j, k] = dPhiBG
-            scaleForInclusive = 1 if k != 3 else 3
-            dPhiSig.Scale(1 / scaleForInclusive)
             self.dPhiSigcorrs[i, j, k] = dPhiSig
         elif self.analysisType == "pp":
             self.dPhiBGcorrs[i, j] = dPhiBG
@@ -703,8 +611,6 @@ class JetHadron(
             self.dEtaSig, TOFcutSpecies=species
         ).Clone()
         if self.analysisType in ["central", "semicentral"]:
-            scaleForInclusive = 1 if k != 3 else 3
-            dPhiSig.Scale(1 / scaleForInclusive)
             self.dPhiSigcorrsForSpecies[species][i, j, k] = dPhiSig
         elif self.analysisType == "pp":
             self.dPhiSigcorrsForSpecies[species][i, j] = dPhiSig
@@ -718,8 +624,6 @@ class JetHadron(
             self.dEtaSig, TOFcutSpecies
         ).Clone()
         if self.analysisType in ["central", "semicentral"]:
-            scaleForInclusive = 1 if k != 3 else 3
-            dPhiSig.Scale(1 / scaleForInclusive)
             self.dPhiSigdpionTPCnSigmacorrs[TOFcutSpecies][i, j, k] = dPhiSig
         elif self.analysisType == "pp":
             self.dPhiSigdpionTPCnSigmacorrs[TOFcutSpecies][i, j] = dPhiSig
@@ -847,6 +751,17 @@ class JetHadron(
         self.set_has_changed()
 
     @print_function_name_with_description_on_call(description="")
+    def set_pT_assoc_range(self, j_low, j_hi):
+        for sparse_ind in range(len(self.JH)):
+            self.JH[sparse_ind].GetAxis(2).SetRangeUser(
+                self.pTassocBinEdges[j_low], self.pTassocBinEdges[j_hi]
+            )
+            self.MixedEvent[sparse_ind].GetAxis(2).SetRangeUser(
+                self.pTassocBinEdges[j_low], self.pTassocBinEdges[j_hi]
+            )
+        self.set_has_changed()
+
+    @print_function_name_with_description_on_call(description="")
     def set_has_changed(self):
         self.get_SE_correlation_function_has_changed = True
         self.get_SE_correlation_function_w_Pion_has_changed = self.init_bool_dict()
@@ -862,7 +777,12 @@ class JetHadron(
         self.ME_norm_sliding_window_has_changed = True
 
     def __repr__(self) -> str:
-        return f"JetHadron object for {self.analysisType} events"
+        string_rep = f"""JetHadron object for {self.analysisType} events\n
+                                 with {self.nTrigPtBins} trigger pT bins, 
+                                {self.nAssocPtBins} associated pT bins, 
+                                and {self.nEventPlaneAngleBins} event plane angle bins\n
+                                """
+        return string_rep
 
     def get_sparses(self, f):
         """
@@ -894,8 +814,8 @@ class JetHadron(
             )
         else:
             anaList = f.Get("AliAnalysisTaskJetH_tracks_caloClusters_biased")
-        fHistEventPlane = anaList.FindObject("fHistEventPlane")
-        return fHistEventPlane
+        fHistEventPlane = ROOT.TH1F(anaList.FindObject("fHistEventPlane"))
+        return fHistEventPlane.Clone()
 
     def assert_sparses_filled(self):
         for sparse_ind in range(len(self.JH)):
