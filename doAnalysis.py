@@ -134,7 +134,8 @@ if __name__ == "__main__":
     DO_PP = True
     DO_CENTRAL = True
     DO_SEMI_CENTRAL = True
-    DO_PLOTTING = False
+    DO_PLOTTING = True
+    DO_FITTING = True
     DO_PICKLING = False
 
     if DO_PP:
@@ -158,39 +159,19 @@ if __name__ == "__main__":
             if DO_PICKLING:
                 with open("jhAnaCentral.pickle", "wb") as handle:
                     pickle.dump(jhAnaCentral, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-        if not jhAnaCentral.RPFObjs.all():
+        
+        if DO_FITTING:
             jhAnaCentral.fit_RPFs()
 
-        """
-        for i in range(len(jhAnaCentral.pTtrigBinEdges)-1):
-            for j in range(len(jhAnaCentral.pTassocBinEdges)-1):
-                print(f"Fitting {i}, {j}")
-                ydata = np.array(jhAnaCentral.get_bin_contents_as_array(jhAnaCentral.dPionASsignals[i,j], forFitting=False))
-                yerr = np.array(jhAnaCentral.get_bin_errors_as_array(jhAnaCentral.dPionASsignals[i,j], forFitting=False))
-                xdata = np.array(jhAnaCentral.get_bin_centers_as_array(jhAnaCentral.dPionASsignals[i,j], forFitting=False))
-                negative_supression_mask = (np.array(ydata)>0)
-                ydata = ydata[negative_supression_mask]
-                yerr = yerr[negative_supression_mask]
-                xdata = xdata[negative_supression_mask]
-                tF = templateFit(jhAnaCentral.pTassocBinEdges[j])
-                tF.fit_sum_of_gaussians(xdata, ydata, yerr, title="$\\Delta_{\\pi}$" + f" for {jhAnaCentral.pTtrigBinEdges[i]}-{jhAnaCentral.pTtrigBinEdges[i+1]}, {jhAnaCentral.pTassocBinEdges[j]}-{jhAnaCentral.pTassocBinEdges[j+1]}")
-        """
+        
         if DO_PLOTTING:
             jhAnaCentral.plot_everything()
-        for i in range(len(jhAnaCentral.pTtrigBinEdges) - 1):
-            for j in range(len(jhAnaCentral.pTassocBinEdges) - 1):
-                jhAnaCentral.plot_dPhi_against_pp_reference(jhAnapp, i, j)
 
-        """
-        pdf = FPDF("L", "in", "Letter")
-        pdf.set_margins(0, 0, 0)
-        base_path = '/home/steffanic/Projects/Thesis/backend_output/'
-        for image in [base_path + 'central/' + img for img in sorted(os.listdir(base_path + 'central/')) if img.endswith('.png') and img.startswith("RPF")]:
-            pdf.add_page()
-            pdf.image(image, x=0, y=0, w=11, h=3.66)
-        pdf.output(base_path + 'central.pdf')
-        """
+        if DO_PP:
+            for i in range(len(jhAnaCentral.pTtrigBinEdges) - 1):
+                for j in range(len(jhAnaCentral.pTassocBinEdges) - 1):
+                    jhAnaCentral.plot_dPhi_against_pp_reference(jhAnapp, i, j)
+
 
     if DO_SEMI_CENTRAL:
         if exists("jhAnaSemiCentral.pickle"):
@@ -204,20 +185,14 @@ if __name__ == "__main__":
                         jhAnaSemiCentral, handle, protocol=pickle.HIGHEST_PROTOCOL
                     )
 
-        if not jhAnaSemiCentral.RPFObjs.all():
+        if DO_FITTING:
             jhAnaSemiCentral.fit_RPFs()
 
         if DO_PLOTTING:
             jhAnaSemiCentral.plot_everything()
-        for i in range(len(jhAnaSemiCentral.pTtrigBinEdges) - 1):
-            for j in range(len(jhAnaSemiCentral.pTassocBinEdges) - 1):
-                jhAnaSemiCentral.plot_dPhi_against_pp_reference(jhAnapp, i, j)
-        """
-        pdf = FPDF("L", "in", "Letter")
-        pdf.set_margins(0, 0, 0)
-        base_path = '/home/steffanic/Projects/Thesis/backend_output/'
-        for image in [base_path + 'semicentral/' + img for img in sorted(os.listdir(base_path + 'semicentral/')) if img.endswith('.png') and img.startswith("RPF")]:
-            pdf.add_page()
-            pdf.image(image, x=0, y=0, w=11, h=3.66)
-        pdf.output(base_path + 'semicentral.pdf')
-        """
+
+        if DO_PP:
+            for i in range(len(jhAnaSemiCentral.pTtrigBinEdges) - 1):
+                for j in range(len(jhAnaSemiCentral.pTassocBinEdges) - 1):
+                    jhAnaSemiCentral.plot_dPhi_against_pp_reference(jhAnapp, i, j)
+        

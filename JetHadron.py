@@ -1,7 +1,10 @@
 from collections import defaultdict
 from itertools import product
+import pickle
+import subprocess
 from typing import Optional
 import numpy as np
+import requests
 import ROOT
 import matplotlib.pyplot as plt
 from functools import partial
@@ -125,26 +128,26 @@ class JetHadron(
             20,
             20,
         ]  # subject to change based on statistics
-        self.central_p0s = {(i,j):[1, 0, 0.02, 0.005, 0.02, 0.05, 0.03,] for i in range(len(self.pTtrigBinCenters)) for j in range(len(self.pTassocBinCenters))}
-        self.central_p0s[(0,0)] = [100042.8, 1e-10, 0.0473, -.000306, 0.02, 0.0513, 0.03,] # pTtrig 20-40, pTassoc 1.0-1.5   
-        self.central_p0s[(0,1)] = [40000.19, 1e-10, 0.0402, -0.0058, 0.02, 0.0906, 0.03,] # pTtrig 20-40, pTassoc 1.5-2.0
-        self.central_p0s[(0,2)] = [4006.86, 1e-10, 0.0414, 0.0015, 0.02, 0.1034, 0.03,] # pTtrig 20-40, pTassoc 2.0-3.0
-        self.central_p0s[(0,3)] = [56.84, 1e-10, 0.0636, -0.00766, 0.02, 0.1237, 0.03,] # pTtrig 20-40, pTassoc 3.0-4.0
-        self.central_p0s[(0,4)] = [8.992, 1e-10, 0.1721, -0.0987, 0.02, 0.233, 0.03,] # pTtrig 20-40, pTassoc 4.0-5.0
-        self.central_p0s[(0,5)] = [2.318, 1e-10, -0.0508, -0.143, 0.02, 0.0876, 0.03,] # pTtrig 20-40, pTassoc  5.0-6.0
-        self.central_p0s[(0,6)] = [2.076, 1e-10, -0.0886, 0.06929, 0.02, 0.0692, 0.03,] # pTtrig 20-40, pTassoc 6.0-10.0
-        self.central_p0s[(1,0)] = [1, 1e-10, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 1.0-1.5
-        self.central_p0s[(1,1)] = [1, 1e-10, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 1.5-2.0
-        self.central_p0s[(1,2)] = [1, 1e-10, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 2.0-3.0
-        self.central_p0s[(1,3)] = [1, 1e-10, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 3.0-4.0
-        self.central_p0s[(1,4)] = [1, 1e-10, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc    4.0-5.0
-        self.central_p0s[(1,5)] = [1, 1e-10, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 5.0-6.0
-        self.central_p0s[(1,6)] = [1, 1e-10, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 6.0-10.0
+        self.central_p0s = {(i,j):[1, 0.02, 0.005, 0.02, 0.05, 0.03,] for i in range(len(self.pTtrigBinCenters)) for j in range(len(self.pTassocBinCenters))}
+        self.central_p0s[(0,0)] = [1000042.8, 0.0473, -.000306, 0.02, 0.0513, 0.03,] # pTtrig 20-40, pTassoc 1.0-1.5   
+        self.central_p0s[(0,1)] = [40000.19, 0.0402, -0.0058, 0.02, 0.0906, 0.03,] # pTtrig 20-40, pTassoc 1.5-2.0
+        self.central_p0s[(0,2)] = [4006.86, 0.0414, 0.0015, 0.02, 0.1034, 0.03,] # pTtrig 20-40, pTassoc 2.0-3.0
+        self.central_p0s[(0,3)] = [56.84, 0.0636, -0.00766, 0.02, 0.1237, 0.03,] # pTtrig 20-40, pTassoc 3.0-4.0
+        self.central_p0s[(0,4)] = [8.992, 0.1721, -0.0987, 0.02, 0.233, 0.03,] # pTtrig 20-40, pTassoc 4.0-5.0
+        self.central_p0s[(0,5)] = [2.318, -0.0508, -0.143, 0.02, 0.0876, 0.03,] # pTtrig 20-40, pTassoc  5.0-6.0
+        self.central_p0s[(0,6)] = [2.076, -0.0886, 0.06929, 0.02, 0.0692, 0.03,] # pTtrig 20-40, pTassoc 6.0-10.0
+        self.central_p0s[(1,0)] = [1, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 1.0-1.5
+        self.central_p0s[(1,1)] = [1, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 1.5-2.0
+        self.central_p0s[(1,2)] = [1, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 2.0-3.0
+        self.central_p0s[(1,3)] = [1, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 3.0-4.0
+        self.central_p0s[(1,4)] = [1, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc    4.0-5.0
+        self.central_p0s[(1,5)] = [1, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 5.0-6.0
+        self.central_p0s[(1,6)] = [1, 0.02, 0.005, 0.02, 0.05, 0.03,] # pTtrig 40-60, pTassoc 6.0-10.0
         # define event plane bins
         self.eventPlaneAngleBinEdges = [0, np.pi / 6, np.pi / 3, np.pi / 2]
 
         # 15 pt assoc bins * 7 pt trig bins * 4 event plane bins = 420 bins
-
+        
         # define signal and background regions
         self.dEtaBGHi = [0.8, 1.21]
         self.dEtaBGLo = [-1.21, -0.8]
@@ -325,7 +328,9 @@ class JetHadron(
                 ]
                 for i in range(len(self.pTtrigBinEdges) - 1)
             ]
-
+        # pickle the object
+        pickle_filename = "jhAnapp.pickle" if self.analysisType == "pp" else "jhAnaCentral.pickle" if self.analysisType == "central" else "jhAnaSemiCentral.pickle"
+        pickle.dump(self, open(pickle_filename, "wb"))
         self.plot_everything()
 
     def return_none(self):
@@ -373,31 +378,46 @@ class JetHadron(
                 # set the ranges in the sparses
                 self.set_pT_epAngle_bin(i, j, k)
                 self.assert_sparses_filled()
-
+                self.epString = (
+                        "out-of-plane"
+                        if k == 2
+                        else (
+                            "mid-plane"
+                            if k == 1
+                            else ("in-plane" if k == 0 else "inclusive")
+                        )
+                    )
                 # fill the N_trigs array
                 if hists_to_fill is None or hists_to_fill.get("Ntrigs"):
                     self.fill_N_trigs(i, j, k)
                 # get the SE correlation function
                 if hists_to_fill is None or hists_to_fill.get("SE"):
                     self.fill_SE_correlation_function(i, j, k)
+                    self.plot_SE_correlation_function(i, j, k)
 
                 # get the ME correlation function
                 if hists_to_fill is None or hists_to_fill.get("ME"):
                     self.fill_ME_correlation_function(i, j, k)
+                    self.plot_ME_correlation_function(i, j, k)
 
                 # get the acceptance corrected SE correlation function
                 if hists_to_fill is None or hists_to_fill.get("AccCorrectedSE"):
                     self.fill_AccCorrected_SE_correlation_function(i, j, k)
+                    self.plot_acceptance_corrected_SE_correlation_function(i,j,k)
 
                 # Get the number of triggers to normalize
                 if hists_to_fill is None or hists_to_fill.get("NormAccCorrectedSE"):
                     self.fill_NormAccCorrected_SE_correlation_function(i, j, k)
+                    self.plot_normalized_acceptance_corrected_correlation_function(i,j,k)
 
                 if hists_to_fill is None or hists_to_fill.get("dPhi"):
                     self.fill_dPhi_correlation_functions(i, j, k)
 
             self.fit_RPF(i, j, p0=self.central_p0s[(i,j)])
             self.plot_RPF(i,j, withSignal=True)
+            jsonpayload ={"value1":f"RPF fitted for p_Ttrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, p_Tassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV"}
+            url = 'https://maker.ifttt.com/trigger/code_finished/with/key/bFQ9TznlbsocL7hbBL_sDyk33qkIJdDNVSIjhyJ7Mqm'
+            requests.post(url, json=jsonpayload)
 
             # get the background subtracted correlation function
             for k in range(len(self.eventPlaneAngleBinEdges) - 1):
@@ -434,7 +454,9 @@ class JetHadron(
             # set the ranges in the sparses
             self.set_pT_epAngle_bin(i, j, 3)
             self.assert_sparses_filled()
-
+            self.epString = (
+                        "inclusive"
+                    )
         if self.analysisType in ["central", "semicentral"]:
             for sparse_ind in range(len(self.JH)):
                 # then grab the inclusive event plane angle bin
@@ -456,18 +478,22 @@ class JetHadron(
         # get the SE correlation function
         if hists_to_fill is None or hists_to_fill.get("SE"):
             self.fill_SE_correlation_function(i, j, 3)
+            self.plot_SE_correlation_function(i,j,3)
 
         # get the ME correlation function
         if hists_to_fill is None or hists_to_fill.get("ME"):
             self.fill_ME_correlation_function(i, j, 3)
+            self.plot_ME_correlation_function(i,j,3)
 
         # get the acceptance corrected SE correlation function
         if hists_to_fill is None or hists_to_fill.get("AccCorrectedSE"):
             self.fill_AccCorrected_SE_correlation_function(i, j, 3)
+            self.plot_acceptance_corrected_SE_correlation_function(i,j,3)
 
         # Get the number of triggers to normalize
         if hists_to_fill is None or hists_to_fill.get("NormAccCorrectedSE"):
             self.fill_NormAccCorrected_SE_correlation_function(i, j, 3)
+            self.plot_normalized_acceptance_corrected_correlation_function(i,j,3)
 
         if hists_to_fill is None or hists_to_fill.get("dPhi"):
             self.fill_dPhi_correlation_functions(i, j, 3)
@@ -522,6 +548,8 @@ class JetHadron(
                 )
 
         print("\a")
+        p=subprocess.Popen(['bash', '-c', f'. ~/.notifyme; notifyme "Finished with p_T^assoc bin {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV, p_T^trig bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV";'])
+        p.kill()
 
     @print_function_name_with_description_on_call(description="")
     def fill_N_trigs(self, i, j, k):
@@ -544,7 +572,8 @@ class JetHadron(
     @print_function_name_with_description_on_call(description="")
     def fill_ME_correlation_function(self, i, j, k):
         if self.analysisType == "pp" and j >= 2:
-            self.set_pT_assoc_range(2, 6)
+            self.set_pT_assoc_range(2, 7)
+            self.set_pT_trig_range(0,2)
             NormMEcorr, ME_norm_error = self.get_normalized_ME_correlation_function()
             self.set_pT_epAngle_bin(i, j, k)
         else:
@@ -758,6 +787,20 @@ class JetHadron(
             )
             self.MixedEvent[sparse_ind].GetAxis(2).SetRangeUser(
                 self.pTassocBinEdges[j_low], self.pTassocBinEdges[j_hi]
+            )
+        self.set_has_changed()
+    
+    @print_function_name_with_description_on_call(description="")
+    def set_pT_trig_range(self, i_low, i_hi):
+        for sparse_ind in range(len(self.JH)):
+            self.JH[sparse_ind].GetAxis(1).SetRangeUser(
+                self.pTtrigBinEdges[i_low], self.pTtrigBinEdges[i_hi]
+            )
+            self.MixedEvent[sparse_ind].GetAxis(1).SetRangeUser(
+                self.pTtrigBinEdges[i_low], self.pTtrigBinEdges[i_hi]
+            )
+            self.Trigger[sparse_ind].GetAxis(1).SetRangeUser(
+                self.pTtrigBinEdges[i_low], self.pTtrigBinEdges[i_hi]
             )
         self.set_has_changed()
 

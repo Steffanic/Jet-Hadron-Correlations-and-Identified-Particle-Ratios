@@ -23,7 +23,7 @@ class FitMixin:
         best_pcov = None
         best_p0 = None
 
-        rpf = RPF() if not p0 else RPF(p0=p0)
+        rpf = RPF(analysisType=self.analysisType) if not p0 else RPF(p0=p0, analysisType=self.analysisType)
         inPlane  = self.dPhiBGcorrs[i,j,0] #type:ignore
         midPlane = self.dPhiBGcorrs[i,j,1] #type:ignore
         outPlane = self.dPhiBGcorrs[i,j,2] #type:ignore
@@ -41,7 +41,7 @@ class FitMixin:
         best_p0 = p0
         self.RPFObjs[i,j] = rpf #type:ignore
         
-        print(f"Best RPF fit for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV had Error Sum of {best_error} and p0 of {best_p0} with final parameter values of {list(zip(['B', 'v1', 'v2', 'v3', 'v4', 'va2', 'va4', 'R2', 'R4'], best_popt))}") #type:ignore
+        print(f"Best RPF fit for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV had Error Sum of {best_error} and p0 of {best_p0} with final parameter values of {list(zip(['B', 'v2', 'v3', 'v4', 'va2', 'va4'], best_popt))}") #type:ignore
         # now let's write a latex table to a txt file for the RPF parameters and their names
         with open(f"RPF_parameters_{self.analysisType}.txt", "a") as f: #type:ignore
             f.write(f"\\begin{{table}}[h!]\n")
@@ -51,7 +51,7 @@ class FitMixin:
             f.write(f"\\hline\n")
             f.write(f"Parameter & Value \\\\ \n")
             f.write(f"\\hline\n")
-            for name, value in list(zip(['B', 'v1', 'v2', 'v3', 'v4', 'va2', 'va4', 'R2', 'R4'], best_popt)):
+            for name, value in list(zip(['B', 'v2', 'v3', 'v4', 'va2', 'va4', 'R2', 'R4'], best_popt)):
                 f.write(f"{name} & {value} \\\\ \n")
             f.write(f"\\hline\n")
             f.write(f"\\end{{tabular}}\n")
@@ -65,7 +65,6 @@ class FitMixin:
         
     def get_p0s(self, i, j):
         B = [1000*np.exp(-2*self.pTtrigBinEdges[i])+1] #type:ignore
-        v1 = 0.005**2 if self.analysisType == "central" else 0.0075**2 #type:ignore
         v1 = [0.005]
         v2 = 0.05 if self.analysisType == "central" else 0.1 #type:ignore
         v2 = [v2]

@@ -168,15 +168,35 @@ class AnalysisMixin:
         sliding_window_norm = self.ME_norm_sliding_window()
         # using a sliding window average with window size pi/2
         sliding_window_norm_half_pi = self.ME_norm_sliding_window(windowSize=np.pi / 2)
+        # using a sliding window average with window size pi/4
+        sliding_window_norm_quarter_pi = self.ME_norm_sliding_window(windowSize=np.pi/4)
+        # using a sliding window average with window size pi/6
+        sliding_window_norm_sixth_pi = self.ME_norm_sliding_window(windowSize=np.pi/6)
+        # using a sliding window average with window size pi/12
+        sliding_window_norm_twelfth_pi = self.ME_norm_sliding_window(windowSize=np.pi/12)
         # by taking the max
-        max_norm = self.ME_norm_sliding_window(windowSize=2 * np.pi)
+        max_norm = self.ME_max()
         # take the average of the three
-        norm = (sliding_window_norm + sliding_window_norm_half_pi + max_norm) / 3
+        norm = (sliding_window_norm)
         # compute the error on the normalization constant
         # using the standard deviation of the three values
         error = np.std([sliding_window_norm, sliding_window_norm_half_pi, max_norm])
         return norm, error
 
+    def ME_max(self, etaRestriction=0.3):
+        """
+        Returns the maximum value of the mixed event correlation function
+        """
+        fhnMixedEventsCorr = self.get_ME_correlation_function()  # TH2
+        fhnMixedEventsCorr.GetXaxis().SetRangeUser(-etaRestriction, etaRestriction)
+        eta_bin_width = fhnMixedEventsCorr.GetXaxis().GetBinWidth(1)
+        eta_bins = fhnMixedEventsCorr.GetXaxis().FindBin(
+            etaRestriction
+        ) - fhnMixedEventsCorr.GetXaxis().FindBin(-etaRestriction)
+        dPhiME = fhnMixedEventsCorr.ProjectionY()
+        dPhiME.Scale(eta_bin_width)
+        return dPhiME.GetMaximum()
+    
     def ME_norm_sliding_window(self, windowSize=np.pi, etaRestriction=0.3):
         """
         Returns normalization constant for mixed event correlation function
@@ -184,44 +204,37 @@ class AnalysisMixin:
         Restricts |△eta|<etaRestriction and projects onto △phi
         Using a sliding window average, find the highest average and call it the max
         """
-        if (
-            self.ME_norm_sliding_window_has_changed
-            or self.ME_norm_sliding_window_result is None
-        ):
-            fhnMixedEventsCorr = self.get_ME_correlation_function()  # TH2
-            fhnMixedEventsCorr.GetXaxis().SetRangeUser(-etaRestriction, etaRestriction)
-            # get  eta bin width
-            eta_bin_width = fhnMixedEventsCorr.GetXaxis().GetBinWidth(1)
-            # get number of bins in eta between +- etaRestriction
-            eta_bins = fhnMixedEventsCorr.GetXaxis().FindBin(
-                etaRestriction
-            ) - fhnMixedEventsCorr.GetXaxis().FindBin(-etaRestriction)
+        fhnMixedEventsCorr = self.get_ME_correlation_function()  # TH2
+        fhnMixedEventsCorr.GetXaxis().SetRangeUser(-etaRestriction, etaRestriction)
+        # get  eta bin width
+        eta_bin_width = fhnMixedEventsCorr.GetXaxis().GetBinWidth(1)
+        # get number of bins in eta between +- etaRestriction
+        eta_bins = fhnMixedEventsCorr.GetXaxis().FindBin(
+            etaRestriction
+        ) - fhnMixedEventsCorr.GetXaxis().FindBin(-etaRestriction)
 
-            dPhiME = fhnMixedEventsCorr.ProjectionY()
-            dPhiME.Scale(1 / (eta_bins))
-            # Calculate moving max of the mixed event correlation function with window size pi
-            maxWindowAve = 0
-            # get bin width
-            binWidth = dPhiME.GetBinWidth(1)
-            # get number of bins
-            nBinsPerWindow = int(windowSize / binWidth)
-            for i in range(dPhiME.GetNbinsX() - int(windowSize // binWidth)):
-                # get the average of the window for this set of bins
-                windowAve = dPhiME.Integral(i, i + int(windowSize // binWidth)) / (
-                    nBinsPerWindow + 1
-                )
-                # if the average is greater than the current max, set the max to the average
-                if windowAve > maxWindowAve:
-                    maxWindowAve = windowAve
+        dPhiME = fhnMixedEventsCorr.ProjectionY()
+        # scale by the number of bins in eta
+        dPhiME.Scale(eta_bin_width)
+        # Calculate moving max of the mixed event correlation function with window size pi
+        maxWindowAve = 0
+        # get bin width
+        binWidth = dPhiME.GetBinWidth(1)
+        # get number of bins
+        nBinsPerWindow = int(windowSize / binWidth)
+        for i in range(dPhiME.GetNbinsX() - int(windowSize // binWidth)):
+            # get the average of the window for this set of bins
+            windowAve = dPhiME.Integral(i, i + int(windowSize // binWidth)) / (
+                nBinsPerWindow * binWidth
+            )
+            # if the average is greater than the current max, set the max to the average
+            if windowAve > maxWindowAve:
+                maxWindowAve = windowAve
 
-            del dPhiME
-            del fhnMixedEventsCorr
-            self.ME_norm_sliding_window_result = maxWindowAve
-            self.ME_norm_sliding_window_has_changed = False
+        del dPhiME
+        del fhnMixedEventsCorr
 
-            return maxWindowAve
-        else:
-            return self.ME_norm_sliding_window_result
+        return maxWindowAve
 
     def get_acceptance_corrected_correlation_function(self):
         if (

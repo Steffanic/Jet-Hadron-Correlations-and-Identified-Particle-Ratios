@@ -822,16 +822,16 @@ class PlotMixin:
                 if k != 3
                 else bin_contentNormINCPbPb
                 + np.sqrt(np.sum(RPFErrors**2, axis=1) ) / N_trig_PbPb,
-                alpha=0.5,
+                alpha=0.3,
                 color="green",
                 label="RPF fit",
             )
             axSigminusBGNormINC[k].fill_between(
                 x_binsNormINC,
-                bin_contentNormINCPbPb - PbPbAna.ME_norm_systematics[i, j, k],
-                bin_contentNormINCPbPb + PbPbAna.ME_norm_systematics[i, j, k],
+                bin_contentNormINCPbPb - PbPbAna.ME_norm_systematics[i, j, k]/N_trig_PbPb,
+                bin_contentNormINCPbPb + PbPbAna.ME_norm_systematics[i, j, k]/N_trig_PbPb,
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
             axSigminusBGNormINC[k].errorbar(
@@ -845,15 +845,15 @@ class PlotMixin:
                 x_binsNormINC,
                 bin_contentNormINCpp - norm_errorsNormINC / N_trig_pp,
                 bin_contentNormINCpp + norm_errorsNormINC / N_trig_pp,
-                alpha=0.5,
+                alpha=0.3,
                 color="orange",
                 label="Yield normalization",
             )
             axSigminusBGNormINC[k].fill_between(
                 x_binsNormINC,
-                bin_contentNormINCpp - ppAna.ME_norm_systematics[i, j],
-                bin_contentNormINCpp + ppAna.ME_norm_systematics[i, j],
-                alpha=0.5,
+                bin_contentNormINCpp - ppAna.ME_norm_systematics[i, j]/N_trig_pp,
+                bin_contentNormINCpp + ppAna.ME_norm_systematics[i, j]/N_trig_pp,
+                alpha=0.3,
                 color="red",
                 label="ME normalization",
             )  # type:ignore
@@ -926,7 +926,7 @@ class PlotMixin:
             full_x,
             fit_y[:, 0]/N_trig - normalized_err,
             fit_y[:, 0]/N_trig + normalized_err,
-            alpha=0.5,
+            alpha=0.3,
         )
         normalized_data_err = np.sqrt(self.get_bin_contents_as_array(inPlane, False)**2/N_trig**5 + self.get_bin_errors_as_array(inPlane, False)**2/N_trig**2)
         ax[0][0].errorbar(
@@ -949,7 +949,7 @@ class PlotMixin:
                 * fit_y_err[:, 0] ** 2
             )
         )
-        ax[1][0].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.5)
+        ax[1][0].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.3)
 
         self.set_pT_epAngle_bin(i, j, 1)
 
@@ -962,7 +962,7 @@ class PlotMixin:
             full_x,
             fit_y[:, 1]/N_trig - normalized_err,
             fit_y[:, 1]/N_trig + normalized_err,
-            alpha=0.5,
+            alpha=0.3,
         )
         normalized_data_err = np.sqrt(self.get_bin_contents_as_array(midPlane, False)**2/N_trig**5 + self.get_bin_errors_as_array(midPlane, False)**2/N_trig**2)
         ax[0][1].errorbar(
@@ -985,7 +985,7 @@ class PlotMixin:
                 * fit_y_err[:, 1] ** 2
             )
         )
-        ax[1][1].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.5)
+        ax[1][1].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.3)
         self.set_pT_epAngle_bin(i, j, 2)
 
         N_trig = self.get_N_trig()
@@ -996,7 +996,7 @@ class PlotMixin:
             full_x,
             fit_y[:, 2]/N_trig - normalized_err,
             fit_y[:, 2]/N_trig + normalized_err,
-            alpha=0.5,
+            alpha=0.3,
         )
         normalized_data_err = np.sqrt(self.get_bin_contents_as_array(outPlane, False)**2/N_trig**5 + self.get_bin_errors_as_array(outPlane, False)**2/N_trig**2)
         ax[0][2].errorbar(
@@ -1019,7 +1019,7 @@ class PlotMixin:
                 * fit_y_err[:, 2] ** 2
             )
         )
-        ax[1][2].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.5)
+        ax[1][2].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.3)
         self.set_pT_epAngle_bin(i, j, 3)
 
         N_trig = self.get_N_trig()
@@ -1030,7 +1030,7 @@ class PlotMixin:
             full_x,
             (np.sum(fit_y, axis=1) )/N_trig - normalized_err,
             (np.sum(fit_y, axis=1) )/N_trig + normalized_err,
-            alpha=0.5,
+            alpha=0.3,
         )
         normalized_data_err = np.sqrt((self.get_bin_contents_as_array(inPlane, False) + self.get_bin_contents_as_array(midPlane, False) + self.get_bin_contents_as_array(outPlane, False))**2/N_trig**5 + (self.get_bin_errors_as_array(inPlane, False)**2 + self.get_bin_errors_as_array(midPlane, False)**2 + self.get_bin_errors_as_array(outPlane, False)**2)/N_trig**2)
         ax[0][3].errorbar(
@@ -1078,7 +1078,7 @@ class PlotMixin:
             1/fit_y[:, 2]**2 * self.get_bin_errors_as_array(outPlane, False)**2 
          )
         
-        ax[1][3].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.5)
+        ax[1][3].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.3)
 
         if withSignal:
             inPlaneSig = self.dPhiSigcorrs[i, j, 0]  # type:ignore
@@ -1222,6 +1222,7 @@ class PlotMixin:
             ax[i].set_title(
                 f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
             )  # type:ignore
+            ax[i].set_ylim(-0.0001, 0.0001)
             
         fig.suptitle(r"$v_1$ vs $p_{T,assoc}$")
         fig.tight_layout()
@@ -1246,6 +1247,7 @@ class PlotMixin:
             ax[i].set_title(
                 f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
             )  # type:ignore
+            ax[i].set_ylim(-0.001, 0.12)
         fig.suptitle(r"$v_2$ vs $p_{T,assoc}$")
         fig.tight_layout()
         fig.savefig(f"{self.base_save_path}v2_vs_pTassoc.png")  # type:ignore
@@ -1269,6 +1271,7 @@ class PlotMixin:
             ax[i].set_title(
                 f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
             )  # type:ignore
+            ax[i].set_ylim(-0.2, 0.1)
         fig.suptitle(r"$v_3$ vs $p_{T,assoc}$")
         fig.tight_layout()
         fig.savefig(f"{self.base_save_path}v3_vs_pTassoc.png")  # type:ignore
@@ -1292,6 +1295,7 @@ class PlotMixin:
             ax[i].set_title(
                 f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
             )  # type:ignore
+            ax[i].set_ylim(-0.2, 0.2)
         fig.suptitle(r"$v_4$ vs $p_{T,assoc}$")
         fig.tight_layout()
         fig.savefig(f"{self.base_save_path}v4_vs_pTassoc.png")  # type:ignore
@@ -1315,6 +1319,7 @@ class PlotMixin:
             ax[i].set_title(
                 f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
             )  # type:ignore
+            ax[i].set_ylim(-0.05, 0.12)
         fig.suptitle(r"$v_{a2}$ vs $p_{T,assoc}$")
         fig.tight_layout()
         fig.savefig(f"{self.base_save_path}va2_vs_pTassoc.png")  # type:ignore
@@ -1338,6 +1343,7 @@ class PlotMixin:
             ax[i].set_title(
                 f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
             )  # type:ignore
+            ax[i].set_ylim(-0.1, 0.12)
         fig.suptitle(r"$v_{a4}$ vs $p_{T,assoc}$")
         fig.tight_layout()
         fig.savefig(f"{self.base_save_path}va4_vs_pTassoc.png")  # type:ignore
@@ -1711,7 +1717,7 @@ class PlotMixin:
                 bin_contentBG - self.ME_norm_systematics[i, j, k],
                 bin_contentBG + self.ME_norm_systematics[i, j, k],
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
             dPhiBG.legend()
@@ -1734,7 +1740,7 @@ class PlotMixin:
                 bin_contentBG - self.ME_norm_systematics[i, j, k],
                 bin_contentBG + self.ME_norm_systematics[i, j, k],
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
         elif self.analysisType == "pp":
@@ -1763,7 +1769,7 @@ class PlotMixin:
                 x_binsBG,
                 bin_contentBG - self.ME_norm_systematics[i, j],
                 bin_contentBG + self.ME_norm_systematics[i, j],
-                alpha=0.5,
+                alpha=0.3,
                 color="red",
                 label="ME normalization",
             )  # type:ignore
@@ -1785,7 +1791,7 @@ class PlotMixin:
                 x_binsBG,
                 bin_contentBG - self.ME_norm_systematics[i, j],
                 bin_contentBG + self.ME_norm_systematics[i, j],
-                alpha=0.5,
+                alpha=0.3,
                 color="red",
                 label="ME normalization",
             )  # type:ignore
@@ -1819,7 +1825,7 @@ class PlotMixin:
                 bin_contentSig - self.ME_norm_systematics[i, j, k],
                 bin_contentSig + self.ME_norm_systematics[i, j, k],
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
             dPhiSig.legend()
@@ -1841,7 +1847,7 @@ class PlotMixin:
                 bin_contentSig - self.ME_norm_systematics[i, j, k],
                 bin_contentSig + self.ME_norm_systematics[i, j, k],
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
         elif self.analysisType == "pp":
@@ -1870,7 +1876,7 @@ class PlotMixin:
                 x_binsSig,
                 bin_contentSig - self.ME_norm_systematics[i, j],
                 bin_contentSig + self.ME_norm_systematics[i, j],
-                alpha=0.5,
+                alpha=0.3,
                 color="red",
                 label="ME normalization",
             )  # type:ignore
@@ -1892,7 +1898,7 @@ class PlotMixin:
                 x_binsSig,
                 bin_contentSig - self.ME_norm_systematics[i, j],
                 bin_contentSig + self.ME_norm_systematics[i, j],
-                alpha=0.5,
+                alpha=0.3,
                 color="red",
                 label="ME normalization",
             )  # type:ignore
@@ -1966,7 +1972,7 @@ class PlotMixin:
                 bin_contentNS + RPFErrorNS[:, k]
                 if k != 3
                 else bin_contentNS + np.sqrt(np.sum(RPFErrorNS**2, axis=1)),
-                alpha=0.5,
+                alpha=0.3,
                 color="green",
                 label="RPF fit",
             )
@@ -1976,7 +1982,7 @@ class PlotMixin:
                 bin_contentNS - self.ME_norm_systematics[i, j, k],
                 bin_contentNS + self.ME_norm_systematics[i, j, k],
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
             dPhiSigminusBGNS.legend()
@@ -2001,7 +2007,7 @@ class PlotMixin:
                 bin_contentNS + RPFErrorNS[:, k]
                 if k != 3
                 else bin_contentNS + np.sqrt(np.sum(RPFErrorNS**2, axis=1)),
-                alpha=0.5,
+                alpha=0.3,
                 color="green",
                 label="RPF fit",
             )
@@ -2010,7 +2016,7 @@ class PlotMixin:
                 bin_contentNS - self.ME_norm_systematics[i, j, k],
                 bin_contentNS + self.ME_norm_systematics[i, j, k],
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
             return n_binsNS, x_binsNS, bin_contentNS, bin_errorsNS, RPFErrorNS
@@ -2065,7 +2071,7 @@ class PlotMixin:
                 x_binsNS,
                 bin_contentNS - norm_errorsNS,
                 bin_contentNS + norm_errorsNS,
-                alpha=0.5,
+                alpha=0.3,
                 color="orange",
                 label="Yield normalization",
             )
@@ -2074,7 +2080,7 @@ class PlotMixin:
                 x_binsNS,
                 bin_contentNS - self.ME_norm_systematics[i, j],
                 bin_contentNS + self.ME_norm_systematics[i, j],
-                alpha=0.5,
+                alpha=0.3,
                 color="red",
                 label="ME normalization",
             )  # type:ignore
@@ -2097,7 +2103,7 @@ class PlotMixin:
                 x_binsNS,
                 bin_contentNS - norm_errorsNS,
                 bin_contentNS + norm_errorsNS,
-                alpha=0.5,
+                alpha=0.3,
                 color="orange",
                 label="Yield normalization",
             )
@@ -2105,7 +2111,7 @@ class PlotMixin:
                 x_binsNS,
                 bin_contentNS - self.ME_norm_systematics[i, j],
                 bin_contentNS + self.ME_norm_systematics[i, j],
-                alpha=0.5,
+                alpha=0.3,
                 color="red",
                 label="ME normalization",
             )  # type:ignore
@@ -2179,7 +2185,7 @@ class PlotMixin:
                 bin_contentAS + RPFErrorAS[:, k]
                 if k != 3
                 else bin_contentAS + np.sqrt(np.sum(RPFErrorAS**2, axis=1)),
-                alpha=0.5,
+                alpha=0.3,
                 color="green",
                 label="RPF fit",
             )
@@ -2189,7 +2195,7 @@ class PlotMixin:
                 bin_contentAS - self.ME_norm_systematics[i, j, k],
                 bin_contentAS + self.ME_norm_systematics[i, j, k],
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
             dPhiSigminusBGAS.legend()
@@ -2214,7 +2220,7 @@ class PlotMixin:
                 bin_contentAS + RPFErrorAS[:, k]
                 if k != 3
                 else bin_contentAS + np.sqrt(np.sum(RPFErrorAS**2, axis=1)),
-                alpha=0.5,
+                alpha=0.3,
                 color="green",
                 label="RPF fit",
             )
@@ -2224,7 +2230,7 @@ class PlotMixin:
                 bin_contentAS - self.ME_norm_systematics[i, j, k],
                 bin_contentAS + self.ME_norm_systematics[i, j, k],
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
             return n_binsAS, x_binsAS, bin_contentAS, bin_errorsAS, RPFErrorAS
@@ -2277,7 +2283,7 @@ class PlotMixin:
                 x_binsAS,
                 bin_contentAS - norm_errorsAS,
                 bin_contentAS + norm_errorsAS,
-                alpha=0.5,
+                alpha=0.3,
                 color="orange",
                 label="Yield normalization",
             )
@@ -2286,7 +2292,7 @@ class PlotMixin:
                 x_binsAS,
                 bin_contentAS - self.ME_norm_systematics[i, j],
                 bin_contentAS + self.ME_norm_systematics[i, j],
-                alpha=0.5,
+                alpha=0.3,
                 color="red",
                 label="ME normalization",
             )  # type:ignore
@@ -2309,7 +2315,7 @@ class PlotMixin:
                 x_binsAS,
                 bin_contentAS - norm_errorsAS,
                 bin_contentAS + norm_errorsAS,
-                alpha=0.5,
+                alpha=0.3,
                 color="orange",
                 label="Yield normalization",
             )
@@ -2317,7 +2323,7 @@ class PlotMixin:
                 x_binsAS,
                 bin_contentAS - self.ME_norm_systematics[i, j],
                 bin_contentAS + self.ME_norm_systematics[i, j],
-                alpha=0.5,
+                alpha=0.3,
                 color="red",
                 label="ME normalization",
             )  # type:ignore
@@ -2380,7 +2386,7 @@ class PlotMixin:
                 bin_contentINC + RPFErrorINC[:, k]
                 if k != 3
                 else bin_contentINC + np.sqrt(np.sum(RPFErrorINC**2, axis=1)),
-                alpha=0.5,
+                alpha=0.3,
                 color="green",
                 label="RPF fit",
             )
@@ -2390,7 +2396,7 @@ class PlotMixin:
                 bin_contentINC - self.ME_norm_systematics[i, j, k],
                 bin_contentINC + self.ME_norm_systematics[i, j, k],
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
             dPhiSigminusBGINC.legend()
@@ -2418,7 +2424,7 @@ class PlotMixin:
                 bin_contentINC + RPFErrorINC[:, k]
                 if k != 3
                 else bin_contentINC + np.sqrt(np.sum(RPFErrorINC**2, axis=1) / 9),
-                alpha=0.5,
+                alpha=0.3,
                 color="green",
                 label="RPF fit",
             )
@@ -2428,7 +2434,7 @@ class PlotMixin:
                 bin_contentINC - self.ME_norm_systematics[i, j, k],
                 bin_contentINC + self.ME_norm_systematics[i, j, k],
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
 
@@ -2468,7 +2474,7 @@ class PlotMixin:
                 x_binsINC,
                 bin_contentINC - norm_errorsINC,
                 bin_contentINC + norm_errorsINC,
-                alpha=0.5,
+                alpha=0.3,
                 color="orange",
                 label="Yield normalization",
             )
@@ -2477,7 +2483,7 @@ class PlotMixin:
                 x_binsINC,
                 bin_contentINC - self.ME_norm_systematics[i, j],
                 bin_contentINC + self.ME_norm_systematics[i, j],
-                alpha=0.5,
+                alpha=0.3,
                 color="red",
                 label="ME normalization",
             )  # type:ignore
@@ -2503,7 +2509,7 @@ class PlotMixin:
                 x_binsINC,
                 bin_contentINC - norm_errorsINC,
                 bin_contentINC + norm_errorsINC,
-                alpha=0.5,
+                alpha=0.3,
                 color="red",
             )
 
@@ -2574,17 +2580,17 @@ class PlotMixin:
                 if k != 3
                 else bin_contentNormINC
                 + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / N_trig,
-                alpha=0.5,
+                alpha=0.3,
                 color="green",
                 label="RPF fit",
             )
             # do fill between for me norm systematic
             dPhiSigminusBGNormINCax.fill_between(
                 x_binsNormINC,
-                bin_contentNormINC - self.ME_norm_systematics[i, j, k],
-                bin_contentNormINC + self.ME_norm_systematics[i, j, k],
+                bin_contentNormINC - self.ME_norm_systematics[i, j, k]/N_trig,
+                bin_contentNormINC + self.ME_norm_systematics[i, j, k]/N_trig,
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
             dPhiSigminusBGNormINC.legend()
@@ -2619,17 +2625,17 @@ class PlotMixin:
                 if k != 3
                 else bin_contentNormINC
                 + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / N_trig,
-                alpha=0.5,
+                alpha=0.3,
                 color="green",
                 label="RPF fit",
             )
             # do fill between for me norm systematic
             axSigminusBGNormINC[k].fill_between(
                 x_binsNormINC,
-                bin_contentNormINC - self.ME_norm_systematics[i, j, k],
-                bin_contentNormINC + self.ME_norm_systematics[i, j, k],
+                bin_contentNormINC - self.ME_norm_systematics[i, j, k]/N_trig,
+                bin_contentNormINC + self.ME_norm_systematics[i, j, k]/N_trig,
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
 
@@ -2685,15 +2691,15 @@ class PlotMixin:
                 x_binsNormINC,
                 bin_contentNormINC - norm_errorsNormINC / N_trig,
                 bin_contentNormINC + norm_errorsNormINC / N_trig,
-                alpha=0.5,
+                alpha=0.3,
                 color="orange",
                 label="Yield normalization",
             )
             dPhiSigminusBGNormINCax.fill_between(
                 x_binsNormINC,
-                bin_contentNormINC - self.ME_norm_systematics[i, j],
-                bin_contentNormINC + self.ME_norm_systematics[i, j],
-                alpha=0.5,
+                bin_contentNormINC - self.ME_norm_systematics[i, j]/N_trig,
+                bin_contentNormINC + self.ME_norm_systematics[i, j]/N_trig,
+                alpha=0.3,
                 color="red",
                 label="ME normalization",
             )  # type:ignore
@@ -2725,15 +2731,15 @@ class PlotMixin:
                 x_binsNormINC,
                 bin_contentNormINC - norm_errorsNormINC / N_trig,
                 bin_contentNormINC + norm_errorsNormINC / N_trig,
-                alpha=0.5,
+                alpha=0.3,
                 color="orange",
                 label="Yield normalization",
             )
             axSigminusBGNormINC.fill_between(
                 x_binsNormINC,
-                bin_contentNormINC - self.ME_norm_systematics[i, j],
-                bin_contentNormINC + self.ME_norm_systematics[i, j],
-                alpha=0.5,
+                bin_contentNormINC - self.ME_norm_systematics[i, j]/N_trig,
+                bin_contentNormINC + self.ME_norm_systematics[i, j]/N_trig,
+                alpha=0.3,
                 color="red",
                 label="ME normalization",
             )  # type:ignore
@@ -2793,22 +2799,22 @@ class PlotMixin:
                 bin_contentNormINC - BGErrorINC[:, k] / N_trig
                 if k != 3
                 else bin_contentNormINC
-                - np.sqrt(np.sum((BGErrorINC) ** 2, axis=1) / 9) / N_trig,
+                - np.sqrt(np.sum((BGErrorINC) ** 2, axis=1) ) / N_trig,
                 bin_contentNormINC + BGErrorINC[:, k] / N_trig
                 if k != 3
                 else bin_contentNormINC
-                + np.sqrt(np.sum(BGErrorINC**2, axis=1) / 9) / N_trig,
-                alpha=0.5,
+                + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / N_trig,
+                alpha=0.3,
                 color="green",
                 label="RPF fit",
             )
             # do fill between for me norm systematic
             dPhiSigminusBGNormINCax.fill_between(
                 x_binsNormINC,
-                bin_contentNormINC - self.ME_norm_systematics[i, j, k],
-                bin_contentNormINC + self.ME_norm_systematics[i, j, k],
+                bin_contentNormINC - self.ME_norm_systematics[i, j, k]/N_trig,
+                bin_contentNormINC + self.ME_norm_systematics[i, j, k]/N_trig,
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
             dPhiSigminusBGNormINC.legend()
@@ -2838,22 +2844,22 @@ class PlotMixin:
                 bin_contentNormINC - BGErrorINC[:, k] / N_trig
                 if k != 3
                 else bin_contentNormINC
-                - np.sqrt(np.sum(BGErrorINC**2, axis=1) / 9) / N_trig,
+                - np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / N_trig,
                 bin_contentNormINC + BGErrorINC[:, k] / N_trig
                 if k != 3
                 else bin_contentNormINC
-                + np.sqrt(np.sum(BGErrorINC**2, axis=1) / 9) / N_trig,
-                alpha=0.5,
+                + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / N_trig,
+                alpha=0.3,
                 color="green",
                 label="RPF fit",
             )
             # do fill between for me norm systematic
             axSigminusBGNormINCSpecies[k].fill_between(
                 x_binsNormINC,
-                bin_contentNormINC - self.ME_norm_systematics[i, j, k],
-                bin_contentNormINC + self.ME_norm_systematics[i, j, k],
+                bin_contentNormINC - self.ME_norm_systematics[i, j, k]/N_trig,
+                bin_contentNormINC + self.ME_norm_systematics[i, j, k]/N_trig,
                 color="red",
-                alpha=0.5,
+                alpha=0.3,
                 label="ME normalization",
             )
 
@@ -2911,15 +2917,15 @@ class PlotMixin:
                 x_binsNormINC,
                 bin_contentNormINC - BG_errorsNormINC / N_trig,
                 bin_contentNormINC + BG_errorsNormINC / N_trig,
-                alpha=0.5,
+                alpha=0.3,
                 color="orange",
                 label="Yield normalization",
             )
             dPhiSigminusBGNormINCax.fill_between(
                 x_binsNormINC,
-                bin_contentNormINC - self.ME_norm_systematics[i, j],
-                bin_contentNormINC + self.ME_norm_systematics[i, j],
-                alpha=0.5,
+                bin_contentNormINC - self.ME_norm_systematics[i, j]/N_trig,
+                bin_contentNormINC + self.ME_norm_systematics[i, j]/N_trig,
+                alpha=0.3,
                 color="red",
                 label="ME normalization",
             )  # type:ignore
@@ -2951,15 +2957,15 @@ class PlotMixin:
                 x_binsNormINC,
                 bin_contentNormINC - BG_errorsNormINC / N_trig,
                 bin_contentNormINC + BG_errorsNormINC / N_trig,
-                alpha=0.5,
+                alpha=0.3,
                 color="orange",
                 label="Yield normalization",
             )
             axSigminusBGNormINCSpecies.fill_between(
                 x_binsNormINC,
-                bin_contentNormINC - self.ME_norm_systematics[i, j],
-                bin_contentNormINC + self.ME_norm_systematics[i, j],
-                alpha=0.5,
+                bin_contentNormINC - self.ME_norm_systematics[i, j]/N_trig,
+                bin_contentNormINC + self.ME_norm_systematics[i, j]/N_trig,
+                alpha=0.3,
                 color="red",
                 label="ME normalization",
             )  # type:ignore
@@ -3037,8 +3043,8 @@ class PlotMixin:
                     self.pTassocBinCenters,
                     np.array(self.Yields[species][i, :], dtype=float) - RPFError,
                     np.array(self.Yields[species][i, :], dtype=float) + RPFError,
-                    alpha=0.5,
-                    color="orange",
+                    alpha=0.3,
+                    color="green",
                     label="RPF systematics" if i == 2 else "",
                 )  # type:ignore
                 # now ME_norm_systematics
@@ -3050,7 +3056,7 @@ class PlotMixin:
                     np.array(self.Yields[species][i, :], dtype=float)
                     + np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
                     / N_trigs,
-                    alpha=0.5,
+                    alpha=0.3,
                     color="red",
                     label="ME normalization" if i == 2 else "",
                 )  # type:ignore
@@ -3067,7 +3073,7 @@ class PlotMixin:
                     - BG_errorsNormINC,
                     np.array(self.Yields[species][i, :], dtype=float)
                     + BG_errorsNormINC,
-                    alpha=0.5,
+                    alpha=0.3,
                     color="orange",
                     label="Yield normalization" if i == 2 else "",
                 )  # type:ignore
@@ -3078,7 +3084,7 @@ class PlotMixin:
                     - np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
                     np.array(self.Yields[species][i, :], dtype=float)
                     + np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
-                    alpha=0.5,
+                    alpha=0.3,
                     color="red",
                     label="ME normalization" if i == 2 else "",
                 )  # type:ignore
@@ -3133,7 +3139,7 @@ class PlotMixin:
                                 )
                                 ** 2
                             )
-                            / 9
+                            
                         )
                         / N_trigs[j]
                         for j in range(len(self.pTassocBinCenters))
@@ -3146,7 +3152,7 @@ class PlotMixin:
                     self.pTassocBinCenters,
                     np.array(self.YieldsNS[species][i, :], dtype=float) - RPFError,
                     np.array(self.YieldsNS[species][i, :], dtype=float) + RPFError,
-                    alpha=0.5,
+                    alpha=0.3,
                     color="orange",
                     label="RPF systematics" if i == 2 else "",
                 )  # type:ignore
@@ -3159,7 +3165,7 @@ class PlotMixin:
                     np.array(self.YieldsNS[species][i, :], dtype=float)
                     + np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
                     / N_trigs,
-                    alpha=0.5,
+                    alpha=0.3,
                     color="red",
                     label="ME normalization" if i == 2 else "",
                 )  # type:ignore
@@ -3176,7 +3182,7 @@ class PlotMixin:
                     - BG_errorsNormINC,
                     np.array(self.YieldsNS[species][i, :], dtype=float)
                     + BG_errorsNormINC,
-                    alpha=0.5,
+                    alpha=0.3,
                     color="orange",
                     label="Yield normalization" if i == 2 else "",
                 )  # type:ignore
@@ -3187,7 +3193,7 @@ class PlotMixin:
                     - np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
                     np.array(self.YieldsNS[species][i, :], dtype=float)
                     + np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
-                    alpha=0.5,
+                    alpha=0.3,
                     color="red",
                     label="ME normalization" if i == 2 else "",
                 )  # type:ignore
@@ -3241,7 +3247,7 @@ class PlotMixin:
                                 )
                                 ** 2
                             )
-                            / 9
+                            
                         )
                         / N_trigs[j]
                         for j in range(len(self.pTassocBinCenters))
@@ -3255,7 +3261,7 @@ class PlotMixin:
                     self.pTassocBinCenters,
                     np.array(self.YieldsAS[species][i, :], dtype=float) - RPFError,
                     np.array(self.YieldsAS[species][i, :], dtype=float) + RPFError,
-                    alpha=0.5,
+                    alpha=0.3,
                     color="orange",
                     label="RPF systematics" if i == 2 else "",
                 )  # type:ignore
@@ -3268,7 +3274,7 @@ class PlotMixin:
                     np.array(self.YieldsAS[species][i, :], dtype=float)
                     + np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
                     / N_trigs,
-                    alpha=0.5,
+                    alpha=0.3,
                     color="red",
                     label="ME normalization" if i == 2 else "",
                 )  # type:ignore
@@ -3285,7 +3291,7 @@ class PlotMixin:
                     - BG_errorsNormINC,
                     np.array(self.YieldsAS[species][i, :], dtype=float)
                     + BG_errorsNormINC,
-                    alpha=0.5,
+                    alpha=0.3,
                     color="orange",
                     label="Yield normalization" if i == 2 else "",
                 )  # type:ignore
@@ -3296,7 +3302,7 @@ class PlotMixin:
                     - np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
                     np.array(self.YieldsAS[species][i, :], dtype=float)
                     + np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
-                    alpha=0.5,
+                    alpha=0.3,
                     color="red",
                     label="ME normalization" if i == 2 else "",
                 )  # type:ignore
