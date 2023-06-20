@@ -15,7 +15,7 @@ class RPF:
         self.simultaneous_fit_err = lambda dPhi, dPhiErr, B, v2, v3, v4, va2, va4: np.hstack([self.in_plane_err(dPhi, dPhiErr, B, v2, v3, v4, va2, va4), self.mid_plane_err(dPhi, dPhiErr, B, v2, v3, v4, va2, va4), self.out_of_plane_err(dPhi, dPhiErr, B, v2, v3, v4, va2, va4)])
         # 9 params in fit
         self.p0 = p0 # B, v1, v2, v3, v4, va2, va4
-        self.bounds = [[0.0, -0.0001, -0.2, -0.2, -0.1, -0.005, -0.02], [1e8, 0.0001, 0.2, 0.3, 0.10, 0.80, 0.15]] # B, v1, v2, v3, v4, va2, va4
+        self.bounds = [[0.0,  -0.2, -0.2, -0.1, -0.005, -0.02], [1e8,  0.2, 0.3, 0.10, 0.80, 0.15]] # B, v1, v2, v3, v4, va2, va4
         self.popt = None
         self.pcov = np.zeros((7,7))
         self.chi2OverNDF = None
@@ -73,7 +73,7 @@ class RPF:
 
     def btilde(self, phis, c):
         def btilde_(B, v2, v4):
-            return B*(1+2*v2*np.cos(2*phis)*np.sin(2*c)/(2*c)*self.R2 + 2*v4*np.cos(4*phis)*np.sin(4*c)/(4*c)*self.R4)
+            return np.pi*B*(1+2*v2*np.cos(2*phis)*np.sin(2*c)/(2*c)*self.R2 + 2*v4*np.cos(4*phis)*np.sin(4*c)/(4*c)*self.R4)
         return btilde_
 
     def background(self,phis, c):
@@ -84,7 +84,7 @@ class RPF:
 
     def background_err(self, phis, c):
         
-        def background_err_(dPhi, dPhiErr, B, v1, v2, v3, v4, va2, va4):
+        def background_err_(dPhi, dPhiErr, B, v2, v3, v4, va2, va4):
             background = self.background(phis, c)
             btilde_func = self.btilde(phis, c)
 
@@ -132,9 +132,9 @@ class RPF:
             #    /
             #    (1 + 2*v2*np.cos(2*phis)*np.sin(2*c)/(2*c)*self.R2 + 2*v4*np.cos(4*phis)*np.sin(4*c)/(4*c)*self.R4)**2) + np.pi*(B*c*2/np.pi*2*np.cos(4*phis)*np.sin(4*c)/(4*c)*self.R4)*(1+2*v1*np.cos(1*dPhi) +2*self.vtilde(2, phis, c)(v1, v2, v3, v4)*va2*np.cos(2*dPhi) +2*v3*np.cos(3*dPhi) + 2*self.vtilde(4, phis, c)(v1, v2, v3, v4)*va4*np.cos(4*dPhi))
 
-            dbdva2 = np.pi*btilde_func(B, v2, v4)*2*self.vtilde(2, phis, c)( v2, v3, v4)*np.cos(2*dPhi)
+            dbdva2 = btilde_func(B, v2, v4)*2*self.vtilde(2, phis, c)( v2, v3, v4)*np.cos(2*dPhi)
 
-            dbdva4 = np.pi*btilde_func(B, v2, v4)*2*self.vtilde(4, phis, c)( v2, v3, v4)*np.cos(4*dPhi)
+            dbdva4 = btilde_func(B, v2, v4)*2*self.vtilde(4, phis, c)( v2, v3, v4)*np.cos(4*dPhi)
 
             err = np.sqrt( (dbdB**2 * self.pcov[0,0]) + (dbdv2**2 * self.pcov[1,1]) + (dbdv3**2 * self.pcov[2,2]) + (dbdv4**2 * self.pcov[3,3]) + (dbdva2**2 * self.pcov[4,4]) + (dbdva4**2 * self.pcov[5,5]) +  \
                 + 2*(dbdB*dbdv2 * self.pcov[0,1]) + 2*(dbdB*dbdv3 * self.pcov[0,2])+2*(dbdB*dbdv4 * self.pcov[0,3])+2*(dbdB*dbdva2 * self.pcov[0,4])+2*(dbdB*dbdva4 * self.pcov[0,5])\
@@ -149,7 +149,7 @@ class RPF:
     def fit(self, x, y, yerr):
         from scipy.optimize import curve_fit
 
-        popt, pcov, infodict, mesg, ierr = curve_fit(self.simultaneous_fit, x, y, sigma=[yerr_i or 1 for yerr_i in yerr], p0=self.p0, bounds=self.bounds,absolute_sigma=True, maxfev=1000000,  verbose=2, full_output=True)
+        popt, pcov, infodict, mesg, ierr = curve_fit(self.simultaneous_fit, x, y, sigma=[yerr_i or 1 for yerr_i in yerr], p0=self.p0, bounds=self.bounds,absolute_sigma=True, maxfev=1000000,  verbose=2, full_output=True, xtol=1e-12, ftol=1e-12, gtol=1e-12, method='trf')
         print(f"{popt=}, {pcov=}, {infodict=}, {mesg=}, {ierr=}")
         '''
         # generate len(x)-1 x, y, yerr and redo fits for bootstrap estimate of error by removing one point at a time

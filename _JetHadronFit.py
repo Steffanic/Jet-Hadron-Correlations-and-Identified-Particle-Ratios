@@ -1,6 +1,7 @@
 from itertools import product
 import numpy as np
 from RPF import RPF
+from PionTPCNSigmaFitter import PionTPCNSigmaFitter
 
 
 class FitMixin:
@@ -15,6 +16,12 @@ class FitMixin:
         for i in range(len(self.pTtrigBinEdges)-1): #type:ignore
             for j in range(len(self.pTassocBinEdges)-1): #type:ignore
                 self.fit_RPF(i,j, p0=self.central_p0s[(i,j)])
+
+    def fit_RPFs_for_species(self):
+        for i in range(len(self.pTtrigBinEdges)-1): #type:ignore
+            for j in range(len(self.pTassocBinEdges)-1): #type:ignore
+                for species in ['pion', 'proton', "kaon"]:
+                    self.fit_RPF_for_species(i,j, species, p0=self.central_p0s[(i,j)])
 
     def fit_RPF(self, i, j, p0=None):
         # get the RPF object
@@ -41,6 +48,7 @@ class FitMixin:
         best_p0 = p0
         self.RPFObjs[i,j] = rpf #type:ignore
         
+        
         print(f"Best RPF fit for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV had Error Sum of {best_error} and p0 of {best_p0} with final parameter values of {list(zip(['B', 'v2', 'v3', 'v4', 'va2', 'va4'], best_popt))}") #type:ignore
         # now let's write a latex table to a txt file for the RPF parameters and their names
         with open(f"RPF_parameters_{self.analysisType}.txt", "a") as f: #type:ignore
@@ -59,8 +67,191 @@ class FitMixin:
             f.write(f"\n")
             
         return best_popt, best_pcov, best_error, best_p0
-
     
+    def fit_RPF_in_z_vertex_bins(self, i, j, p0=None):
+        # get the RPF object
+        best_error = 100000
+        best_popt = []
+        best_pcov = None
+        best_p0 = None
+
+        rpf = RPF(analysisType=self.analysisType) if not p0 else RPF(p0=p0, analysisType=self.analysisType)
+        inPlane  = self.dPhiBGcorrsZV[i,j,0] #type:ignore
+        midPlane = self.dPhiBGcorrsZV[i,j,1] #type:ignore
+        outPlane = self.dPhiBGcorrsZV[i,j,2] #type:ignore
+        combo_x = self.get_bin_centers_as_array(inPlane) #type:ignore
+        combo_y = np.hstack((self.get_bin_contents_as_array(inPlane), self.get_bin_contents_as_array(midPlane), self.get_bin_contents_as_array(outPlane))) #type:ignore
+        combo_yerr = np.hstack((self.get_bin_errors_as_array(inPlane), self.get_bin_errors_as_array(midPlane), self.get_bin_errors_as_array(outPlane))) #type:ignore
+        popt, pcov, chi2OverNDF = rpf.fit(combo_x, combo_y, combo_yerr)
+        print("*"*80)
+        print(f"Error: {sum(np.sqrt(np.diag(pcov)))}")
+        error = sum(np.sqrt(np.diag(pcov)))
+        print("*"*80)
+        best_error = error
+        best_popt = popt
+        best_pcov = pcov
+        best_p0 = p0
+        self.RPFObjsZV[i,j] = rpf #type:ignore
+        
+        
+        print(f"Best RPF fit for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV had Error Sum of {best_error} and p0 of {best_p0} with final parameter values of {list(zip(['B', 'v2', 'v3', 'v4', 'va2', 'va4'], best_popt))}") #type:ignore
+        # now let's write a latex table to a txt file for the RPF parameters and their names
+        with open(f"RPF_parameters_{self.analysisType}.txt", "a") as f: #type:ignore
+            f.write(f"\\begin{{table}}[h!]\n")
+            f.write(f"\\centering\n")
+            f.write(f"\\caption{{RPF parameters for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV}}\n")
+            f.write(f"\\begin{{tabular}}{{|c|c|}}\n")
+            f.write(f"\\hline\n")
+            f.write(f"Parameter & Value \\\\ \n")
+            f.write(f"\\hline\n")
+            for name, value in list(zip(['B', 'v2', 'v3', 'v4', 'va2', 'va4', 'R2', 'R4'], best_popt)):
+                f.write(f"{name} & {value} \\\\ \n")
+            f.write(f"\\hline\n")
+            f.write(f"\\end{{tabular}}\n")
+            f.write(f"\\end{{table}}\n")
+            f.write(f"\n")
+            
+        return best_popt, best_pcov, best_error, best_p0
+    
+    def fit_RPF_for_species(self, i, j, species, p0=None):
+        # get the RPF object
+        best_error = 100000
+        best_popt = []
+        best_pcov = None
+        best_p0 = None
+
+        rpf = RPF(analysisType=self.analysisType) if not p0 else RPF(p0=p0, analysisType=self.analysisType)
+        inPlane  = self.dPhiBGcorrsForSpecies[species][i,j,0] #type:ignore
+        midPlane = self.dPhiBGcorrsForSpecies[species][i,j,1] #type:ignore
+        outPlane = self.dPhiBGcorrsForSpecies[species][i,j,2] #type:ignore
+        combo_x = self.get_bin_centers_as_array(inPlane) #type:ignore
+        combo_y = np.hstack((self.get_bin_contents_as_array(inPlane), self.get_bin_contents_as_array(midPlane), self.get_bin_contents_as_array(outPlane))) #type:ignore
+        combo_yerr = np.hstack((self.get_bin_errors_as_array(inPlane), self.get_bin_errors_as_array(midPlane), self.get_bin_errors_as_array(outPlane))) #type:ignore
+        popt, pcov, chi2OverNDF = rpf.fit(combo_x, combo_y, combo_yerr)
+        print("*"*80)
+        print(f"Error: {sum(np.sqrt(np.diag(pcov)))}")
+        error = sum(np.sqrt(np.diag(pcov)))
+        print("*"*80)
+        best_error = error
+        best_popt = popt
+        best_pcov = pcov
+        best_p0 = p0
+        self.RPFObjsForSpecies[species][i,j] = rpf #type:ignore
+        
+        
+        print(f"Best RPF fit for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV had Error Sum of {best_error} and p0 of {best_p0} with final parameter values of {list(zip(['B', 'v2', 'v3', 'v4', 'va2', 'va4'], best_popt))}") #type:ignore
+        # now let's write a latex table to a txt file for the RPF parameters and their names
+        with open(f"RPF_parameters_{species}_{self.analysisType}.txt", "a") as f: #type:ignore
+            f.write(f"\\begin{{table}}[h!]\n")
+            f.write(f"\\centering\n")
+            f.write(f"\\caption{{RPF parameters for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV}}\n")
+            f.write(f"\\begin{{tabular}}{{|c|c|}}\n")
+            f.write(f"\\hline\n")
+            f.write(f"Parameter & Value \\\\ \n")
+            f.write(f"\\hline\n")
+            for name, value in list(zip(['B', 'v2', 'v3', 'v4', 'va2', 'va4', 'R2', 'R4'], best_popt)):
+                f.write(f"{name} & {value} \\\\ \n")
+            f.write(f"\\hline\n")
+            f.write(f"\\end{{tabular}}\n")
+            f.write(f"\\end{{table}}\n")
+            f.write(f"\n")
+            
+        return best_popt, best_pcov, best_error, best_p0
+    
+    def fit_RPF_for_species_in_z_vertex_bins(self, i, j, species, p0=None):
+        # get the RPF object
+        best_error = 100000
+        best_popt = []
+        best_pcov = None
+        best_p0 = None
+
+        rpf = RPF(analysisType=self.analysisType) if not p0 else RPF(p0=p0, analysisType=self.analysisType)
+        inPlane  = self.dPhiBGcorrsForSpeciesZV[species][i,j,0] #type:ignore
+        midPlane = self.dPhiBGcorrsForSpeciesZV[species][i,j,1] #type:ignore
+        outPlane = self.dPhiBGcorrsForSpeciesZV[species][i,j,2] #type:ignore
+        combo_x = self.get_bin_centers_as_array(inPlane) #type:ignore
+        combo_y = np.hstack((self.get_bin_contents_as_array(inPlane), self.get_bin_contents_as_array(midPlane), self.get_bin_contents_as_array(outPlane))) #type:ignore
+        combo_yerr = np.hstack((self.get_bin_errors_as_array(inPlane), self.get_bin_errors_as_array(midPlane), self.get_bin_errors_as_array(outPlane))) #type:ignore
+        popt, pcov, chi2OverNDF = rpf.fit(combo_x, combo_y, combo_yerr)
+        print("*"*80)
+        print(f"Error: {sum(np.sqrt(np.diag(pcov)))}")
+        error = sum(np.sqrt(np.diag(pcov)))
+        print("*"*80)
+        best_error = error
+        best_popt = popt
+        best_pcov = pcov
+        best_p0 = p0
+        self.RPFObjsForSpeciesZV[species][i,j] = rpf #type:ignore
+        
+        
+        print(f"Best RPF fit for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV had Error Sum of {best_error} and p0 of {best_p0} with final parameter values of {list(zip(['B', 'v2', 'v3', 'v4', 'va2', 'va4'], best_popt))}") #type:ignore
+        # now let's write a latex table to a txt file for the RPF parameters and their names
+        with open(f"RPF_parameters_{species}_{self.analysisType}.txt", "a") as f: #type:ignore
+            f.write(f"\\begin{{table}}[h!]\n")
+            f.write(f"\\centering\n")
+            f.write(f"\\caption{{RPF parameters for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV}}\n")
+            f.write(f"\\begin{{tabular}}{{|c|c|}}\n")
+            f.write(f"\\hline\n")
+            f.write(f"Parameter & Value \\\\ \n")
+            f.write(f"\\hline\n")
+            for name, value in list(zip(['B', 'v2', 'v3', 'v4', 'va2', 'va4', 'R2', 'R4'], best_popt)):
+                f.write(f"{name} & {value} \\\\ \n")
+            f.write(f"\\hline\n")
+            f.write(f"\\end{{tabular}}\n")
+            f.write(f"\\end{{table}}\n")
+            f.write(f"\n")
+            
+        return best_popt, best_pcov, best_error, best_p0
+
+    def fit_PionTPCNSigma(self, i, j, k, p0=None):
+        if p0 is None:
+            if self.analysisType=='pp':
+                if j==0:
+                    p0 = [2.5, 0, .5, 0.1, 0.1, 0.1, 100,100, 0.11, 10,100, 10, 0.11,100, 100]
+                    bounds = [[-6, -0.1, -6, 1e-1,1e-1,1e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [6, 0.1, 6, 10.0, 10.0, 10.0, 100000,100000,10,100000,100000,100000,10,100000,100000]]
+                else:
+                    p0 = [-2.5, 0, -1.0, 0.1, 0.1, 0.1, 100,100, 0.11, 10,100, 10, 0.11,100, 100]
+                    bounds = [[-6, -0.1, -6, 1e-1,1e-1,1e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [0, 0.1, 0, 10.0, 10.0, 10.0, 100000,100000,10,100000,100000,100000,10,100000,100000]]
+
+            elif self.analysisType in ['central', 'semicentral']:
+                if j==0:
+                    p0 = [2.5, 0.5, 1.5, 0.1, 0.1, 0.1, 10000,10000, 1.1, 1000,10000, 1000, 1.1,10000, 10000]
+                    bounds = [[0, 0, 0, 1e-1,1e-1,1e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [6, 1.0, 6, 10.0, 10.0, 10.0, 100000,100000,10,100000,100000,100000,10,100000,100000]]
+                else:
+                    p0 = [2.5, 0.5, 1.0, 0.1, 0.1, 0.1, 10000,10000, 1.1, 1000,10000, 1000, 1.1,10000, 10000]
+                    bounds = [[0, 0, 0, 1e-1,1e-1,1e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [6, 1.0, 6, 10.0, 10.0, 10.0, 100000,100000,1000,100000,100000,100000,1000,100000,100000]]
+        fitter = PionTPCNSigmaFitter(p0=p0, p0_bounds=bounds)
+
+        if self.analysisType in ['central', 'semicentral']:
+            pionEnhanced = self.pionTPCnSigma_pionTOFcut[i, j, k]
+            protonEnchanced = self.pionTPCnSigma_protonTOFcut[i, j, k]
+            kaonEnhanced = self.pionTPCnSigma_kaonTOFcut[i, j, k]
+        else:
+            pionEnhanced = self.pionTPCnSigma_pionTOFcut[i, j]
+            protonEnchanced = self.pionTPCnSigma_protonTOFcut[i, j]
+            kaonEnhanced = self.pionTPCnSigma_kaonTOFcut[i, j]
+
+        nbins = pionEnhanced.GetNbinsX()
+        x = np.array([pionEnhanced.GetBinCenter(i) for i in range(1, nbins+1)])
+        y_pi = np.array([pionEnhanced.GetBinContent(i) for i in range(1, nbins+1)])
+        y_p = np.array([protonEnchanced.GetBinContent(i) for i in range(1, nbins+1)])
+        y_k = np.array([kaonEnhanced.GetBinContent(i) for i in range(1, nbins+1)])
+        y = [y_pi, y_p, y_k]
+        yerr_pi = np.array([pionEnhanced.GetBinError(i) for i in range(1, nbins+1)])
+        yerr_p = np.array([protonEnchanced.GetBinError(i) for i in range(1, nbins+1)])
+        yerr_k = np.array([kaonEnhanced.GetBinError(i) for i in range(1, nbins+1)])
+        yerr = [yerr_pi, yerr_p, yerr_k]
+
+        best_popt, best_pcov, chi2perNDF = fitter.fit(x, y, yerr=yerr)
+
+        if self.analysisType in ['central', 'semicentral']:
+            self.PionTPCNSigmaFitObjs[i,j,k] = fitter
+        else:
+            self.PionTPCNSigmaFitObjs[i,j] = fitter
+
+        return best_popt, best_pcov, chi2perNDF
+
+
     
         
     def get_p0s(self, i, j):
