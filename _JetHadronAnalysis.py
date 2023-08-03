@@ -110,7 +110,7 @@ class AnalysisMixin:
                     for i in range(1, self.JH[sparse_ind].GetNdimensions())
                 ]
 
-            if species is not "other":
+            if species != "other":
                 if species=="pion":
 
                     self.JH[sparse_ind].GetAxis(9 - offset).SetRangeUser(
