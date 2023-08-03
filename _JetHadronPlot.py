@@ -3092,7 +3092,6 @@ class PlotMixin:
                 A_std = std_vec(A)
                 sns.heatmap(A_nom, annot=True, cmap='viridis', fmt='.2f', ax = ax[2,0], vmin=0, vmax=1)
                 sns.heatmap(A_std, annot=True, cmap='viridis', fmt='.2f', ax = ax[2,1], vmin=0, vmax=1)
-                self.ResponseMatrices[f'{dphi_range}']=A
 
             ax[0,0].legend()
             ax[0,1].legend()

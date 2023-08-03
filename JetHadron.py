@@ -3,7 +3,7 @@ from itertools import product
 import logging
 import pickle
 import subprocess
-from typing import Optional
+from typing import Optional, Union
 import numpy as np
 import requests
 import matplotlib.pyplot as plt
@@ -70,7 +70,7 @@ class JetHadron(
         # let's turn the sparses into lists of sparses to use all files
         self.JH, self.MixedEvent, self.Trigger = [], [], []
         self.EventPlaneAngleHist = []
-        first = True
+
         for filename in rootFileNames:
             debug_logger.debug(f"Loading file {filename}")
             file = TFile(filename)
@@ -309,366 +309,128 @@ class JetHadron(
         self.unfoldedTruthErrors = None
         self.resetUnfoldingResults = True
 
+        with_eventPlane = None
         if self.analysisType in ["central", "semicentral"]:
             # Define all the arrays that will hold various objects for each bin
             self.N_trigs = np.zeros(
                 (len(self.pTtrigBinEdges) - 1, len(self.eventPlaneAngleBinEdges)),
                 dtype=int,
             )
-            self.N_assoc =  self.init_pTtrig_pTassoc_eventPlane_dict(int)
-            self.N_assoc_for_species = self.init_pTtrig_pTassoc_eventPlane_region_dict(int)
-            self.SEcorrs = self.init_pTtrig_pTassoc_eventPlane_array(
-                TH2F
-            )  # Event plane angle has 4 bins, in-, mid-, out, and inclusive
-            self.NormMEcorrs = self.init_pTtrig_pTassoc_eventPlane_array(TH2F)
-            self.AccCorrectedSEcorrs = self.init_pTtrig_pTassoc_eventPlane_array(
-                TH2F
-            )
-            self.AccCorrectedSEcorrsZV = self.init_pTtrig_pTassoc_eventPlane_array(
-                TH2F
-            )
-            self.NormAccCorrectedSEcorrs = self.init_pTtrig_pTassoc_eventPlane_array(
-                TH2F
-            )
-            self.NormAccCorrectedSEcorrsZV = self.init_pTtrig_pTassoc_eventPlane_array(
-                TH2F
-            )
-            self.ME_norm_systematics = self.init_pTtrig_pTassoc_eventPlane_array(float)
-            self.dPhiSigcorrs = self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
-            self.dPhiSigcorrsZV = self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
-            self.dPhiBGcorrsForTrueSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiSigcorrsForTrueSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiBGcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiSigcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiBGPIDErrForTrueSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiSigPIDErrForTrueSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiBGPIDErrForTrueSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiSigPIDErrForTrueSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiBGcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiSigcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiBGcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiSigcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiBGPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiSigPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiBGPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-            self.dPhiSigPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH1F
-            )
-
-            self.dPhiBGcorrs = self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
-            self.dPhiBGcorrsZV = self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
-            self.dPhiSigdpionTPCnSigmacorrs = self.init_pTtrig_pTassoc_eventPlane_dict(
-                TH2F
-            )
-            self.dEtacorrs = self.init_pTtrig_pTassoc_array(TH1F)
-            self.RPFObjs = self.init_pTtrig_pTassoc_array(object)
-            self.RPFObjsZV = self.init_pTtrig_pTassoc_array(object)
-            self.PionTPCNSigmaFitObjs = self.init_pTtrig_pTassoc_eventPlane_dict(object)
-            self.RPFObjsForTrueSpecies = self.init_pTtrig_pTassoc_dict(object)
-            self.RPFObjsForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(object)
-            self.RPFObjsForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(object)
-            self.RPFObjsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(object)
-            self.BGSubtractedAccCorrectedSEdPhiSigNScorrs = (
-                self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
-            )
-            self.BGSubtractedAccCorrectedSEdPhiSigAScorrs = (
-                self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
-            )
-            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs = (
-                self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
-            )
-            self.BGSubtractedAccCorrectedSEdPhiSigNScorrsZV = (
-                self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
-            )
-            self.BGSubtractedAccCorrectedSEdPhiSigAScorrsZV = (
-                self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
-            )
-            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsZV = (
-                self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
-            )
-            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrs = (
-                self.init_pTtrig_pTassoc_eventPlane_dict(TH2F)
-            )
-            self.NormalizedBGSubtracteddPhiForTrueSpecies = (
-                self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
-            )
-            self.NormalizedBGSubtracteddPhiForTrueSpeciesZV = (
-                self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
-            )
-            self.NormalizedBGSubtracteddPhiForEnhancedSpecies = (
-                self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
-            )
-            self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV = (
-                self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
-            )
-            self.BGSubtractedAccCorrectedSEdPhidPionSigNScorrs = (
-                self.init_pTtrig_pTassoc_array(TH2F)
-            )
-            self.BGSubtractedAccCorrectedSEdPhidPionSigAScorrs = (
-                self.init_pTtrig_pTassoc_array(TH2F)
-            )
-            self.dPionNSsignals = self.init_pTtrig_pTassoc_array(TH1F)
-            self.dPionASsignals = self.init_pTtrig_pTassoc_array(TH1F)
-            self.pionTPCnSigmaInc = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
-            self.pionTPCnSigma_pionTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
-            self.pionTPCnSigma_protonTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
-            self.pionTPCnSigma_kaonTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
-            self.pionTPCnSigma_otherTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
-            self.pionTPCnSigmaInc_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
-            self.pionTPCnSigma_pionTOFcut_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
-            self.pionTPCnSigma_protonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
-            self.pionTPCnSigma_kaonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
-
-
-            self.YieldsTrue = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsTrueNS = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsTrueAS = self.init_pTtrig_pTassoc_dict(float)
-
-            self.YieldErrsTrue = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsTrueNS = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsTrueAS = self.init_pTtrig_pTassoc_dict(float)
-            
-            self.YieldsTrueZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsTrueNSZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsTrueASZV = self.init_pTtrig_pTassoc_dict(float)
-
-            self.YieldErrsTrueZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsTrueNSZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsTrueASZV = self.init_pTtrig_pTassoc_dict(float)
-            
-            self.YieldsEnhanced = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsEnhancedNS = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsEnhancedAS = self.init_pTtrig_pTassoc_dict(float)
-
-            self.YieldErrsEnhanced = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsEnhancedNS = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsEnhancedAS = self.init_pTtrig_pTassoc_dict(float)
-            
-            self.YieldsEnhancedZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsEnhancedNSZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsEnhancedASZV = self.init_pTtrig_pTassoc_dict(float)
-
-            self.YieldErrsEnhancedZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsEnhancedNSZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsEnhancedASZV = self.init_pTtrig_pTassoc_dict(float)
-
-            self.ResponseMatrices = self.init_pTtrig_pTassoc_eventPlane_dict(np.ndarray)
-
-        else:
+            self.RPFObjs = self.init_pTtrig_pTassoc_array(with_eventPlane=False, dtype=object)
+            self.RPFObjsZV = self.init_pTtrig_pTassoc_array(with_eventPlane=False, dtype=object)
+            self.RPFObjsForTrueSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=object)
+            self.RPFObjsForTrueSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=object)
+            self.RPFObjsForEnhancedSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=object)
+            self.RPFObjsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=object)
+            with_eventPlane = True
+        elif self.analysisType == "pp":
             self.N_trigs = np.zeros(
                 (len(self.pTtrigBinEdges) - 1),
                 dtype=object,
             )
-            self.N_assoc = self.init_pTtrig_pTassoc_dict(int)
-            self.N_assoc_for_species = self.init_pTtrig_pTassoc_region_dict(int)
-            self.SEcorrs = self.init_pTtrig_pTassoc_array(TH2F)
-            self.NormMEcorrs = self.init_pTtrig_pTassoc_array(TH2F)
-            self.AccCorrectedSEcorrs = self.init_pTtrig_pTassoc_array(TH2F)
-            self.AccCorrectedSEcorrsZV = self.init_pTtrig_pTassoc_array(TH2F)
-            self.NormAccCorrectedSEcorrs = self.init_pTtrig_pTassoc_array(TH2F)
-            self.NormAccCorrectedSEcorrsZV = self.init_pTtrig_pTassoc_array(TH2F)
-            self.ME_norm_systematics = self.init_pTtrig_pTassoc_array(float)
-            self.dPhiSigcorrs = self.init_pTtrig_pTassoc_array(TH1F)
-            self.dPhiSigcorrsZV = self.init_pTtrig_pTassoc_array(TH1F)
-            self.dPhiBGcorrsForTrueSpecies = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.dPhiSigcorrsForTrueSpecies = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.dPhiBGcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.dPhiSigcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.dPhiBGPIDErrForTrueSpecies = self.init_pTtrig_pTassoc_dict(
-                TH1F
-            )
-            self.dPhiSigPIDErrForTrueSpecies = self.init_pTtrig_pTassoc_dict(
-                TH1F
-            )
-            self.dPhiBGPIDErrForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(
-                TH1F
-            )
-            self.dPhiSigPIDErrForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(
-                TH1F
-            )
-            self.dPhiBGcorrs = self.init_pTtrig_pTassoc_array(TH1F)
-            self.dPhiBGcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.dPhiSigcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.dPhiBGcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.dPhiSigcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.dPhiBGPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(
-                TH1F
-            )
-            self.dPhiSigPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(
-                TH1F
-            )
-            self.dPhiBGPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(
-                TH1F
-            )
-            self.dPhiSigPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(
-                TH1F
-            )
-            self.dPhiBGcorrs = self.init_pTtrig_pTassoc_array(TH1F)
-            self.dPhiBGcorrsZV = self.init_pTtrig_pTassoc_array(TH1F)
-            self.dPhiSigdpionTPCnSigmacorrs = self.init_pTtrig_pTassoc_dict(TH2F)
-            self.dEtacorrs = self.init_pTtrig_pTassoc_array(TH1F)
-            self.RPFObjs = self.init_pTtrig_pTassoc_array(object)
-            self.RPFObjsZV = self.init_pTtrig_pTassoc_array(object)
-            self.PionTPCNSigmaFitObjs = self.init_pTtrig_pTassoc_dict(object)
-            self.RPFObjsForTrueSpecies = self.init_pTtrig_pTassoc_dict(object)
-            self.RPFObjsForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(object)
-            self.RPFObjsForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(object)
-            self.RPFObjsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(object)
-            self.BGSubtractedAccCorrectedSEdPhiSigNScorrs = (
-                self.init_pTtrig_pTassoc_array(TH1F)
-            )
-            self.BGSubtractedAccCorrectedSEdPhiSigAScorrs = (
-                self.init_pTtrig_pTassoc_array(TH1F)
-            )
-            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs = (
-                self.init_pTtrig_pTassoc_array(TH1F)
-            )
-            self.BGSubtractedAccCorrectedSEdPhiSigNScorrsZV = (
-                self.init_pTtrig_pTassoc_array(TH1F)
-            )
-            self.BGSubtractedAccCorrectedSEdPhiSigAScorrsZV = (
-                self.init_pTtrig_pTassoc_array(TH1F)
-            )
-            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsZV = (
-                self.init_pTtrig_pTassoc_array(TH1F)
-            )
-            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrs = (
-                self.init_pTtrig_pTassoc_dict(TH2F)
-            )
-            self.NormalizedBGSubtracteddPhiForTrueSpecies = self.init_pTtrig_pTassoc_dict(
-                TH1F
-            )
-            self.NormalizedBGSubtracteddPhiForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(
-                TH1F
-            )
-            self.BGSubtractedAccCorrectedSEdPhiSigNScorrsminVals = (
-                self.init_pTtrig_pTassoc_array(float)
-            )
-            self.BGSubtractedAccCorrectedSEdPhiSigAScorrsminVals = (
-                self.init_pTtrig_pTassoc_array(float)
-            )
-            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminVals = (
-                self.init_pTtrig_pTassoc_array(float)
-            )
-            self.NormalizedBGSubtracteddPhiForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(
-                TH1F
-            )
-            self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(
-                TH1F
-            )
-            self.BGSubtractedAccCorrectedSEdPhiSigNScorrsminValsZV = (
-                self.init_pTtrig_pTassoc_array(float)
-            )
-            self.BGSubtractedAccCorrectedSEdPhiSigAScorrsminValsZV = (
-                self.init_pTtrig_pTassoc_array(float)
-            )
-            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminValsZV = (
-                self.init_pTtrig_pTassoc_array(float)
-            )
-            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrsminVals = self.init_pTtrig_pTassoc_dict(
-                float
-            )
-            self.NormalizedBGSubtracteddPhiForTrueSpeciesminVals = (
-                self.init_pTtrig_pTassoc_dict(float)
-            )
-            self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminVals = (
-                self.init_pTtrig_pTassoc_dict(float)
-            )
-            self.BGSubtractedAccCorrectedSEdPhidPionSigNScorrs = (
-                self.init_pTtrig_pTassoc_array(TH2F)
-            )
-            self.BGSubtractedAccCorrectedSEdPhidPionSigAScorrs = (
-                self.init_pTtrig_pTassoc_array(TH2F)
-            )
-            self.NormalizedBGSubtracteddPhiForTrueSpeciesminValsZV = (
-                self.init_pTtrig_pTassoc_dict(float)
-            )
-            self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminValsZV = (
-                self.init_pTtrig_pTassoc_dict(float)
-            )
-            self.BGSubtractedAccCorrectedSEdPhidPionSigNScorrsZV = (
-                self.init_pTtrig_pTassoc_array(TH2F)
-            )
-            self.BGSubtractedAccCorrectedSEdPhidPionSigAScorrsZV = (
-                self.init_pTtrig_pTassoc_array(TH2F)
-            )
-            self.dPionNSsignals = self.init_pTtrig_pTassoc_array(TH1F)
-            self.dPionASsignals = self.init_pTtrig_pTassoc_array(TH1F)
-            self.pionTPCnSigmaInc = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.pionTPCnSigma_pionTOFcut = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.pionTPCnSigma_protonTOFcut = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.pionTPCnSigma_kaonTOFcut = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.pionTPCnSigma_otherTOFcut = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.pionTPCnSigmaInc_vs_dphi = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.pionTPCnSigma_pionTOFcut_vs_dphi = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.pionTPCnSigma_protonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_dict(TH1F)
-            self.pionTPCnSigma_kaonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.BGSubtractedAccCorrectedSEdPhiSigNScorrsminVals = self.init_pTtrig_pTassoc_array(with_eventPlane=False, dtype=float)
+            self.BGSubtractedAccCorrectedSEdPhiSigAScorrsminVals = self.init_pTtrig_pTassoc_array(with_eventPlane=False, dtype=float)
+            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminVals = self.init_pTtrig_pTassoc_array(with_eventPlane=False, dtype=float)
+            self.BGSubtractedAccCorrectedSEdPhiSigNScorrsminValsZV = self.init_pTtrig_pTassoc_array(with_eventPlane=False, dtype=float)
+            self.BGSubtractedAccCorrectedSEdPhiSigAScorrsminValsZV = self.init_pTtrig_pTassoc_array(with_eventPlane=False, dtype=float)
+            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminValsZV =  self.init_pTtrig_pTassoc_array(with_eventPlane=False, dtype=float)
+            self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrsminVals = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False,dtype=float)
+            self.NormalizedBGSubtracteddPhiForTrueSpeciesminVals = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+            self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminVals = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+            self.NormalizedBGSubtracteddPhiForTrueSpeciesminValsZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+            self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminValsZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+            with_eventPlane = False
 
 
-            self.YieldsTrue = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsTrueNS = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsTrueAS = self.init_pTtrig_pTassoc_dict(float)
+        self.N_assoc =  self.init_pTtrig_pTassoc_region_dict(with_eventPlane=with_eventPlane, with_species=False, dtype=int)
+        self.N_assoc_for_species = self.init_pTtrig_pTassoc_region_dict(with_eventPlane=with_eventPlane, with_species=True, dtype=int)
+        self.SEcorrs = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH2F) 
+        self.NormMEcorrs = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH2F)
+        self.AccCorrectedSEcorrs = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH2F)
+        self.AccCorrectedSEcorrsZV = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH2F)
+        self.NormAccCorrectedSEcorrs = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH2F)
+        self.NormAccCorrectedSEcorrsZV = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH2F)
+        self.ME_norm_systematics = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=float)
+        self.dPhiSigcorrs = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiSigcorrsZV = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiBGcorrsForTrueSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiSigcorrsForTrueSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiBGcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiSigcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiBGPIDErrForTrueSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiSigPIDErrForTrueSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiBGPIDErrForTrueSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiSigPIDErrForTrueSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiBGcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiSigcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiBGcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiSigcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiBGPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiSigPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiBGPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiSigPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
 
-            self.YieldErrsTrue = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsTrueNS = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsTrueAS = self.init_pTtrig_pTassoc_dict(float)
-            
-            self.YieldsTrueZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsTrueNSZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsTrueASZV = self.init_pTtrig_pTassoc_dict(float)
+        self.dPhiBGcorrs = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiBGcorrsZV = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiSigdpionTPCnSigmacorrs = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH2F)
+        self.dEtacorrs = self.init_pTtrig_pTassoc_array(with_eventPlane=False, dtype=TH1F)
+        self.PionTPCNSigmaFitObjs = self.init_pTtrig_pTassoc_region_dict(with_eventPlane=with_eventPlane, with_species=False, dtype=object)
+        self.BGSubtractedAccCorrectedSEdPhiSigNScorrs = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.BGSubtractedAccCorrectedSEdPhiSigAScorrs =self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.BGSubtractedAccCorrectedSEdPhiSigNScorrsZV = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.BGSubtractedAccCorrectedSEdPhiSigAScorrsZV = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsZV =self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrs =self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH2F)
+        self.NormalizedBGSubtracteddPhiForTrueSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.NormalizedBGSubtracteddPhiForTrueSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.NormalizedBGSubtracteddPhiForEnhancedSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.pionTPCnSigmaInc = self.init_pTtrig_pTassoc_region_dict(with_eventPlane=with_eventPlane, with_species=False, dtype=TH1F)
+        self.pionTPCnSigma_pionTOFcut = self.init_pTtrig_pTassoc_region_dict(with_eventPlane=with_eventPlane, with_species=False, dtype=TH1F)
+        self.pionTPCnSigma_protonTOFcut = self.init_pTtrig_pTassoc_region_dict(with_eventPlane=with_eventPlane, with_species=False, dtype=TH1F)
+        self.pionTPCnSigma_kaonTOFcut = self.init_pTtrig_pTassoc_region_dict(with_eventPlane=with_eventPlane, with_species=False, dtype=TH1F)
+        self.pionTPCnSigma_otherTOFcut = self.init_pTtrig_pTassoc_region_dict(with_eventPlane=with_eventPlane, with_species=False, dtype=TH1F)
+        self.pionTPCnSigmaInc_vs_dphi = self.init_pTtrig_pTassoc_region_dict(with_eventPlane=with_eventPlane, with_species=False, dtype=TH1F)
+        self.pionTPCnSigma_pionTOFcut_vs_dphi = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.pionTPCnSigma_protonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.pionTPCnSigma_kaonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
 
-            self.YieldErrsTrueZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsTrueNSZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsTrueASZV = self.init_pTtrig_pTassoc_dict(float)
-           
-            self.YieldsEnhanced = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsEnhancedNS = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsEnhancedAS = self.init_pTtrig_pTassoc_dict(float)
 
-            self.YieldErrsEnhanced = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsEnhancedNS = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsEnhancedAS = self.init_pTtrig_pTassoc_dict(float)
-            
-            self.YieldsEnhancedZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsEnhancedNSZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsEnhancedASZV = self.init_pTtrig_pTassoc_dict(float)
+        self.YieldsTrue = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldsTrueNS = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldsTrueAS = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
 
-            self.YieldErrsEnhancedZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsEnhancedNSZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsEnhancedASZV = self.init_pTtrig_pTassoc_dict(float)
+        self.YieldErrsTrue = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldErrsTrueNS = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldErrsTrueAS = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        
+        self.YieldsTrueZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldsTrueNSZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldsTrueASZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
 
-            self.ResponseMatrices = self.init_pTtrig_pTassoc_dict(np.ndarray)
+        self.YieldErrsTrueZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldErrsTrueNSZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldErrsTrueASZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        
+        self.YieldsEnhanced = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldsEnhancedNS = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldsEnhancedAS = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
 
+        self.YieldErrsEnhanced = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldErrsEnhancedNS = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldErrsEnhancedAS = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        
+        self.YieldsEnhancedZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldsEnhancedNSZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldsEnhancedASZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+
+        self.YieldErrsEnhancedZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldErrsEnhancedNSZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+        self.YieldErrsEnhancedASZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+
+
+   
         if fill_on_init:
             [
                 [
@@ -691,35 +453,31 @@ class JetHadron(
             self.plot_everything()
 
 
-    def init_pTtrig_pTassoc_dict(self, dtype):
-        return defaultdict(partial(self.init_pTtrig_pTassoc_array, dtype=dtype))
 
-    def init_pTtrig_pTassoc_eventPlane_dict(self, dtype):
-        return defaultdict(
-            partial(self.init_pTtrig_pTassoc_eventPlane_array, dtype=dtype)
+    def init_pTtrig_pTassoc_region_dict(self, with_eventPlane, with_species, dtype):
+        if with_species:
+            return defaultdict(partial(self.init_pTtrig_pTassoc_species_dict, with_eventPlane=with_eventPlane, dtype=dtype))
+        else:
+            return defaultdict(partial(self.init_pTtrig_pTassoc_array, with_eventPlane=with_eventPlane, dtype=dtype))
+
+    def init_pTtrig_pTassoc_species_dict(self, with_eventPlane, dtype):
+        return defaultdict(partial(self.init_pTtrig_pTassoc_array, with_eventPlane=with_eventPlane, dtype=dtype))
+
+    def init_pTtrig_pTassoc_array(self, with_eventPlane:Union[bool, None]=False, dtype=object):
+        '''
+        Initialize an array with zeros for each pTtrig, pTassoc bin
+        '''
+        if with_eventPlane is None:
+            print("You silly goose! with_eventPlane is None, but it should be True or False! I'm going to throw a ValueError!")
+            raise ValueError("with_eventPlane is None, but it should be True or False!")
+        shape = (
+            len(self.pTtrigBinEdges) - 1,
+            len(self.pTassocBinEdges) - 1,
         )
-    
-    def init_pTtrig_pTassoc_region_dict(self, dtype):
-        return defaultdict(partial(self.init_pTtrig_pTassoc_dict, dtype=dtype))
-
-    def init_pTtrig_pTassoc_eventPlane_region_dict(self, dtype):
-        return defaultdict(
-            partial(self.init_pTtrig_pTassoc_eventPlane_dict, dtype=dtype)
-        )
-
-    def init_pTtrig_pTassoc_eventPlane_array(self, dtype=object):
+        if with_eventPlane:
+            shape += (len(self.eventPlaneAngleBinEdges),)
         return np.zeros(
-            (
-                len(self.pTtrigBinEdges) - 1,
-                len(self.pTassocBinEdges) - 1,
-                len(self.eventPlaneAngleBinEdges),
-            ),
-            dtype=dtype,
-        )
-
-    def init_pTtrig_pTassoc_array(self, dtype=object):
-        return np.zeros(
-            (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1), dtype=dtype
+            shape, dtype=dtype
         )
 
     @log_function_call(description="")
@@ -1098,27 +856,7 @@ class JetHadron(
         self.plot_PionTPCNSigmaFit(i, j, 3, "NS")
         self.plot_PionTPCNSigmaFit(i, j, 3, "AS")
         self.plot_PionTPCNSigmaFit(i, j, 3, "BG")
-        # self.plot_PionTPCNSigmaVsDphi(i, j, 3)
-        # self.plot_PionTPCNSigmaVsDphi(i, j, 3, dphi_range=(-np.pi/2, 3*np.pi/2))
-        # dphi_bins = np.linspace(-np.pi/2, 3*np.pi/2, 4)
-        # for dphi_bin in zip(dphi_bins[:-1], dphi_bins[1:]):
-        #     self.plot_PionTPCNSigmaVsDphi(i, j, 3, dphi_range=dphi_bin)
-
-#         nom_vec = np.vectorize(lambda x:x.n)
-#         std_vec = np.vectorize(lambda x:x.s)
-#         average_response = np.mean(nom_vec(np.array(list(self.ResponseMatrices.values()))), axis=0).flatten()
-#         average_response_error = np.mean(std_vec(np.array(list(self.ResponseMatrices.values()))), axis=0).flatten()
-#         fig = plt.figure()
-#         plt.errorbar(x=np.arange(0, 9), y=average_response, yerr=average_response_error, fmt="o")
-#         fig.savefig("average_response_matrix.png")
-# 
-#         response = nom_vec(np.array(list(self.ResponseMatrices.values())))
-#         response_error = std_vec(np.array(list(self.ResponseMatrices.values())))
-#         fig = plt.figure()
-#         for resp_bin in range(4):
-#             plt.errorbar(x=np.arange(0, 9)+resp_bin/5, y=response[resp_bin,: ].flatten(), yerr=response_error[resp_bin,: ].flatten(), fmt="ko", alpha=1-resp_bin/4, )
-#         plt.ylim(0, 1.1)
-#         fig.savefig("response_matrix.png")
+       
 
         
         self.fill_inclusive_yield(i, j)
