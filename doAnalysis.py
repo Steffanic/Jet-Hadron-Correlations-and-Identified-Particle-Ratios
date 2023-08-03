@@ -159,6 +159,7 @@ if __name__ == "__main__":
         #for i in range(1, 8)
     #] # + train_output_r_filenames
     fpplist = ["/mnt/d/pp/17p.root"]
+    LOAD_PARTIAL_PICKLES = True
     DO_PP = True
     DO_CENTRAL = False
     DO_SEMI_CENTRAL = True
@@ -167,29 +168,58 @@ if __name__ == "__main__":
     DO_PICKLING = False
 
     if DO_PP:
-        if exists("jhAnapp.pickle"):
-            jhAnapp = pickle.load(open("jhAnapp.pickle", "rb"))
+        if not LOAD_PARTIAL_PICKLES:
+            if exists("jhAnapp.pickle"):
+                jhAnapp = pickle.load(open("jhAnapp.pickle", "rb"))
+            else:
+                jhAnapp = JetHadron(fpplist, "pp")
+                # save a pickle file of the analysis object
+                if DO_PICKLING:
+                    with open("jhAnapp.pickle", "wb") as handle:
+                        pickle.dump(jhAnapp, handle, protocol=pickle.HIGHEST_PROTOCOL)
         else:
-            jhAnapp = JetHadron(fpplist, "pp")
-            # save a pickle file of the analysis object
-            if DO_PICKLING:
-                with open("jhAnapp.pickle", "wb") as handle:
-                    pickle.dump(jhAnapp, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            if exists("jhAnappPartial.pickle"):
+                jhAnappPartial = pickle.load(open("jhAnappPartial.pickle", "rb"))
+                jhAnappPartial.pick_up_where_you_left_off()
+                jhAnapp = jhAnappPartial
+            else:
+                jhAnapp = JetHadron(fpplist, "pp")
+                # save a pickle file of the analysis object
+                if DO_PICKLING:
+                    with open("jhAnapp.pickle", "wb") as handle:
+                        pickle.dump(jhAnapp, handle, protocol=pickle.HIGHEST_PROTOCOL)
         if DO_PLOTTING:
             jhAnapp.plot_everything()
 
     
     if DO_SEMI_CENTRAL:
-        if exists("jhAnaSemiCentral.pickle"):
-            jhAnaSemiCentral = pickle.load(open("jhAnaSemiCentral.pickle", "rb"))
+        if not LOAD_PARTIAL_PICKLES:
+            if exists("jhAnaSemiCentral.pickle"):
+                jhAnaSemiCentral = pickle.load(open("jhAnaSemiCentral.pickle", "rb"))
+            else:
+                jhAnaSemiCentral = JetHadron(flist, "semicentral")
+                # save a pickle file of the analysis object
+                if DO_PICKLING:
+                    with open("jhAnaSemiCentral.pickle", "wb") as handle:
+                        pickle.dump(
+                            jhAnaSemiCentral, handle, protocol=pickle.HIGHEST_PROTOCOL
+                        )
+
         else:
-            jhAnaSemiCentral = JetHadron(flist, "semicentral")
-            # save a pickle file of the analysis object
-            if DO_PICKLING:
-                with open("jhAnaSemiCentral.pickle", "wb") as handle:
-                    pickle.dump(
-                        jhAnaSemiCentral, handle, protocol=pickle.HIGHEST_PROTOCOL
-                    )
+            if exists("jhAnaSemiCentralPartial.pickle"):
+                jhAnaSemiCentralPartial = pickle.load(
+                    open("jhAnaSemiCentralPartial.pickle", "rb")
+                )
+                jhAnaSemiCentralPartial.pick_up_where_you_left_off()
+                jhAnaSemiCentral = jhAnaSemiCentralPartial
+            else:
+                jhAnaSemiCentral = JetHadron(flist, "semicentral")
+                # save a pickle file of the analysis object
+                if DO_PICKLING:
+                    with open("jhAnaSemiCentral.pickle", "wb") as handle:
+                        pickle.dump(
+                            jhAnaSemiCentral, handle, protocol=pickle.HIGHEST_PROTOCOL
+                        )
 
         if DO_FITTING:
             for i in range(len(jhAnaSemiCentral.pTtrigBinEdges) - 1):
@@ -207,15 +237,30 @@ if __name__ == "__main__":
                     jhAnaSemiCentral.plot_dPhi_against_pp_reference(jhAnapp, i, j)
         
     if DO_CENTRAL:
-        if exists("jhAnaCentral.pickle"):
-            jhAnaCentral = pickle.load(open("jhAnaCentral.pickle", "rb"))
+        if not LOAD_PARTIAL_PICKLES:
+            if exists("jhAnaCentral.pickle"):
+                jhAnaCentral = pickle.load(open("jhAnaCentral.pickle", "rb"))
+            else:
+                jhAnaCentral = JetHadron(flist, "central")
+                # save a pickle file of the analysis object
+                if DO_PICKLING:
+                    with open("jhAnaCentral.pickle", "wb") as handle:
+                        pickle.dump(jhAnaCentral, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
         else:
-            jhAnaCentral = JetHadron(flist, "central")
-            # save a pickle file of the analysis object
-            if DO_PICKLING:
-                with open("jhAnaCentral.pickle", "wb") as handle:
-                    pickle.dump(jhAnaCentral, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        
+            if exists("jhAnaCentralPartial.pickle"):
+                jhAnaCentralPartial = pickle.load(
+                    open("jhAnaCentralPartial.pickle", "rb")
+                )
+                jhAnaCentralPartial.pick_up_where_you_left_off()
+                jhAnaCentral = jhAnaCentralPartial
+            else:
+                jhAnaCentral = JetHadron(flist, "central")
+                # save a pickle file of the analysis object
+                if DO_PICKLING:
+                    with open("jhAnaCentral.pickle", "wb") as handle:
+                        pickle.dump(jhAnaCentral, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
         if DO_FITTING:
             jhAnaCentral.fit_RPFs()
 

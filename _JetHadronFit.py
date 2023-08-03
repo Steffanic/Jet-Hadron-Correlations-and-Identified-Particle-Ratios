@@ -324,8 +324,8 @@ class FitMixin:
                     
                     bounds = [bounds[0]+inclusive_bounds[0]+ generalized_bounds[0], bounds[1]+inclusive_bounds[1] + generalized_bounds[1]]
                 else:
-                    p0 = [-2.5, 0, -2.5, 0.5, 0.5, 0.5, 100,100, 0.11, 10,100, 10, 0.11,100, 100] + inclusive_p0+ generalized_p0
-                    bounds = [[-6, -0.1, -6, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [0, 0.1, 0, 100.0, 100.0, 100.0, 100000,100000,10,100000,100000,100000,10,100000,100000]]
+                    p0 = [-3.5, 0, -2.5, 0.5, 0.5, 0.5, 100,100, 0.11, 10,100, 10, 0.11,100, 100] + inclusive_p0+ generalized_p0
+                    bounds = [[-6, -0.1, -6, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [0, 0.1, 0, 100.0, 100.0, 100.0, 100000,100000,10000,100000,100000,100000,10000,100000,100000]]
                    
                     bounds = [bounds[0]+inclusive_bounds[0] + generalized_bounds[0], bounds[1]+inclusive_bounds[1]+ generalized_bounds[1]]
 
@@ -379,9 +379,6 @@ class FitMixin:
 
         return best_popt, best_pcov, chi2perNDF
 
-
-    
-        
     def get_p0s(self, i, j):
         B = [1000*np.exp(-2*self.pTtrigBinEdges[i])+1] #type:ignore
         v1 = [0.005]
@@ -397,5 +394,3 @@ class FitMixin:
        
         return product(B, v1, v2, v3, v4, va2, va4)
 
-
-    

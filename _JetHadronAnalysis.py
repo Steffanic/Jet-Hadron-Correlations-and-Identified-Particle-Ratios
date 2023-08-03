@@ -593,6 +593,7 @@ class AnalysisMixin:
         if self.resetUnfoldingResults:
             self.unfoldedTruthValues = np.zeros((3, nphibins, netabins))
             self.unfoldedTruthErrors = np.zeros((3, nphibins, netabins))
+            self.refoldedValues = np.zeros((3, nphibins, netabins))
             for x_bin in range(nphibins):
                 debug_logger.debug("Unfolding bin ({})".format(x_bin))
                 for y_bin in range(netabins):
@@ -622,9 +623,10 @@ class AnalysisMixin:
                     unfolding_logger.info(f"{np.array2string(unfolded['unfolding_matrix'], formatter={'float': lambda x: f'{x:.2f}'})}")
                     # refold the truth values to get the refolded values
                     refolded = np.matmul(unfolded['unfolding_matrix'], unfolded['unfolded'])
+                    self.refoldedValues[:, x_bin, y_bin] = refolded[:-1] # drop the trash bin
                     # print the delta between the refolded values and the original values
                     unfolding_logger.info(f"Percent delta between refolded and original values for bin ({x_bin}, {y_bin})")
-                    unfolding_logger.info(f"{refolded=}, {enhancedObservations[:, x_bin, y_bin]=}, {np.array2string((refolded - enhancedObservations[:, x_bin, y_bin])/enhancedObservations[:, x_bin, y_bin], formatter={'float': lambda x: f'{x:.2f}'})}")
+                    unfolding_logger.info(f"{refolded=}, {enhancedObservations[:, x_bin, y_bin]=}, {np.array2string((refolded - enhancedObservations[:, x_bin, y_bin])/refolded, formatter={'float': lambda x: f'{x:.2f}'})}")
 
                     # log the matrix product of the unfolding matrix and the response matrix
                     # unfolding_logger.info(f"Unfolding matrix times response matrix for bin ({x_bin}, {y_bin})")
@@ -637,13 +639,16 @@ class AnalysisMixin:
 
             Corr = pionEnhCorr.Clone()
             Corr_err = pionEnhCorr.Clone()
+            RefoldedCorr = pionEnhCorr.Clone()
             Corr.Reset()
             Corr_err.Reset()
+            RefoldedCorr.Reset()
             for x_bin in range(nphibins):
                 for y_bin in range(netabins):
                     Corr.SetBinContent(x_bin, y_bin, self.unfoldedTruthValues[0, x_bin, y_bin])
                     Corr.SetBinError(x_bin, y_bin, self.unfoldedTruthErrors[0, x_bin, y_bin])
                     Corr_err.SetBinContent(x_bin, y_bin, self.unfoldedTruthErrors[0, x_bin, y_bin])
+                    RefoldedCorr.SetBinContent(x_bin, y_bin, self.refoldedValues[0, x_bin, y_bin])
 
 
 
@@ -654,30 +659,36 @@ class AnalysisMixin:
 
             Corr = pionEnhCorr.Clone()
             Corr_err = pionEnhCorr.Clone()
+            RefoldedCorr = pionEnhCorr.Clone()
             Corr.Reset()
             Corr_err.Reset()
+            RefoldedCorr.Reset()
             for x_bin in range(nphibins):
                 for y_bin in range(netabins):
                     Corr.SetBinContent(x_bin, y_bin, self.unfoldedTruthValues[1, x_bin, y_bin])
                     Corr.SetBinError(x_bin, y_bin, self.unfoldedTruthErrors[1, x_bin, y_bin])
                     Corr_err.SetBinContent(x_bin, y_bin, self.unfoldedTruthErrors[1, x_bin, y_bin])
+                    RefoldedCorr.SetBinContent(x_bin, y_bin, self.refoldedValues[1, x_bin, y_bin])
             
         elif species == 'kaon':
 
             Corr = pionEnhCorr.Clone()
             Corr_err = pionEnhCorr.Clone()
+            RefoldedCorr = pionEnhCorr.Clone()
             Corr.Reset()
             Corr_err.Reset()
+            RefoldedCorr.Reset()
             for x_bin in range(nphibins):
                 for y_bin in range(netabins):
                     Corr.SetBinContent(x_bin, y_bin, self.unfoldedTruthValues[2, x_bin, y_bin])
                     Corr.SetBinError(x_bin, y_bin, self.unfoldedTruthErrors[2, x_bin, y_bin])           
                     Corr_err.SetBinContent(x_bin, y_bin, self.unfoldedTruthErrors[2, x_bin, y_bin])
+                    RefoldedCorr.SetBinContent(x_bin, y_bin, self.refoldedValues[2, x_bin, y_bin])
            
         del NormMEC
 
 
-        return Corr.Clone(), Corr_err.Clone()
+        return Corr.Clone(), Corr_err.Clone(), RefoldedCorr.Clone()
 
         
 
@@ -1013,7 +1024,7 @@ class AnalysisMixin:
         """
         Returns the dPhi distribution for a given dEta range
         """
-        tempHist, PIDerrTH2 = self.get_acceptance_corrected_correlation_function_for_true_species(i,j,k,
+        tempHist, PIDerrTH2, _ = self.get_acceptance_corrected_correlation_function_for_true_species(i,j,k,
             TOFcutSpecies, in_z_vertex_bins=in_z_vertex_bins
         )
         lowerBin, upperBin = (tempHist.GetXaxis().FindBin(bin) for bin in dEtaRange)
@@ -1043,6 +1054,38 @@ class AnalysisMixin:
             dPhiPIDErr = dPhiPIDErr.Rebin(2)
             dPhiPIDErr.Scale(0.5)
         return dPhi.Clone(), nbins, binwidth, dPhiPIDErr.Clone()
+    
+    def get_dPhi_projection_in_dEta_range_for_refolded_species(
+        self, i,j,k,dEtaRange, TOFcutSpecies, rebin=True, scaleUp=False, in_z_vertex_bins=False
+    ):
+        """
+        Returns the dPhi distribution for a given dEta range
+        """
+        _, _, tempHist = self.get_acceptance_corrected_correlation_function_for_true_species(i,j,k,
+            TOFcutSpecies, in_z_vertex_bins=in_z_vertex_bins
+        )
+        lowerBin, upperBin = (tempHist.GetXaxis().FindBin(bin) for bin in dEtaRange)
+        tempHist.GetXaxis().SetRange(lowerBin, upperBin)
+
+        dPhi = tempHist.ProjectionY()
+
+        nbins = upperBin - lowerBin
+        binwidth = tempHist.GetXaxis().GetBinWidth(1)
+        dPhi.Scale(binwidth) # scale by the number of bins in the dEta range to get the correct normalization
+        if scaleUp:
+            # Scale background up
+            nbins = upperBin - lowerBin
+            nbins_sig = tempHist.GetXaxis().FindBin(0.6) - tempHist.GetXaxis().FindBin(
+                -0.6
+            )
+            debug_logger.info(f"Grabbing between bins {upperBin} and {lowerBin}")
+            dPhi.Scale((nbins_sig + 1) / (nbins + 1))
+        # rebin dPhi
+        if rebin:
+            dPhi = dPhi.Rebin(2)
+            dPhi.Scale(0.5)
+
+        return dPhi.Clone(), nbins, binwidth
 
     def get_dPhi_dpionTPCnSigma_projection_in_dEta_range(
         self, dEtaRange, TOFcutSpecies, rebin=True, scaleUp=False

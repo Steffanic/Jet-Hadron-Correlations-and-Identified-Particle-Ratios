@@ -369,6 +369,9 @@ class JetHadron(
         self.dPhiSigPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
         self.dPhiBGPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
         self.dPhiSigPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiBGcorrsForRefoldedSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.dPhiSigcorrsForRefoldedSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+
 
         self.dPhiBGcorrs = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
         self.dPhiBGcorrsZV = self.init_pTtrig_pTassoc_array(with_eventPlane=with_eventPlane, dtype=TH1F)
@@ -430,15 +433,27 @@ class JetHadron(
         self.YieldErrsEnhancedASZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
 
 
-   
+        self.current_trig_bin=0
+        self.current_assoc_bin=0
         if fill_on_init:
-            [
+            try:
                 [
-                    self.fill_hist_arrays(i, j)
-                    for j in range(len(self.pTassocBinEdges) - 1)
+                    [
+                        (self.current_trig_bin:=i, self.current_assoc_bin:=j, self.fill_hist_arrays(i, j))
+                        for j in range(len(self.pTassocBinEdges) - 1)
+                    ]
+                    for i in range(len(self.pTtrigBinEdges) - 1)
                 ]
-                for i in range(len(self.pTtrigBinEdges) - 1)
-            ]
+            except:
+                print("Error in fill_on_init, doing a partial pickle")
+                pickle_filename = (
+                    "jhAnappPartial.pickle"
+                    if self.analysisType == "pp"
+                    else "jhAnaCentralPartial.pickle"
+                    if self.analysisType == "central"
+                    else "jhAnaSemiCentralPartial.pickle"
+                )
+                pickle.dump(self, open(pickle_filename, "wb"))
         if pickle_on_init:
             # pickle the object
             pickle_filename = (
@@ -452,7 +467,25 @@ class JetHadron(
         if plot_on_init:
             self.plot_everything()
 
-
+    def pick_up_where_you_left_off(self):
+        try:
+            [
+                [
+                    (self.current_trig_bin:=i, self.current_assoc_bin:=j, self.fill_hist_arrays(i, j))
+                    for j in range(self.current_assoc_bin, len(self.pTassocBinEdges) - 1)
+                ]
+                for i in range(self.current_trig_bin, len(self.pTtrigBinEdges) - 1)
+            ]
+        except:
+                print("Error in fill_on_init, doing a partial pickle")
+                pickle_filename = (
+                    "jhAnappPartial.pickle"
+                    if self.analysisType == "pp"
+                    else "jhAnaCentralPartial.pickle"
+                    if self.analysisType == "central"
+                    else "jhAnaSemiCentralPartial.pickle"
+                )
+                pickle.dump(self, open(pickle_filename, "wb"))
 
     def init_pTtrig_pTassoc_region_dict(self, with_eventPlane, with_species, dtype):
         if with_species:
@@ -1411,6 +1444,114 @@ class JetHadron(
             self.dPhiSigcorrsForTrueSpecies[species][i, j] = dPhiSig
             self.dPhiBGPIDErrForTrueSpecies[species][i, j] = dPhiBGPIDerr
             self.dPhiSigPIDErrForTrueSpecies[species][i, j] = dPhiSigPIDerr
+        del dPhiSig
+    
+    @log_function_call(description="", logging_level=logging.INFO)
+    def fill_dPhi_correlation_functions_for_refolded_species(self, i, j, k, species):
+
+        dPhiMid, nbins_mid, binwidth,  = self.get_dPhi_projection_in_dEta_range_for_refolded_species(i,j,k,
+            self.dEtaSig, TOFcutSpecies=species
+        )
+
+        dPhiBGLo, nbins_lo, binwidth,  = self.get_dPhi_projection_in_dEta_range_for_refolded_species(i,j,k,
+            self.dEtaBGLo, TOFcutSpecies=species
+        )
+
+        dPhiBGHi, nbins_hi, binwidth,  = self.get_dPhi_projection_in_dEta_range_for_refolded_species(i,j,k,
+            self.dEtaBGHi, TOFcutSpecies=species
+        )
+
+        dPhiBGcorrs = dPhiMid.Clone()
+        dPhiSig = dPhiMid.Clone()
+        dPhiBGcorrs.Reset()
+        dPhiSig.Reset()
+
+
+        for iBin in range(1, dPhiBGcorrs.GetNbinsX() + 1):
+            if dPhiBGcorrs.GetBinCenter(iBin + 1) < np.pi / 2:
+                # Near Side
+                dPhiBGcorrs.SetBinContent(
+                    iBin,
+                    (dPhiBGLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiBGHi.GetBinContent(iBin) /((nbins_hi+1)*binwidth))
+                    /2
+                )
+                dPhiBGcorrs.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiBGLo.GetBinError(iBin)/((nbins_lo+1)*binwidth)) ** 2
+                            + (dPhiBGHi.GetBinError(iBin)/((nbins_hi+1)*binwidth)) ** 2
+                        )
+                        /4
+                    )
+                    ** 0.5,
+                )
+
+                dPhiSig.SetBinContent(
+                    iBin, dPhiMid.GetBinContent(iBin)/((nbins_mid+1)*binwidth)
+                )
+                dPhiSig.SetBinError(
+                    iBin, dPhiMid.GetBinError(iBin)/((nbins_mid+1)*binwidth)
+                )
+
+                
+            else:
+                # Away Side
+
+                dPhiBGcorrs.SetBinContent(
+                    iBin,
+                    (
+                        dPhiBGLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiBGHi.GetBinContent(iBin) /((nbins_hi+1)*binwidth)
+                        + dPhiMid.GetBinContent(iBin) /((nbins_mid+1)*binwidth)
+                    )
+                    /3
+                )
+                dPhiBGcorrs.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiBGHi.GetBinError(iBin)/((nbins_hi+1)*binwidth))**2
+                            + (dPhiBGLo.GetBinError(iBin)/((nbins_lo+1)*binwidth))**2
+                            + (dPhiMid.GetBinError(iBin)/((nbins_mid+1)*binwidth))**2
+                        )
+                        /9
+                    )
+                    ** 0.5,
+                )
+
+                dPhiSig.SetBinContent(
+                    iBin,
+                    (
+                        dPhiBGLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiBGHi.GetBinContent(iBin)/((nbins_hi +1)*binwidth)
+                        + dPhiMid.GetBinContent(iBin)/((nbins_mid +1)*binwidth)
+                    )
+                    /3
+                )
+                dPhiSig.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiBGHi.GetBinError(iBin)/((nbins_hi+1)*binwidth)) ** 2
+                            + (dPhiBGLo.GetBinError(iBin)/((nbins_lo+1)*binwidth)) ** 2
+                            + (dPhiMid.GetBinError(iBin)/((nbins_mid+1)*binwidth)) ** 2
+                        )
+                        /9
+                    )
+                    ** 0.5,
+                )
+
+                
+        if self.analysisType in ["central", "semicentral"]:
+            self.dPhiBGcorrsForRefoldedSpecies[species][i, j, k] = dPhiBGcorrs
+            self.dPhiSigcorrsForRefoldedSpecies[species][i, j, k] = dPhiSig
+            
+        elif self.analysisType == "pp":
+            self.dPhiBGcorrsForRefoldedSpecies[species][i, j] = dPhiBGcorrs
+            self.dPhiSigcorrsForRefoldedSpecies[species][i, j] = dPhiSig
+            
         del dPhiSig
     
     @log_function_call(description="")
