@@ -1,44 +1,38 @@
 from collections import defaultdict
 from itertools import product
+import logging
 import pickle
 import subprocess
 from typing import Optional
 import numpy as np
 import requests
-import ROOT
 import matplotlib.pyplot as plt
 from functools import partial
-
-
 from time import time
 
-import warnings
 
-import logging
-
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO,
-    filename="jet_hadron.log",
+from ROOT import (
+    TH1F,
+    TH2F,
+    TFile,
+    TH1,
 )
-debug_logger = logging.getLogger('debug')
-error_logger = logging.getLogger('error')
-info_logger = logging.getLogger('info')
-d_fh = logging.FileHandler(filename='jhDEBUG.log', mode='w', encoding='utf-8',)
-e_fh = logging.FileHandler(filename='jhERROR.log', mode='w', encoding='utf-8',)
-i_fh = logging.FileHandler(filename='jhINFO.log', mode='w', encoding='utf-8',)
-d_fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-e_fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-i_fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-debug_logger.addHandler(d_fh)
-error_logger.addHandler(e_fh)
-info_logger.addHandler(i_fh)
-debug_logger.setLevel(logging.DEBUG)
-error_logger.setLevel(logging.ERROR)
-info_logger.setLevel(logging.INFO)
-warnings.filterwarnings("ignore")
+
 
 import _JetHadronPlot, _JetHadronFit, _JetHadronAnalysis
+
+from _JetHadronUtilities import (
+    return_none,
+    return_true,
+    init_none_dict,
+    init_bool_dict,
+)
+from _JetHadronLogging import (
+    debug_logger,
+    error_logger,
+    info_logger,
+    log_function_call,
+)
 
 # turn latex on in matplotlib
 plt.rc("text", usetex=True)
@@ -47,28 +41,6 @@ plt.rc("font", family="serif")
 # increase the font size for christine
 plt.rcParams.update({"font.size": 16})
 
-
-def print_function_name_with_description_on_call(description, logging_level=logging.DEBUG):
-    """
-    Prints the name of the function and a description of what it does
-    """
-
-    def function_wrapper(function):
-        def method_wrapper(self, *args, **kwargs):
-            if logging_level == logging.DEBUG:
-                logger = debug_logger
-            elif logging_level == logging.INFO:
-                logger = info_logger
-            elif logging_level == logging.ERROR:
-                logger = error_logger
-            else:
-                raise ValueError(f"Unknown logging level {logging_level}")
-            logger.log(level=logging_level, msg=f"{function.__name__} in {self.__class__.__name__}:\n\t{description}")
-            return function(self, *args, **kwargs)
-
-        return method_wrapper
-
-    return function_wrapper
 
 class JetHadron(
     _JetHadronPlot.PlotMixin, _JetHadronFit.FitMixin, _JetHadronAnalysis.AnalysisMixin
@@ -89,7 +61,7 @@ class JetHadron(
         Initializes the location to save plots and grabs the main components of the rootFile
         """
         # turn off ROOT's automatic garbage collection
-        ROOT.TH1.AddDirectory(False)
+        TH1.AddDirectory(False)
         assert analysisType in ["central", "semicentral", "pp"]
         self.analysisType = analysisType
         self.base_save_path = (
@@ -101,7 +73,7 @@ class JetHadron(
         first = True
         for filename in rootFileNames:
             debug_logger.debug(f"Loading file {filename}")
-            file = ROOT.TFile(filename)
+            file = TFile(filename)
             fileJH, fileME, fileT = self.get_sparses(file)
             self.JH.append(fileJH)
             self.MixedEvent.append(fileME)
@@ -309,7 +281,7 @@ class JetHadron(
         self.dPhiSigAS = [np.pi / 2, 3 * np.pi / 2]
 
         self.get_SE_correlation_function_has_changed = True
-        self.get_SE_correlation_function_w_Pion_has_changed = self.init_bool_dict()
+        self.get_SE_correlation_function_w_Pion_has_changed = init_bool_dict()
         self.get_ME_correlation_function_has_changed = True
         self.get_normalized_ME_correlation_function_has_changed = True
         self.get_normalized_ME_correlation_error_has_changed = True
@@ -317,12 +289,12 @@ class JetHadron(
         self.get_acceptance_corrected_dPhi_dEta_dPion_distribution_has_changed = True
         self.get_normalized_acceptance_corrected_correlation_function_has_changed = True
         self.get_acceptance_corrected_correlation_function_w_pionTPCnSigma_has_changed = (
-            self.init_bool_dict()
+            init_bool_dict()
         )
         self.ME_norm_sliding_window_has_changed = True
 
         self.get_SE_correlation_function_result = None
-        self.get_SE_correlation_function_w_Pion_result = self.init_none_dict()
+        self.get_SE_correlation_function_w_Pion_result = init_none_dict()
         self.get_ME_correlation_function_result = None
         self.get_normalized_ME_correlation_function_result = None
         self.get_normalized_ME_correlation_error = None
@@ -330,7 +302,7 @@ class JetHadron(
         self.get_acceptance_corrected_dPhi_dEta_dPion_distribution_result = None
         self.get_normalized_acceptance_corrected_correlation_function_result = None
         self.get_acceptance_corrected_correlation_function_w_pionTPCnSigma_result = (
-            self.init_none_dict()
+            init_none_dict()
         )
         self.ME_norm_sliding_window_result = None
         self.unfoldedTruthValues = None
@@ -346,79 +318,79 @@ class JetHadron(
             self.N_assoc =  self.init_pTtrig_pTassoc_eventPlane_dict(int)
             self.N_assoc_for_species = self.init_pTtrig_pTassoc_eventPlane_region_dict(int)
             self.SEcorrs = self.init_pTtrig_pTassoc_eventPlane_array(
-                ROOT.TH2F
+                TH2F
             )  # Event plane angle has 4 bins, in-, mid-, out, and inclusive
-            self.NormMEcorrs = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH2F)
+            self.NormMEcorrs = self.init_pTtrig_pTassoc_eventPlane_array(TH2F)
             self.AccCorrectedSEcorrs = self.init_pTtrig_pTassoc_eventPlane_array(
-                ROOT.TH2F
+                TH2F
             )
             self.AccCorrectedSEcorrsZV = self.init_pTtrig_pTassoc_eventPlane_array(
-                ROOT.TH2F
+                TH2F
             )
             self.NormAccCorrectedSEcorrs = self.init_pTtrig_pTassoc_eventPlane_array(
-                ROOT.TH2F
+                TH2F
             )
             self.NormAccCorrectedSEcorrsZV = self.init_pTtrig_pTassoc_eventPlane_array(
-                ROOT.TH2F
+                TH2F
             )
             self.ME_norm_systematics = self.init_pTtrig_pTassoc_eventPlane_array(float)
-            self.dPhiSigcorrs = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
-            self.dPhiSigcorrsZV = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
+            self.dPhiSigcorrs = self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
+            self.dPhiSigcorrsZV = self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
             self.dPhiBGcorrsForTrueSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiSigcorrsForTrueSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiBGcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiSigcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiBGPIDErrForTrueSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiSigPIDErrForTrueSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiBGPIDErrForTrueSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiSigPIDErrForTrueSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiBGcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiSigcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiBGcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiSigcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiBGPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiSigPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiBGPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiSigPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH1F
+                TH1F
             )
 
-            self.dPhiBGcorrs = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
-            self.dPhiBGcorrsZV = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
+            self.dPhiBGcorrs = self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
+            self.dPhiBGcorrsZV = self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
             self.dPhiSigdpionTPCnSigmacorrs = self.init_pTtrig_pTassoc_eventPlane_dict(
-                ROOT.TH2F
+                TH2F
             )
-            self.dEtacorrs = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.dEtacorrs = self.init_pTtrig_pTassoc_array(TH1F)
             self.RPFObjs = self.init_pTtrig_pTassoc_array(object)
             self.RPFObjsZV = self.init_pTtrig_pTassoc_array(object)
             self.PionTPCNSigmaFitObjs = self.init_pTtrig_pTassoc_eventPlane_dict(object)
@@ -427,55 +399,55 @@ class JetHadron(
             self.RPFObjsForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(object)
             self.RPFObjsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(object)
             self.BGSubtractedAccCorrectedSEdPhiSigNScorrs = (
-                self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
             )
             self.BGSubtractedAccCorrectedSEdPhiSigAScorrs = (
-                self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
             )
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs = (
-                self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
             )
             self.BGSubtractedAccCorrectedSEdPhiSigNScorrsZV = (
-                self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
             )
             self.BGSubtractedAccCorrectedSEdPhiSigAScorrsZV = (
-                self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
             )
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsZV = (
-                self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_eventPlane_array(TH1F)
             )
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrs = (
-                self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH2F)
+                self.init_pTtrig_pTassoc_eventPlane_dict(TH2F)
             )
             self.NormalizedBGSubtracteddPhiForTrueSpecies = (
-                self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
             )
             self.NormalizedBGSubtracteddPhiForTrueSpeciesZV = (
-                self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
             )
             self.NormalizedBGSubtracteddPhiForEnhancedSpecies = (
-                self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
             )
             self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV = (
-                self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
             )
             self.BGSubtractedAccCorrectedSEdPhidPionSigNScorrs = (
-                self.init_pTtrig_pTassoc_array(ROOT.TH2F)
+                self.init_pTtrig_pTassoc_array(TH2F)
             )
             self.BGSubtractedAccCorrectedSEdPhidPionSigAScorrs = (
-                self.init_pTtrig_pTassoc_array(ROOT.TH2F)
+                self.init_pTtrig_pTassoc_array(TH2F)
             )
-            self.dPionNSsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
-            self.dPionASsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
-            self.pionTPCnSigmaInc = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
-            self.pionTPCnSigma_pionTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
-            self.pionTPCnSigma_protonTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
-            self.pionTPCnSigma_kaonTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
-            self.pionTPCnSigma_otherTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
-            self.pionTPCnSigmaInc_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
-            self.pionTPCnSigma_pionTOFcut_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
-            self.pionTPCnSigma_protonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
-            self.pionTPCnSigma_kaonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+            self.dPionNSsignals = self.init_pTtrig_pTassoc_array(TH1F)
+            self.dPionASsignals = self.init_pTtrig_pTassoc_array(TH1F)
+            self.pionTPCnSigmaInc = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
+            self.pionTPCnSigma_pionTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
+            self.pionTPCnSigma_protonTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
+            self.pionTPCnSigma_kaonTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
+            self.pionTPCnSigma_otherTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
+            self.pionTPCnSigmaInc_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
+            self.pionTPCnSigma_pionTOFcut_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
+            self.pionTPCnSigma_protonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
+            self.pionTPCnSigma_kaonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(TH1F)
 
 
             self.YieldsTrue = self.init_pTtrig_pTassoc_dict(float)
@@ -519,52 +491,52 @@ class JetHadron(
             )
             self.N_assoc = self.init_pTtrig_pTassoc_dict(int)
             self.N_assoc_for_species = self.init_pTtrig_pTassoc_region_dict(int)
-            self.SEcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH2F)
-            self.NormMEcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH2F)
-            self.AccCorrectedSEcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH2F)
-            self.AccCorrectedSEcorrsZV = self.init_pTtrig_pTassoc_array(ROOT.TH2F)
-            self.NormAccCorrectedSEcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH2F)
-            self.NormAccCorrectedSEcorrsZV = self.init_pTtrig_pTassoc_array(ROOT.TH2F)
+            self.SEcorrs = self.init_pTtrig_pTassoc_array(TH2F)
+            self.NormMEcorrs = self.init_pTtrig_pTassoc_array(TH2F)
+            self.AccCorrectedSEcorrs = self.init_pTtrig_pTassoc_array(TH2F)
+            self.AccCorrectedSEcorrsZV = self.init_pTtrig_pTassoc_array(TH2F)
+            self.NormAccCorrectedSEcorrs = self.init_pTtrig_pTassoc_array(TH2F)
+            self.NormAccCorrectedSEcorrsZV = self.init_pTtrig_pTassoc_array(TH2F)
             self.ME_norm_systematics = self.init_pTtrig_pTassoc_array(float)
-            self.dPhiSigcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
-            self.dPhiSigcorrsZV = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
-            self.dPhiBGcorrsForTrueSpecies = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.dPhiSigcorrsForTrueSpecies = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.dPhiBGcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.dPhiSigcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.dPhiSigcorrs = self.init_pTtrig_pTassoc_array(TH1F)
+            self.dPhiSigcorrsZV = self.init_pTtrig_pTassoc_array(TH1F)
+            self.dPhiBGcorrsForTrueSpecies = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.dPhiSigcorrsForTrueSpecies = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.dPhiBGcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.dPhiSigcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(TH1F)
             self.dPhiBGPIDErrForTrueSpecies = self.init_pTtrig_pTassoc_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiSigPIDErrForTrueSpecies = self.init_pTtrig_pTassoc_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiBGPIDErrForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiSigPIDErrForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(
-                ROOT.TH1F
+                TH1F
             )
-            self.dPhiBGcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
-            self.dPhiBGcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.dPhiSigcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.dPhiBGcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.dPhiSigcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.dPhiBGcorrs = self.init_pTtrig_pTassoc_array(TH1F)
+            self.dPhiBGcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.dPhiSigcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.dPhiBGcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.dPhiSigcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(TH1F)
             self.dPhiBGPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiSigPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiBGPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.dPhiSigPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(
-                ROOT.TH1F
+                TH1F
             )
-            self.dPhiBGcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
-            self.dPhiBGcorrsZV = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
-            self.dPhiSigdpionTPCnSigmacorrs = self.init_pTtrig_pTassoc_dict(ROOT.TH2F)
-            self.dEtacorrs = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.dPhiBGcorrs = self.init_pTtrig_pTassoc_array(TH1F)
+            self.dPhiBGcorrsZV = self.init_pTtrig_pTassoc_array(TH1F)
+            self.dPhiSigdpionTPCnSigmacorrs = self.init_pTtrig_pTassoc_dict(TH2F)
+            self.dEtacorrs = self.init_pTtrig_pTassoc_array(TH1F)
             self.RPFObjs = self.init_pTtrig_pTassoc_array(object)
             self.RPFObjsZV = self.init_pTtrig_pTassoc_array(object)
             self.PionTPCNSigmaFitObjs = self.init_pTtrig_pTassoc_dict(object)
@@ -573,31 +545,31 @@ class JetHadron(
             self.RPFObjsForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(object)
             self.RPFObjsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(object)
             self.BGSubtractedAccCorrectedSEdPhiSigNScorrs = (
-                self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_array(TH1F)
             )
             self.BGSubtractedAccCorrectedSEdPhiSigAScorrs = (
-                self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_array(TH1F)
             )
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs = (
-                self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_array(TH1F)
             )
             self.BGSubtractedAccCorrectedSEdPhiSigNScorrsZV = (
-                self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_array(TH1F)
             )
             self.BGSubtractedAccCorrectedSEdPhiSigAScorrsZV = (
-                self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_array(TH1F)
             )
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsZV = (
-                self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+                self.init_pTtrig_pTassoc_array(TH1F)
             )
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrs = (
-                self.init_pTtrig_pTassoc_dict(ROOT.TH2F)
+                self.init_pTtrig_pTassoc_dict(TH2F)
             )
             self.NormalizedBGSubtracteddPhiForTrueSpecies = self.init_pTtrig_pTassoc_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.NormalizedBGSubtracteddPhiForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.BGSubtractedAccCorrectedSEdPhiSigNScorrsminVals = (
                 self.init_pTtrig_pTassoc_array(float)
@@ -609,10 +581,10 @@ class JetHadron(
                 self.init_pTtrig_pTassoc_array(float)
             )
             self.NormalizedBGSubtracteddPhiForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(
-                ROOT.TH1F
+                TH1F
             )
             self.BGSubtractedAccCorrectedSEdPhiSigNScorrsminValsZV = (
                 self.init_pTtrig_pTassoc_array(float)
@@ -633,10 +605,10 @@ class JetHadron(
                 self.init_pTtrig_pTassoc_dict(float)
             )
             self.BGSubtractedAccCorrectedSEdPhidPionSigNScorrs = (
-                self.init_pTtrig_pTassoc_array(ROOT.TH2F)
+                self.init_pTtrig_pTassoc_array(TH2F)
             )
             self.BGSubtractedAccCorrectedSEdPhidPionSigAScorrs = (
-                self.init_pTtrig_pTassoc_array(ROOT.TH2F)
+                self.init_pTtrig_pTassoc_array(TH2F)
             )
             self.NormalizedBGSubtracteddPhiForTrueSpeciesminValsZV = (
                 self.init_pTtrig_pTassoc_dict(float)
@@ -645,22 +617,22 @@ class JetHadron(
                 self.init_pTtrig_pTassoc_dict(float)
             )
             self.BGSubtractedAccCorrectedSEdPhidPionSigNScorrsZV = (
-                self.init_pTtrig_pTassoc_array(ROOT.TH2F)
+                self.init_pTtrig_pTassoc_array(TH2F)
             )
             self.BGSubtractedAccCorrectedSEdPhidPionSigAScorrsZV = (
-                self.init_pTtrig_pTassoc_array(ROOT.TH2F)
+                self.init_pTtrig_pTassoc_array(TH2F)
             )
-            self.dPionNSsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
-            self.dPionASsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
-            self.pionTPCnSigmaInc = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.pionTPCnSigma_pionTOFcut = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.pionTPCnSigma_protonTOFcut = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.pionTPCnSigma_kaonTOFcut = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.pionTPCnSigma_otherTOFcut = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.pionTPCnSigmaInc_vs_dphi = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.pionTPCnSigma_pionTOFcut_vs_dphi = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.pionTPCnSigma_protonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.pionTPCnSigma_kaonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.dPionNSsignals = self.init_pTtrig_pTassoc_array(TH1F)
+            self.dPionASsignals = self.init_pTtrig_pTassoc_array(TH1F)
+            self.pionTPCnSigmaInc = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.pionTPCnSigma_pionTOFcut = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.pionTPCnSigma_protonTOFcut = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.pionTPCnSigma_kaonTOFcut = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.pionTPCnSigma_otherTOFcut = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.pionTPCnSigmaInc_vs_dphi = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.pionTPCnSigma_pionTOFcut_vs_dphi = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.pionTPCnSigma_protonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_dict(TH1F)
+            self.pionTPCnSigma_kaonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_dict(TH1F)
 
 
             self.YieldsTrue = self.init_pTtrig_pTassoc_dict(float)
@@ -718,17 +690,6 @@ class JetHadron(
         if plot_on_init:
             self.plot_everything()
 
-    def return_none(self):
-        return None
-
-    def return_true(self):
-        return True
-
-    def init_none_dict(self):
-        return defaultdict(self.return_none)
-
-    def init_bool_dict(self):
-        return defaultdict(self.return_true)
 
     def init_pTtrig_pTassoc_dict(self, dtype):
         return defaultdict(partial(self.init_pTtrig_pTassoc_array, dtype=dtype))
@@ -761,7 +722,7 @@ class JetHadron(
             (len(self.pTtrigBinEdges) - 1, len(self.pTassocBinEdges) - 1), dtype=dtype
         )
 
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_hist_arrays(self, i, j, hists_to_fill: "Optional[dict[str, bool]]" = None):
         if self.analysisType in ["central", "semicentral"]:
             self.set_pT_epAngle_bin(i, j, 3)
@@ -1219,7 +1180,7 @@ class JetHadron(
         )
         p.kill()
 
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_N_trigs(self, i, j, k):
         Ntrigs = self.get_N_trig()
         if self.analysisType in ["central", "semicentral"]:
@@ -1228,7 +1189,7 @@ class JetHadron(
             self.N_trigs[i] = Ntrigs
         del Ntrigs
 
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_N_assoc(self, i, j, k, region):
         if region == "BG":
             Nassoc = self.get_N_assoc('BGHi')+self.get_N_assoc('BGLo')
@@ -1241,7 +1202,7 @@ class JetHadron(
             self.N_assoc[region][i, j] = Nassoc
         del Nassoc
 
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_N_assoc_for_species(self, i, j, k, species, region):
         if region == "BG":
             Nassoc = self.get_N_assoc_for_species(i,j,k,species, "BGHi")+self.get_N_assoc_for_species(i,j,k,species, "BGLo")
@@ -1254,7 +1215,7 @@ class JetHadron(
             self.N_assoc_for_species[region][species][i, j] = Nassoc
         del Nassoc
 
-    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    @log_function_call(description="", logging_level=logging.INFO)
     def fill_SE_correlation_function(self, i, j, k):
         SEcorr = self.get_SE_correlation_function()
         if self.analysisType in ["central", "semicentral"]:
@@ -1263,7 +1224,7 @@ class JetHadron(
             self.SEcorrs[i, j] = SEcorr
         del SEcorr
 
-    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    @log_function_call(description="", logging_level=logging.INFO)
     def fill_ME_correlation_function(self, i, j, k):
         if j >= 2:
             self.set_pT_assoc_range(2, 7)
@@ -1280,7 +1241,7 @@ class JetHadron(
             self.ME_norm_systematics[i, j] = ME_norm_error
         del NormMEcorr
 
-    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    @log_function_call(description="", logging_level=logging.INFO)
     def fill_AccCorrected_SE_correlation_function(self, i, j, k):
         AccCorrectedSEcorr = self.get_acceptance_corrected_correlation_function()
         if self.analysisType in ["central", "semicentral"]:
@@ -1289,7 +1250,7 @@ class JetHadron(
             self.AccCorrectedSEcorrs[i, j] = AccCorrectedSEcorr
         del AccCorrectedSEcorr
 
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_AccCorrected_SE_correlation_function_in_z_vertex_bins(self, i, j, k):
         AccCorrectedSEcorr = self.get_acceptance_corrected_correlation_function(in_z_vertex_bins=True)
         if self.analysisType in ["central", "semicentral"]:
@@ -1298,7 +1259,7 @@ class JetHadron(
             self.AccCorrectedSEcorrsZV[i, j] = AccCorrectedSEcorr
         del AccCorrectedSEcorr
 
-    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    @log_function_call(description="", logging_level=logging.INFO)
     def fill_NormAccCorrected_SE_correlation_function(self, i, j, k):
         NormAccCorrectedSEcorr = (
             self.get_normalized_acceptance_corrected_correlation_function()
@@ -1309,7 +1270,7 @@ class JetHadron(
             self.NormAccCorrectedSEcorrs[i, j] = NormAccCorrectedSEcorr
         del NormAccCorrectedSEcorr
 
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_NormAccCorrected_SE_correlation_function_in_z_vertex_bins(self, i, j, k):
         NormAccCorrectedSEcorr = (
             self.get_normalized_acceptance_corrected_correlation_function(in_z_vertex_bins=True)
@@ -1320,7 +1281,7 @@ class JetHadron(
             self.NormAccCorrectedSEcorrsZV[i, j] = NormAccCorrectedSEcorr
         del NormAccCorrectedSEcorr
 
-    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    @log_function_call(description="", logging_level=logging.INFO)
     def fill_dPhi_correlation_functions(self, i, j, k):
         dPhiBGHi, nbins_hi, binwidth = self.get_dPhi_projection_in_dEta_range(
             self.dEtaBGHi
@@ -1427,7 +1388,7 @@ class JetHadron(
             self.dPhiSigcorrs[i, j] = dPhiSig
         del dPhiBGHi, dPhiBGLo, dPhiBGcorrs, dPhiSig
     
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_dPhi_correlation_functions_in_z_vertex_bins(self, i, j, k):
         dPhiBGHi, nbins_hi, binwidth = self.get_dPhi_projection_in_dEta_range(
             self.dEtaBGHi, in_z_vertex_bins=True
@@ -1534,7 +1495,7 @@ class JetHadron(
             self.dPhiSigcorrsZV[i, j] = dPhiSig
         del dPhiBGHi, dPhiBGLo, dPhiBGcorrs, dPhiSig
 
-    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    @log_function_call(description="", logging_level=logging.INFO)
     def fill_dPhi_correlation_functions_for_true_species(self, i, j, k, species):
 
         dPhiMid, nbins_mid, binwidth, dPhiPIDerrMid = self.get_dPhi_projection_in_dEta_range_for_true_species(i,j,k,
@@ -1714,7 +1675,7 @@ class JetHadron(
             self.dPhiSigPIDErrForTrueSpecies[species][i, j] = dPhiSigPIDerr
         del dPhiSig
     
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_dPhi_correlation_functions_for_true_species_in_z_vertex_bins(self, i, j, k, species):
 
         dPhiMid, nbins_mid, binwidth, dPhiPIDerrMid = self.get_dPhi_projection_in_dEta_range_for_true_species(i,j,k,
@@ -1899,7 +1860,7 @@ class JetHadron(
             self.dPhiSigPIDErrForTrueSpeciesZV[species][i, j] = dPhiSigPIDerr
         del dPhiSig
     
-    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    @log_function_call(description="", logging_level=logging.INFO)
     def fill_dPhi_correlation_functions_for_enhanced_species(self, i, j, k, species):
 
         dPhiMid, nbins_mid, binwidth = self.get_dPhi_projection_in_dEta_range_for_enhanced_species(i,j,k,
@@ -2008,7 +1969,7 @@ class JetHadron(
 
         del dPhiSig
     
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_dPhi_correlation_functions_for_enhanced_species_in_z_vertex_bins(self, i, j, k, species):
 
         dPhiMid, nbins_mid, binwidth = self.get_dPhi_projection_in_dEta_range_for_enhanced_species(i,j,k,
@@ -2118,7 +2079,7 @@ class JetHadron(
             self.dPhiSigcorrsForEnhancedSpeciesZV[species][i, j] = dPhiSig
         del dPhiSig
 
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_dPhi_dpionTPCnSigma_correlation_functions(self, i, j, k, TOFcutSpecies):
 
         # print(f"dPhiBG is at {hex(id(dPhiBG))}")
@@ -2131,7 +2092,7 @@ class JetHadron(
             self.dPhiSigdpionTPCnSigmacorrs[TOFcutSpecies][i, j] = dPhiSig
         del dPhiSig
 
-    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    @log_function_call(description="", logging_level=logging.INFO)
     def fill_BG_subtracted_AccCorrected_SE_correlation_functions(self, i, j, k):
         if self.analysisType in ["central", "semicentral"]:
             NSCorr = self.get_BG_subtracted_AccCorrectedSEdPhiSigNScorr(i, j, k)  # type: ignore
@@ -2147,7 +2108,7 @@ class JetHadron(
             self.BGSubtractedAccCorrectedSEdPhiSigAScorrsminVals[i, j] = ASminVal
         del NSCorr, ASCorr
     
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_BG_subtracted_AccCorrected_SE_correlation_functions_in_z_vertex_bins(self, i, j, k):
         if self.analysisType in ["central", "semicentral"]:
             NSCorr = self.get_BG_subtracted_AccCorrectedSEdPhiSigNScorr(i, j, k, in_z_vertex_bins=True)  # type: ignore
@@ -2163,7 +2124,7 @@ class JetHadron(
             self.BGSubtractedAccCorrectedSEdPhiSigAScorrsminValsZV[i, j] = ASminVal
         del NSCorr, ASCorr
 
-    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    @log_function_call(description="", logging_level=logging.INFO)
     def fill_normalized_BG_subtracted_AccCorrected_SE_correlation_functions(
         self, i, j, k
     ):
@@ -2177,7 +2138,7 @@ class JetHadron(
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminVals[i, j] = minVal  # type: ignore
         del Corr
     
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_normalized_BG_subtracted_AccCorrected_SE_correlation_functions_in_z_vertex_bins(
         self, i, j, k
     ):
@@ -2190,7 +2151,7 @@ class JetHadron(
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminValsZV[i, j] = minVal  # type: ignore
         del Corr
 
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_normalized_BG_subtracted_AccCorrected_SE_correlation_functions_w_pionTPCnSigma(
         self, i, j, k, species
     ):
@@ -2208,7 +2169,7 @@ class JetHadron(
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrsminVals[species][i, j] = minVal  # type: ignore
         del Corr
 
-    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    @log_function_call(description="", logging_level=logging.INFO)
     def fill_normalized_background_subtracted_dPhi_for_true_species(self, i, j, k, species):
         if self.analysisType in ["central", "semicentral"]:
             Corr = self.get_normalized_background_subtracted_dPhi_for_true_species(
@@ -2221,7 +2182,7 @@ class JetHadron(
             self.NormalizedBGSubtracteddPhiForTrueSpeciesminVals[species][i, j] = minVal  # type: ignore
         del Corr
    
-    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    @log_function_call(description="", logging_level=logging.INFO)
     def fill_normalized_background_subtracted_dPhi_for_enhanced_species(self, i, j, k, species):
         if self.analysisType in ["central", "semicentral"]:
             Corr = self.get_normalized_background_subtracted_dPhi_for_enhanced_species(
@@ -2234,7 +2195,7 @@ class JetHadron(
             self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminVals[species][i, j] = minVal  # type: ignore
         del Corr
     
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_normalized_background_subtracted_dPhi_for_true_species_in_z_vertex_bins(self, i, j, k, species):
         if self.analysisType in ["central", "semicentral"]:
             Corr = self.get_normalized_background_subtracted_dPhi_for_true_species(
@@ -2247,7 +2208,7 @@ class JetHadron(
             self.NormalizedBGSubtracteddPhiForTrueSpeciesminValsZV[species][i, j] = minVal  # type: ignore
         del Corr
     
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_normalized_background_subtracted_dPhi_for_enhanced_species_in_z_vertex_bins(self, i, j, k, species):
         if self.analysisType in ["central", "semicentral"]:
             Corr = self.get_normalized_background_subtracted_dPhi_for_enhanced_species(
@@ -2260,7 +2221,7 @@ class JetHadron(
             self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminValsZV[species][i, j] = minVal  # type: ignore
         del Corr
 
-    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    @log_function_call(description="", logging_level=logging.INFO)
     def fill_yield_for_true_species(self, i, j, species):
         yield_, yield_err_ = self.get_yield_for_true_species(i, j, 3, species)
         self.YieldsTrue[species][i, j] = yield_
@@ -2276,7 +2237,7 @@ class JetHadron(
         self.YieldsTrueAS[species][i, j] = yield_AS
         self.YieldErrsTrueAS[species][i, j] = yield_err_AS
     
-    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    @log_function_call(description="", logging_level=logging.INFO)
     def fill_yield_for_enhanced_species(self, i, j, species):
         yield_, yield_err_ = self.get_yield_for_enhanced_species(i, j, 3, species)
         self.YieldsEnhanced[species][i, j] = yield_
@@ -2292,7 +2253,7 @@ class JetHadron(
         self.YieldsEnhancedAS[species][i, j] = yield_AS
         self.YieldErrsEnhancedAS[species][i, j] = yield_err_AS
     
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_yield_for_true_species_in_z_vertex_bins(self, i, j, species):
         yield_, yield_err_ = self.get_yield_for_true_species(i, j, 3, species, in_z_vertex_bins=True)
         self.YieldsTrueZV[species][i, j] = yield_
@@ -2308,7 +2269,7 @@ class JetHadron(
         self.YieldsTrueASZV[species][i, j] = yield_AS
         self.YieldErrsTrueASZV[species][i, j] = yield_err_AS
     
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_yield_for_enhanced_species_in_z_vertex_bins(self, i, j, species):
         yield_, yield_err_ = self.get_yield_for_true_species(i, j, 3, species, in_z_vertex_bins=True)
         self.YieldsEnhancedZV[species][i, j] = yield_
@@ -2324,7 +2285,7 @@ class JetHadron(
         self.YieldsEnhancedASZV[species][i, j] = yield_AS
         self.YieldErrsEnhancedASZV[species][i, j] = yield_err_AS
 
-    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    @log_function_call(description="", logging_level=logging.INFO)
     def fill_inclusive_yield(self, i, j,):
         yield_, yield_err_ = self.get_inclusive_yield(i, j, 3)
         self.YieldsTrue["inclusive"][i, j] = yield_
@@ -2340,7 +2301,7 @@ class JetHadron(
         self.YieldsTrueAS["inclusive"][i, j] = yield_AS
         self.YieldErrsTrueAS["inclusive"][i, j] = yield_err_AS
     
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def fill_inclusive_yield_in_z_vertex_bins(self, i, j):
         yield_, yield_err_ = self.get_inclusive_yield(i, j, 3, in_z_vertex_bins=True)
         self.YieldsTrueZV['inclusive'][i, j] = yield_
@@ -2356,7 +2317,7 @@ class JetHadron(
         self.YieldsTrueASZV['inclusive'][i, j] = yield_AS
         self.YieldErrsTrueASZV['inclusive'][i, j] = yield_err_AS
 
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def set_pT_epAngle_bin(self, i, j, k):
 
         for sparse_ind in range(len(self.JH)):
@@ -2409,7 +2370,7 @@ class JetHadron(
                     )
         self.set_has_changed()
 
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def set_pT_assoc_range(self, j_low, j_hi):
         for sparse_ind in range(len(self.JH)):
             self.JH[sparse_ind].GetAxis(2).SetRangeUser(
@@ -2420,7 +2381,7 @@ class JetHadron(
             )
         self.set_has_changed()
 
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def set_pT_trig_range(self, i_low, i_hi):
         for sparse_ind in range(len(self.JH)):
             self.JH[sparse_ind].GetAxis(1).SetRangeUser(
@@ -2434,7 +2395,7 @@ class JetHadron(
             )
         self.set_has_changed()
 
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def set_z_vertex_bin(self, bin_no):
         for sparse_ind in range(len(self.JH)):
             self.JH[sparse_ind].GetAxis(5).SetRangeUser(self.z_vertex_bins[bin_no], self.z_vertex_bins[bin_no+1])
@@ -2442,7 +2403,7 @@ class JetHadron(
             self.Trigger[sparse_ind].GetAxis(2).SetRangeUser(self.z_vertex_bins[bin_no], self.z_vertex_bins[bin_no+1])
         self.set_has_changed()
 
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def reset_z_vertex_bin(self):
         for sparse_ind in range(len(self.JH)):
             self.JH[sparse_ind].GetAxis(5).SetRange(0, -1)
@@ -2450,10 +2411,10 @@ class JetHadron(
             self.Trigger[sparse_ind].GetAxis(2).SetRange(0, -1)
         self.set_has_changed()
 
-    @print_function_name_with_description_on_call(description="")
+    @log_function_call(description="")
     def set_has_changed(self):
         self.get_SE_correlation_function_has_changed = True
-        self.get_SE_correlation_function_w_Pion_has_changed = self.init_bool_dict()
+        self.get_SE_correlation_function_w_Pion_has_changed = init_bool_dict()
         self.get_ME_correlation_function_has_changed = True
         self.get_normalized_ME_correlation_function_has_changed = True
         self.get_normalized_ME_correlation_error_has_changed = True
@@ -2461,7 +2422,7 @@ class JetHadron(
         self.get_acceptance_corrected_dPhi_dEta_dPion_distribution_has_changed = True
         self.get_normalized_acceptance_corrected_correlation_function_has_changed = True
         self.get_acceptance_corrected_correlation_function_w_pionTPCnSigma_has_changed = (
-            self.init_bool_dict()
+            init_bool_dict()
         )
         self.ME_norm_sliding_window_has_changed = True
         self.resetUnfoldingResults = True
@@ -2504,7 +2465,7 @@ class JetHadron(
             )
         else:
             anaList = f.Get("AliAnalysisTaskJetH_tracks_caloClusters_biased")
-        fHistEventPlane = ROOT.TH1F(anaList.FindObject("fHistEventPlane"))
+        fHistEventPlane = TH1F(anaList.FindObject("fHistEventPlane"))
         return fHistEventPlane.Clone()
 
     def assert_sparses_filled(self):
