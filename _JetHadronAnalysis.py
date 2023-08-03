@@ -79,7 +79,6 @@ class AnalysisMixin:
             if TH2Corr is None:
                 TH2Corr = self.JH[sparse_ind].Projection(4, 3)  # type:ignore
                 # divide by the bin widths to get the correct correlation function
-                TH2Corr.Sumw2()
             else:
                 success = TH2Corr.Add(self.JH[sparse_ind].Projection(4, 3))  # type:ignore
                 # divide by the bin widths to get the correct correlation function
@@ -121,7 +120,6 @@ class AnalysisMixin:
                     self.JH[sparse_ind].GetAxis(10 - offset).SetRange(0,self.JH[sparse_ind].GetAxis(10-offset).FindBin(-2))
                     if TH2Corr is None:
                         TH2Corr = self.JH[sparse_ind].Projection(4, 3)  # type:ignore
-                        TH2Corr.Sumw2()
                         
                     else:
                         TH2Corr.Add(self.JH[sparse_ind].Projection(4, 3))  # type:ignore
@@ -136,7 +134,6 @@ class AnalysisMixin:
                     self.JH[sparse_ind].GetAxis(10 - offset).SetRange(0,self.JH[sparse_ind].GetAxis(10-offset).FindBin(-2))
                     if TH2Corr is None:
                         TH2Corr = self.JH[sparse_ind].Projection(4, 3)  # type:ignore
-                        TH2Corr.Sumw2()
                         
                     else:
                         TH2Corr.Add(self.JH[sparse_ind].Projection(4, 3))  # type:ignore
@@ -150,7 +147,6 @@ class AnalysisMixin:
                     )
                     if TH2Corr is None:
                         TH2Corr = self.JH[sparse_ind].Projection(4, 3)  # type:ignore
-                        TH2Corr.Sumw2()
                         
                     else:
                         TH2Corr.Add(self.JH[sparse_ind].Projection(4, 3))  # type:ignore
@@ -174,7 +170,6 @@ class AnalysisMixin:
                 )  # type:ignore
                 if TH2Corr is None:
                     TH2Corr = self.JH[sparse_ind].Projection(4, 3)  # type:ignore
-                    TH2Corr.Sumw2() 
                 else:
                     TH2Corr.Add(self.JH[sparse_ind].Projection(4, 3))  # type:ignore
 
@@ -253,7 +248,6 @@ class AnalysisMixin:
                 TH3Corr = self.JH[sparse_ind].Projection(
                     3, 4, 7 - offset
                 )  # type:ignore
-                TH3Corr.Sumw2()
             else:
                 TH3Corr.Add(
                     self.JH[sparse_ind].Projection(3, 4, 7 - offset)
@@ -278,7 +272,6 @@ class AnalysisMixin:
         for sparse_ind in range(len(self.MixedEvent)):  # type:ignore
             if TH2Corr is None:
                 TH2Corr = self.MixedEvent[sparse_ind].Projection(4, 3)
-                TH2Corr.Sumw2()
             else:
                 TH2Corr.Add(self.MixedEvent[sparse_ind].Projection(4, 3))
         bin_widths = [
@@ -965,7 +958,6 @@ class AnalysisMixin:
         lowerBin, upperBin = (tempHist.GetXaxis().FindBin(bin) for bin in dEtaRange)
         tempHist.GetXaxis().SetRange(lowerBin, upperBin)
         dPhi = tempHist.ProjectionY()
-        dPhi.Sumw2()
         nbins = upperBin - lowerBin
         binwidth = tempHist.GetXaxis().GetBinWidth(1)
         dPhi.Scale(binwidth) # scale by the number of bins in the dEta range to get the correct normalization
@@ -996,7 +988,6 @@ class AnalysisMixin:
         tempHist.GetXaxis().SetRange(lowerBin, upperBin)
 
         dPhi = tempHist.ProjectionY()
-        dPhi.Sumw2()
 
         nbins = upperBin - lowerBin
         binwidth = tempHist.GetXaxis().GetBinWidth(1)
@@ -1030,9 +1021,7 @@ class AnalysisMixin:
         PIDerrTH2.GetXaxis().SetRange(lowerBin, upperBin)
 
         dPhi = tempHist.ProjectionY()
-        dPhi.Sumw2()
         dPhiPIDErr = PIDerrTH2.ProjectionY()
-        dPhiPIDErr.Sumw2()
 
         nbins = upperBin - lowerBin
         binwidth = tempHist.GetXaxis().GetBinWidth(1)
@@ -1067,7 +1056,6 @@ class AnalysisMixin:
         lowerBin, upperBin = (tempHist.GetXaxis().FindBin(bin) for bin in dEtaRange)
         tempHist.GetXaxis().SetRange(lowerBin, upperBin)
         dPhidpionTPCnSigma = tempHist.Project3D("zy")
-        dPhidpionTPCnSigma.Sumw2()
         if scaleUp:
             # Scale background up
             nbins = upperBin - lowerBin
@@ -2093,7 +2081,6 @@ class AnalysisMixin:
                     )
             if pion_TPC_signal is None:
                 pion_TPC_signal = self.JH[sparse_ind].Projection(8-offset)  # type:ignore
-                pion_TPC_signal.Sumw2()
             else:
                 pion_TPC_signal.Add(self.JH[sparse_ind].Projection(8-offset))  # type:ignore
 
@@ -2111,7 +2098,6 @@ class AnalysisMixin:
         for sparse_ind in range(len(self.JH)):  # type:ignore
             if pion_TPC_signal is None:
                 pion_TPC_signal = self.JH[sparse_ind].Projection(8-offset, 4)  # type:ignore
-                pion_TPC_signal.Sumw2()
             else:
                 pion_TPC_signal.Add(self.JH[sparse_ind].Projection(8-offset, 4))  # type:ignore
         return pion_TPC_signal
@@ -2172,7 +2158,6 @@ class AnalysisMixin:
                     pion_TPC_nSigma = self.JH[sparse_ind].Projection(
                         8 - offset
                     )  # type:ignore
-                    pion_TPC_nSigma.Sumw2()
                 else:
                     pion_TPC_nSigma.Add(
                         self.JH[sparse_ind].Projection(8 - offset)
@@ -2191,7 +2176,6 @@ class AnalysisMixin:
                     pion_TPC_nSigma = self.JH[sparse_ind].Projection(
                         8 - offset
                     )  # type:ignore
-                    pion_TPC_nSigma.Sumw2()
                 else:
                     pion_TPC_nSigma.Add(self.JH[sparse_ind].Projection(8 - offset))
 
@@ -2205,7 +2189,6 @@ class AnalysisMixin:
                     pion_TPC_nSigma = self.JH[sparse_ind].Projection(
                         8 - offset
                     )  # type:ignore
-                    pion_TPC_nSigma.Sumw2()
                 else:
                     pion_TPC_nSigma.Add(self.JH[sparse_ind].Projection(8 - offset))
 
@@ -2222,7 +2205,6 @@ class AnalysisMixin:
                     pion_TPC_nSigma = self.JH[sparse_ind].Projection(
                         8 - offset
                     )  # type:ignore
-                    pion_TPC_nSigma.Sumw2()
                 else:
                     pion_TPC_nSigma.Add(self.JH[sparse_ind].Projection(8 - offset))
 
@@ -2325,7 +2307,6 @@ class AnalysisMixin:
                     pion_TPC_nSigma = self.JH[sparse_ind].Projection(
                         8 - offset, 4
                     )  # type:ignore
-                    pion_TPC_nSigma.Sumw2()
                 else:
                     pion_TPC_nSigma.Add(
                         self.JH[sparse_ind].Projection(8 - offset, 4)
@@ -2342,7 +2323,6 @@ class AnalysisMixin:
                     pion_TPC_nSigma = self.JH[sparse_ind].Projection(
                         8 - offset, 4
                     )  # type:ignore
-                    pion_TPC_nSigma.Sumw2()
                 else:
                     pion_TPC_nSigma.Add(self.JH[sparse_ind].Projection(8 - offset, 4))
                 self.JH[sparse_ind].GetAxis(10 - offset).SetRangeUser(
@@ -2357,7 +2337,6 @@ class AnalysisMixin:
                     pion_TPC_nSigma = self.JH[sparse_ind].Projection(
                         8 - offset, 4
                     )  # type:ignore
-                    pion_TPC_nSigma.Sumw2()
                 else:
                     pion_TPC_nSigma.Add(self.JH[sparse_ind].Projection(8 - offset, 4))
                 self.JH[sparse_ind].GetAxis(11 - offset).SetRangeUser(
