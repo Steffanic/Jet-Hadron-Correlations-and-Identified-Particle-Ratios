@@ -14,6 +14,28 @@ from time import time
 
 import warnings
 
+import logging
+
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+    filename="jet_hadron.log",
+)
+debug_logger = logging.getLogger('debug')
+error_logger = logging.getLogger('error')
+info_logger = logging.getLogger('info')
+d_fh = logging.FileHandler(filename='jhDEBUG.log', mode='w', encoding='utf-8',)
+e_fh = logging.FileHandler(filename='jhERROR.log', mode='w', encoding='utf-8',)
+i_fh = logging.FileHandler(filename='jhINFO.log', mode='w', encoding='utf-8',)
+d_fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+e_fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+i_fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+debug_logger.addHandler(d_fh)
+error_logger.addHandler(e_fh)
+info_logger.addHandler(i_fh)
+debug_logger.setLevel(logging.DEBUG)
+error_logger.setLevel(logging.ERROR)
+info_logger.setLevel(logging.INFO)
 warnings.filterwarnings("ignore")
 
 import _JetHadronPlot, _JetHadronFit, _JetHadronAnalysis
@@ -26,14 +48,22 @@ plt.rc("font", family="serif")
 plt.rcParams.update({"font.size": 16})
 
 
-def print_function_name_with_description_on_call(description):
+def print_function_name_with_description_on_call(description, logging_level=logging.DEBUG):
     """
     Prints the name of the function and a description of what it does
     """
 
     def function_wrapper(function):
         def method_wrapper(self, *args, **kwargs):
-            print(f"{function.__name__} in {self.__class__.__name__}:\n\t{description}")
+            if logging_level == logging.DEBUG:
+                logger = debug_logger
+            elif logging_level == logging.INFO:
+                logger = info_logger
+            elif logging_level == logging.ERROR:
+                logger = error_logger
+            else:
+                raise ValueError(f"Unknown logging level {logging_level}")
+            logger.log(level=logging_level, msg=f"{function.__name__} in {self.__class__.__name__}:\n\t{description}")
             return function(self, *args, **kwargs)
 
         return method_wrapper
@@ -70,7 +100,7 @@ class JetHadron(
         self.EventPlaneAngleHist = []
         first = True
         for filename in rootFileNames:
-            print(f"Loading file {filename}")
+            debug_logger.debug(f"Loading file {filename}")
             file = ROOT.TFile(filename)
             fileJH, fileME, fileT = self.get_sparses(file)
             self.JH.append(fileJH)
@@ -79,7 +109,7 @@ class JetHadron(
             if self.analysisType in ["central", "semicentral"]:
                 self.EventPlaneAngleHist.append(self.get_event_plane_angle_hist(file))
 
-        print("Finished loading files")
+        debug_logger.debug("Finished loading files")
         self.assert_sparses_filled()
 
         # define pT bins
@@ -261,8 +291,8 @@ class JetHadron(
         # define event plane bins
         self.eventPlaneAngleBinEdges = [0, np.pi / 6, np.pi / 3, np.pi / 2]
 
-        self.z_vertex_bins_PbPb= [-10,-9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3 ,4, 5, 6, 7, 8, 9, 10]
-        self.z_vertex_bins_pp= [-2, -1, 0, 1, 2]
+        self.z_vertex_bins_PbPb= [-10,-8, -6, -4, -2,  0, 2,4, 6, 8,  10]
+        self.z_vertex_bins_pp= [-8, -4,  0,  4, 8]
         if self.analysisType == 'pp':
             self.z_vertex_bins = self.z_vertex_bins_pp
         else:
@@ -303,6 +333,9 @@ class JetHadron(
             self.init_none_dict()
         )
         self.ME_norm_sliding_window_result = None
+        self.unfoldedTruthValues = None
+        self.unfoldedTruthErrors = None
+        self.resetUnfoldingResults = True
 
         if self.analysisType in ["central", "semicentral"]:
             # Define all the arrays that will hold various objects for each bin
@@ -310,8 +343,8 @@ class JetHadron(
                 (len(self.pTtrigBinEdges) - 1, len(self.eventPlaneAngleBinEdges)),
                 dtype=int,
             )
-            self.N_assoc =  self.init_pTtrig_pTassoc_eventPlane_array(int)
-            self.N_assoc_for_species = self.init_pTtrig_pTassoc_eventPlane_dict(int)
+            self.N_assoc =  self.init_pTtrig_pTassoc_eventPlane_dict(int)
+            self.N_assoc_for_species = self.init_pTtrig_pTassoc_eventPlane_region_dict(int)
             self.SEcorrs = self.init_pTtrig_pTassoc_eventPlane_array(
                 ROOT.TH2F
             )  # Event plane angle has 4 bins, in-, mid-, out, and inclusive
@@ -331,18 +364,55 @@ class JetHadron(
             self.ME_norm_systematics = self.init_pTtrig_pTassoc_eventPlane_array(float)
             self.dPhiSigcorrs = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
             self.dPhiSigcorrsZV = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
-            self.dPhiBGcorrsForSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
+            self.dPhiBGcorrsForTrueSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
                 ROOT.TH1F
             )
-            self.dPhiSigcorrsForSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
+            self.dPhiSigcorrsForTrueSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
                 ROOT.TH1F
             )
-            self.dPhiBGcorrsForSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
+            self.dPhiBGcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
                 ROOT.TH1F
             )
-            self.dPhiSigcorrsForSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
+            self.dPhiSigcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
                 ROOT.TH1F
             )
+            self.dPhiBGPIDErrForTrueSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
+                ROOT.TH1F
+            )
+            self.dPhiSigPIDErrForTrueSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
+                ROOT.TH1F
+            )
+            self.dPhiBGPIDErrForTrueSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
+                ROOT.TH1F
+            )
+            self.dPhiSigPIDErrForTrueSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
+                ROOT.TH1F
+            )
+            self.dPhiBGcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
+                ROOT.TH1F
+            )
+            self.dPhiSigcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
+                ROOT.TH1F
+            )
+            self.dPhiBGcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
+                ROOT.TH1F
+            )
+            self.dPhiSigcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
+                ROOT.TH1F
+            )
+            self.dPhiBGPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
+                ROOT.TH1F
+            )
+            self.dPhiSigPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_eventPlane_dict(
+                ROOT.TH1F
+            )
+            self.dPhiBGPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
+                ROOT.TH1F
+            )
+            self.dPhiSigPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_eventPlane_dict(
+                ROOT.TH1F
+            )
+
             self.dPhiBGcorrs = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
             self.dPhiBGcorrsZV = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
             self.dPhiSigdpionTPCnSigmacorrs = self.init_pTtrig_pTassoc_eventPlane_dict(
@@ -351,9 +421,11 @@ class JetHadron(
             self.dEtacorrs = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
             self.RPFObjs = self.init_pTtrig_pTassoc_array(object)
             self.RPFObjsZV = self.init_pTtrig_pTassoc_array(object)
-            self.PionTPCNSigmaFitObjs = self.init_pTtrig_pTassoc_eventPlane_array(object)
-            self.RPFObjsForSpecies = self.init_pTtrig_pTassoc_dict(object)
-            self.RPFObjsForSpeciesZV = self.init_pTtrig_pTassoc_dict(object)
+            self.PionTPCNSigmaFitObjs = self.init_pTtrig_pTassoc_eventPlane_dict(object)
+            self.RPFObjsForTrueSpecies = self.init_pTtrig_pTassoc_dict(object)
+            self.RPFObjsForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(object)
+            self.RPFObjsForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(object)
+            self.RPFObjsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(object)
             self.BGSubtractedAccCorrectedSEdPhiSigNScorrs = (
                 self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
             )
@@ -375,10 +447,16 @@ class JetHadron(
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrs = (
                 self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH2F)
             )
-            self.NormalizedBGSubtracteddPhiForSpecies = (
+            self.NormalizedBGSubtracteddPhiForTrueSpecies = (
                 self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
             )
-            self.NormalizedBGSubtracteddPhiForSpeciesZV = (
+            self.NormalizedBGSubtracteddPhiForTrueSpeciesZV = (
+                self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+            )
+            self.NormalizedBGSubtracteddPhiForEnhancedSpecies = (
+                self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+            )
+            self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV = (
                 self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
             )
             self.BGSubtractedAccCorrectedSEdPhidPionSigNScorrs = (
@@ -387,37 +465,60 @@ class JetHadron(
             self.BGSubtractedAccCorrectedSEdPhidPionSigAScorrs = (
                 self.init_pTtrig_pTassoc_array(ROOT.TH2F)
             )
-            self.pionTPCsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
             self.dPionNSsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
             self.dPionASsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
-            self.pionTPCnSigma_pionTOFcut = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
-            self.pionTPCnSigma_protonTOFcut = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
-            self.pionTPCnSigma_kaonTOFcut = self.init_pTtrig_pTassoc_eventPlane_array(ROOT.TH1F)
+            self.pionTPCnSigmaInc = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+            self.pionTPCnSigma_pionTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+            self.pionTPCnSigma_protonTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+            self.pionTPCnSigma_kaonTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+            self.pionTPCnSigma_otherTOFcut = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+            self.pionTPCnSigmaInc_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+            self.pionTPCnSigma_pionTOFcut_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+            self.pionTPCnSigma_protonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
+            self.pionTPCnSigma_kaonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_eventPlane_dict(ROOT.TH1F)
 
 
-            self.Yields = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsNS = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsAS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsTrue = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsTrueNS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsTrueAS = self.init_pTtrig_pTassoc_dict(float)
 
-            self.YieldErrs = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsNS = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsAS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsTrue = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsTrueNS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsTrueAS = self.init_pTtrig_pTassoc_dict(float)
             
-            self.YieldsZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsNSZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsASZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsTrueZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsTrueNSZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsTrueASZV = self.init_pTtrig_pTassoc_dict(float)
 
-            self.YieldErrsZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsNSZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsASZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsTrueZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsTrueNSZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsTrueASZV = self.init_pTtrig_pTassoc_dict(float)
+            
+            self.YieldsEnhanced = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsEnhancedNS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsEnhancedAS = self.init_pTtrig_pTassoc_dict(float)
+
+            self.YieldErrsEnhanced = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsEnhancedNS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsEnhancedAS = self.init_pTtrig_pTassoc_dict(float)
+            
+            self.YieldsEnhancedZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsEnhancedNSZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsEnhancedASZV = self.init_pTtrig_pTassoc_dict(float)
+
+            self.YieldErrsEnhancedZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsEnhancedNSZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsEnhancedASZV = self.init_pTtrig_pTassoc_dict(float)
+
+            self.ResponseMatrices = self.init_pTtrig_pTassoc_eventPlane_dict(np.ndarray)
 
         else:
             self.N_trigs = np.zeros(
                 (len(self.pTtrigBinEdges) - 1),
                 dtype=object,
             )
-            self.N_assoc = self.init_pTtrig_pTassoc_array(int)
-            self.N_assoc_for_species = self.init_pTtrig_pTassoc_dict(int)
+            self.N_assoc = self.init_pTtrig_pTassoc_dict(int)
+            self.N_assoc_for_species = self.init_pTtrig_pTassoc_region_dict(int)
             self.SEcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH2F)
             self.NormMEcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH2F)
             self.AccCorrectedSEcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH2F)
@@ -427,19 +528,50 @@ class JetHadron(
             self.ME_norm_systematics = self.init_pTtrig_pTassoc_array(float)
             self.dPhiSigcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
             self.dPhiSigcorrsZV = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
-            self.dPhiBGcorrsForSpecies = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.dPhiSigcorrsForSpecies = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.dPhiBGcorrsForSpeciesZV = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
-            self.dPhiSigcorrsForSpeciesZV = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.dPhiBGcorrsForTrueSpecies = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.dPhiSigcorrsForTrueSpecies = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.dPhiBGcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.dPhiSigcorrsForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.dPhiBGPIDErrForTrueSpecies = self.init_pTtrig_pTassoc_dict(
+                ROOT.TH1F
+            )
+            self.dPhiSigPIDErrForTrueSpecies = self.init_pTtrig_pTassoc_dict(
+                ROOT.TH1F
+            )
+            self.dPhiBGPIDErrForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(
+                ROOT.TH1F
+            )
+            self.dPhiSigPIDErrForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(
+                ROOT.TH1F
+            )
+            self.dPhiBGcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.dPhiBGcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.dPhiSigcorrsForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.dPhiBGcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.dPhiSigcorrsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.dPhiBGPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(
+                ROOT.TH1F
+            )
+            self.dPhiSigPIDErrForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(
+                ROOT.TH1F
+            )
+            self.dPhiBGPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(
+                ROOT.TH1F
+            )
+            self.dPhiSigPIDErrForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(
+                ROOT.TH1F
+            )
             self.dPhiBGcorrs = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
             self.dPhiBGcorrsZV = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
             self.dPhiSigdpionTPCnSigmacorrs = self.init_pTtrig_pTassoc_dict(ROOT.TH2F)
             self.dEtacorrs = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
             self.RPFObjs = self.init_pTtrig_pTassoc_array(object)
             self.RPFObjsZV = self.init_pTtrig_pTassoc_array(object)
-            self.PionTPCNSigmaFitObjs = self.init_pTtrig_pTassoc_array(object)
-            self.RPFObjsForSpecies = self.init_pTtrig_pTassoc_dict(object)
-            self.RPFObjsForSpeciesZV = self.init_pTtrig_pTassoc_dict(object)
+            self.PionTPCNSigmaFitObjs = self.init_pTtrig_pTassoc_dict(object)
+            self.RPFObjsForTrueSpecies = self.init_pTtrig_pTassoc_dict(object)
+            self.RPFObjsForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(object)
+            self.RPFObjsForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(object)
+            self.RPFObjsForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(object)
             self.BGSubtractedAccCorrectedSEdPhiSigNScorrs = (
                 self.init_pTtrig_pTassoc_array(ROOT.TH1F)
             )
@@ -461,7 +593,10 @@ class JetHadron(
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrs = (
                 self.init_pTtrig_pTassoc_dict(ROOT.TH2F)
             )
-            self.NormalizedBGSubtracteddPhiForSpecies = self.init_pTtrig_pTassoc_dict(
+            self.NormalizedBGSubtracteddPhiForTrueSpecies = self.init_pTtrig_pTassoc_dict(
+                ROOT.TH1F
+            )
+            self.NormalizedBGSubtracteddPhiForEnhancedSpecies = self.init_pTtrig_pTassoc_dict(
                 ROOT.TH1F
             )
             self.BGSubtractedAccCorrectedSEdPhiSigNScorrsminVals = (
@@ -473,7 +608,10 @@ class JetHadron(
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminVals = (
                 self.init_pTtrig_pTassoc_array(float)
             )
-            self.NormalizedBGSubtracteddPhiForSpeciesZV = self.init_pTtrig_pTassoc_dict(
+            self.NormalizedBGSubtracteddPhiForTrueSpeciesZV = self.init_pTtrig_pTassoc_dict(
+                ROOT.TH1F
+            )
+            self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_dict(
                 ROOT.TH1F
             )
             self.BGSubtractedAccCorrectedSEdPhiSigNScorrsminValsZV = (
@@ -488,7 +626,10 @@ class JetHadron(
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrsminVals = self.init_pTtrig_pTassoc_dict(
                 float
             )
-            self.NormalizedBGSubtracteddPhiForSpeciesminVals = (
+            self.NormalizedBGSubtracteddPhiForTrueSpeciesminVals = (
+                self.init_pTtrig_pTassoc_dict(float)
+            )
+            self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminVals = (
                 self.init_pTtrig_pTassoc_dict(float)
             )
             self.BGSubtractedAccCorrectedSEdPhidPionSigNScorrs = (
@@ -497,7 +638,10 @@ class JetHadron(
             self.BGSubtractedAccCorrectedSEdPhidPionSigAScorrs = (
                 self.init_pTtrig_pTassoc_array(ROOT.TH2F)
             )
-            self.NormalizedBGSubtracteddPhiForSpeciesminValsZV = (
+            self.NormalizedBGSubtracteddPhiForTrueSpeciesminValsZV = (
+                self.init_pTtrig_pTassoc_dict(float)
+            )
+            self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminValsZV = (
                 self.init_pTtrig_pTassoc_dict(float)
             )
             self.BGSubtractedAccCorrectedSEdPhidPionSigNScorrsZV = (
@@ -506,29 +650,52 @@ class JetHadron(
             self.BGSubtractedAccCorrectedSEdPhidPionSigAScorrsZV = (
                 self.init_pTtrig_pTassoc_array(ROOT.TH2F)
             )
-            self.pionTPCsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
             self.dPionNSsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
             self.dPionASsignals = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
-            self.pionTPCnSigma_pionTOFcut = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
-            self.pionTPCnSigma_protonTOFcut = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
-            self.pionTPCnSigma_kaonTOFcut = self.init_pTtrig_pTassoc_array(ROOT.TH1F)
+            self.pionTPCnSigmaInc = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.pionTPCnSigma_pionTOFcut = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.pionTPCnSigma_protonTOFcut = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.pionTPCnSigma_kaonTOFcut = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.pionTPCnSigma_otherTOFcut = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.pionTPCnSigmaInc_vs_dphi = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.pionTPCnSigma_pionTOFcut_vs_dphi = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.pionTPCnSigma_protonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
+            self.pionTPCnSigma_kaonTOFcut_vs_dphi = self.init_pTtrig_pTassoc_dict(ROOT.TH1F)
 
 
-            self.Yields = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsNS = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsAS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsTrue = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsTrueNS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsTrueAS = self.init_pTtrig_pTassoc_dict(float)
 
-            self.YieldErrs = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsNS = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsAS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsTrue = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsTrueNS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsTrueAS = self.init_pTtrig_pTassoc_dict(float)
             
-            self.YieldsZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsNSZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldsASZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsTrueZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsTrueNSZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsTrueASZV = self.init_pTtrig_pTassoc_dict(float)
 
-            self.YieldErrsZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsNSZV = self.init_pTtrig_pTassoc_dict(float)
-            self.YieldErrsASZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsTrueZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsTrueNSZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsTrueASZV = self.init_pTtrig_pTassoc_dict(float)
+           
+            self.YieldsEnhanced = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsEnhancedNS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsEnhancedAS = self.init_pTtrig_pTassoc_dict(float)
+
+            self.YieldErrsEnhanced = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsEnhancedNS = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsEnhancedAS = self.init_pTtrig_pTassoc_dict(float)
+            
+            self.YieldsEnhancedZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsEnhancedNSZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldsEnhancedASZV = self.init_pTtrig_pTassoc_dict(float)
+
+            self.YieldErrsEnhancedZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsEnhancedNSZV = self.init_pTtrig_pTassoc_dict(float)
+            self.YieldErrsEnhancedASZV = self.init_pTtrig_pTassoc_dict(float)
+
+            self.ResponseMatrices = self.init_pTtrig_pTassoc_dict(np.ndarray)
 
         if fill_on_init:
             [
@@ -570,6 +737,14 @@ class JetHadron(
         return defaultdict(
             partial(self.init_pTtrig_pTassoc_eventPlane_array, dtype=dtype)
         )
+    
+    def init_pTtrig_pTassoc_region_dict(self, dtype):
+        return defaultdict(partial(self.init_pTtrig_pTassoc_dict, dtype=dtype))
+
+    def init_pTtrig_pTassoc_eventPlane_region_dict(self, dtype):
+        return defaultdict(
+            partial(self.init_pTtrig_pTassoc_eventPlane_dict, dtype=dtype)
+        )
 
     def init_pTtrig_pTassoc_eventPlane_array(self, dtype=object):
         return np.zeros(
@@ -590,7 +765,8 @@ class JetHadron(
     def fill_hist_arrays(self, i, j, hists_to_fill: "Optional[dict[str, bool]]" = None):
         if self.analysisType in ["central", "semicentral"]:
             self.set_pT_epAngle_bin(i, j, 3)
-            self.fill_N_assoc(i, j,3)
+            for region in ['NS', 'AS', 'BG']:
+                self.fill_N_assoc(i, j,3, region)
             
             for k in range(len(self.eventPlaneAngleBinEdges) - 1):
                 print(
@@ -611,9 +787,11 @@ class JetHadron(
                 # fill the N_trigs array
                 if hists_to_fill is None or hists_to_fill.get("Ntrigs"):
                     self.fill_N_trigs(i, j, k)
-                    self.fill_N_assoc(i, j, k)
+                    for region in ['NS', 'AS', 'BG']:
+                        self.fill_N_assoc(i, j, k, region)
                 for species in ['pion', 'proton', 'kaon']:
-                    self.fill_N_assoc_for_species(i, j, k, species)
+                    for region in ['NS', 'AS', 'BG']:
+                        self.fill_N_assoc_for_species(i, j, k, species, region)
                 # get the SE correlation function
                 if hists_to_fill is None or hists_to_fill.get("SE"):
                     self.fill_SE_correlation_function(i, j, k)
@@ -655,39 +833,85 @@ class JetHadron(
                 if hists_to_fill is None or hists_to_fill.get("dPhiZV"):
                     self.fill_dPhi_correlation_functions_in_z_vertex_bins(i, j, k)
 
-                pionTPCnSigma_pionTOFcut = self.get_pion_TPC_nSigma("pion")
-                self.pionTPCnSigma_pionTOFcut[i, j, k] = pionTPCnSigma_pionTOFcut
-                del pionTPCnSigma_pionTOFcut
+                for region in ["NS", "AS", "BG"]:
+                    pionTPCnSigma = self.get_pion_TPC_nSigma_inclusive(i,j,k,region=region) if region!='BG' else self.get_pion_TPC_nSigma_inclusive(i,j,k,region="BGHi")
+                    if region=='BG':
+                        pionTPCnSigma.Add(self.get_pion_TPC_nSigma_inclusive(i,j,k,region="BGLo"))
+                    self.pionTPCnSigmaInc[region][i, j,k] = pionTPCnSigma
+                    del pionTPCnSigma
 
-                pionTPCnSigma_kaonTOFcut = self.get_pion_TPC_nSigma("kaon")
-                self.pionTPCnSigma_kaonTOFcut[i, j, k] = pionTPCnSigma_kaonTOFcut
-                del pionTPCnSigma_kaonTOFcut
+                    pionTPCnSigma_pionTOFcut = self.get_pion_TPC_nSigma(i,j,k,"pion", region=region) if region!='BG' else self.get_pion_TPC_nSigma(i,j,k,"pion", region="BGHi")
+                    if region=='BG':
+                        pionTPCnSigma_pionTOFcut.Add(self.get_pion_TPC_nSigma(i,j,k,"pion", region="BGLo"))
+                    self.pionTPCnSigma_pionTOFcut[region][i, j, k] = pionTPCnSigma_pionTOFcut
+                    del pionTPCnSigma_pionTOFcut
 
-                pionTPCnSigma_protonTOFcut = self.get_pion_TPC_nSigma("proton")
-                self.pionTPCnSigma_protonTOFcut[i, j, k] = pionTPCnSigma_protonTOFcut
-                del pionTPCnSigma_protonTOFcut
+                    pionTPCnSigma_kaonTOFcut = self.get_pion_TPC_nSigma(i,j,k,"kaon", region=region) if region!='BG' else self.get_pion_TPC_nSigma(i,j,k,"kaon", region="BGHi")
+                    if region=='BG':
+                        pionTPCnSigma_kaonTOFcut.Add(self.get_pion_TPC_nSigma(i,j,k,"kaon", region="BGLo"))
+                    self.pionTPCnSigma_kaonTOFcut[region][i, j, k] = pionTPCnSigma_kaonTOFcut
+                    del pionTPCnSigma_kaonTOFcut
 
-                self.fit_PionTPCNSigma(i, j, k)
-                self.plot_PionTPCNSigmaFit(i,j, k)
+                    pionTPCnSigma_protonTOFcut = self.get_pion_TPC_nSigma(i,j,k,"proton", region=region) if region!='BG' else self.get_pion_TPC_nSigma(i,j,k,"proton", region="BGHi")
+                    if region=='BG':
+                        pionTPCnSigma_protonTOFcut.Add(self.get_pion_TPC_nSigma(i,j,k,"proton", region="BGLo"))
+                    self.pionTPCnSigma_protonTOFcut[region][i, j, k] = pionTPCnSigma_protonTOFcut
+                    del pionTPCnSigma_protonTOFcut
+                    
+                    pionTPCnSigma_otherTOFcut = self.get_pion_TPC_nSigma(i,j,k,"other", region=region) if region!='BG' else self.get_pion_TPC_nSigma(i,j,k,"other", region="BGHi")
+                    if region=='BG':
+                        pionTPCnSigma_otherTOFcut.Add(self.get_pion_TPC_nSigma(i,j,k,"other", region="BGLo"))
+                    self.pionTPCnSigma_otherTOFcut[region][i, j, k] = pionTPCnSigma_otherTOFcut
+                    del pionTPCnSigma_otherTOFcut
+                    
+#                     pionTPCnSigma = self.get_pion_TPC_nSigma_inclusive_vs_dphi()
+#                     self.pionTPCnSigmaInc_vs_dphi[i, j,k] = pionTPCnSigma
+#                     del pionTPCnSigma
+# 
+#                     pionTPCnSigma_pionTOFcut = self.get_pion_TPC_nSigma_vs_dphi("pion")
+#                     self.pionTPCnSigma_pionTOFcut_vs_dphi[i, j, k] = pionTPCnSigma_pionTOFcut
+#                     del pionTPCnSigma_pionTOFcut
+# 
+#                     pionTPCnSigma_kaonTOFcut = self.get_pion_TPC_nSigma_vs_dphi("kaon")
+#                     self.pionTPCnSigma_kaonTOFcut_vs_dphi[i, j, k] = pionTPCnSigma_kaonTOFcut
+#                     del pionTPCnSigma_kaonTOFcut
+# 
+#                     pionTPCnSigma_protonTOFcut = self.get_pion_TPC_nSigma_vs_dphi("proton")
+#                     self.pionTPCnSigma_protonTOFcut_vs_dphi[i, j, k] = pionTPCnSigma_protonTOFcut
+#                     del pionTPCnSigma_protonTOFcut
+
+                self.fit_PionTPCNSigma(i, j, k, "NS")
+                self.fit_PionTPCNSigma(i, j, k, "AS")
+                self.fit_PionTPCNSigma(i, j, k, "BG")
+                self.plot_PionTPCNSigmaFit(i,j, k, "NS")
+                self.plot_PionTPCNSigmaFit(i,j, k, "AS")
+                self.plot_PionTPCNSigmaFit(i,j, k, "BG")
+                # self.plot_PionTPCNSigmaVsDphi(i,j, k)
 
                 for species in ["pion", "proton", "kaon"]:
-                    self.fill_dPhi_correlation_functions_for_species(i, j, k, species)
-                    self.fill_dPhi_correlation_functions_for_species_in_z_vertex_bins(i, j, k, species)
+                    self.fill_dPhi_correlation_functions_for_true_species(i, j, k, species)
+                    self.fill_dPhi_correlation_functions_for_true_species_in_z_vertex_bins(i, j, k, species)
+                    self.fill_dPhi_correlation_functions_for_enhanced_species(i, j, k, species)
+                    self.fill_dPhi_correlation_functions_for_enhanced_species_in_z_vertex_bins(i, j, k, species)
             self.fill_N_trigs(i, j, 3)
             self.fit_RPF(i, j, p0=self.central_p0s[(i, j)])
             self.plot_RPF(i, j, withSignal=True)
             self.fit_RPF_in_z_vertex_bins(i, j, p0=self.central_p0s[(i, j)])
             self.plot_RPF_in_z_vertex_bins(i, j, withSignal=True)
             for species in ["pion", "proton", "kaon"]:
-                self.fit_RPF_for_species(i, j, species, p0=self.central_p0s[(i, j)])
-                self.fit_RPF_for_species_in_z_vertex_bins(i, j, species, p0=self.central_p0s[(i, j)])
-                #self.plot_RPF_for_species(i, j, species, withSignal=True)
+                self.fit_RPF_for_true_species(i, j, species, p0=self.central_p0s[(i, j)])
+                self.fit_RPF_for_true_species_in_z_vertex_bins(i, j, species, p0=self.central_p0s[(i, j)])
+                self.fit_RPF_for_enhanced_species(i, j, species, p0=self.central_p0s[(i, j)])
+                self.fit_RPF_for_enhanced_species_in_z_vertex_bins(i, j, species, p0=self.central_p0s[(i, j)])
+              
             if j == len(self.pTassocBinCenters):
                 self.plot_optimal_parameters(i)
                 self.plot_optimal_parameters_in_z_vertex_bins(i)
                 for species in ["pion", "proton", "kaon"]:
-                    self.plot_optimal_parameters_for_species(i, species)
-                    self.plot_optimal_parameters_for_species_in_z_vertex_bins(i, species)
+                    self.plot_optimal_parameters_for_true_species(i, species)
+                    self.plot_optimal_parameters_for_true_species_in_z_vertex_bins(i, species)
+                    self.plot_optimal_parameters_for_enhanced_species(i, species)
+                    self.plot_optimal_parameters_for_enhanced_species_in_z_vertex_bins(i, species)
             jsonpayload = {
                 "value1": f"RPF fitted for p_Ttrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, p_Tassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV"
             }
@@ -695,7 +919,7 @@ class JetHadron(
             try:
                 requests.post(url, json=jsonpayload)
             except:
-                print("Status notification failed, oh well")
+                error_logger.error("Status notification failed, oh well")
 
             # get the background subtracted correlation function
             for k in range(len(self.eventPlaneAngleBinEdges) - 1):
@@ -719,20 +943,26 @@ class JetHadron(
                     self.fill_normalized_BG_subtracted_AccCorrected_SE_correlation_functions_w_pionTPCnSigma(
                         i, j, k, species
                     )
-                    self.fill_normalized_background_subtracted_dPhi_for_species(
+                    self.fill_normalized_background_subtracted_dPhi_for_true_species(
                         i, j, k, species
                     )
-                    self.fill_normalized_background_subtracted_dPhi_for_species_in_z_vertex_bins(
+                    self.fill_normalized_background_subtracted_dPhi_for_true_species_in_z_vertex_bins(
                         i, j, k, species
                     )
-                    print(
-                        f"Inclusive yield for {species} in p_T^assoc bin {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV, p_T^trig bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, event plane angle {self.eventPlaneAngleBinEdges[k]}-{self.eventPlaneAngleBinEdges[k+1]}: {self.get_yield_for_species(i,j,k,species)}"
+                    self.fill_normalized_background_subtracted_dPhi_for_enhanced_species(
+                        i, j, k, species
                     )
-                    print(
-                        f"NS yield for {species} in p_T^assoc bin {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV, p_T^trig bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, event plane angle {self.eventPlaneAngleBinEdges[k]}-{self.eventPlaneAngleBinEdges[k+1]}: {self.get_yield_for_species(i,j,k,species, 'NS')}"
+                    self.fill_normalized_background_subtracted_dPhi_for_enhanced_species_in_z_vertex_bins(
+                        i, j, k, species
                     )
-                    print(
-                        f"AS yield for {species} in p_T^assoc bin {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV, p_T^trig bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, event plane angle {self.eventPlaneAngleBinEdges[k]}-{self.eventPlaneAngleBinEdges[k+1]}: {self.get_yield_for_species(i,j,k,species, 'AS')}"
+                    debug_logger.debug(
+                        f"Inclusive yield for {species} in p_T^assoc bin {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV, p_T^trig bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, event plane angle {self.eventPlaneAngleBinEdges[k]}-{self.eventPlaneAngleBinEdges[k+1]}: {self.get_yield_for_true_species(i,j,k,species)}"
+                    )
+                    debug_logger.debug(
+                        f"NS yield for {species} in p_T^assoc bin {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV, p_T^trig bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, event plane angle {self.eventPlaneAngleBinEdges[k]}-{self.eventPlaneAngleBinEdges[k+1]}: {self.get_yield_for_true_species(i,j,k,species, 'NS')}"
+                    )
+                    debug_logger.debug(
+                        f"AS yield for {species} in p_T^assoc bin {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV, p_T^trig bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, event plane angle {self.eventPlaneAngleBinEdges[k]}-{self.eventPlaneAngleBinEdges[k+1]}: {self.get_yield_for_true_species(i,j,k,species, 'AS')}"
                     )
             
 
@@ -761,9 +991,11 @@ class JetHadron(
         # fill the N_trigs array
         if hists_to_fill is None or hists_to_fill.get("Ntrigs"):
             self.fill_N_trigs(i, j, 3)
-            self.fill_N_assoc(i, j, 3)
+            for region in ['NS', 'AS', 'BG']:
+                self.fill_N_assoc(i, j, 3, region)
         for species in ['pion', 'proton', 'kaon']:
-            self.fill_N_assoc_for_species(i, j, 3, species)
+            for region in ["NS", "AS", "BG"]:
+                self.fill_N_assoc_for_species(i, j, 3, species, region)
 
         # get the SE correlation function
         if hists_to_fill is None or hists_to_fill.get("SE"):
@@ -804,38 +1036,131 @@ class JetHadron(
         self.dEtacorrs[i, j] = dEta
         del dEta
 
-        pionTPCsignal = self.get_pion_TPC_signal()
-        self.pionTPCsignals[i, j] = pionTPCsignal
-        del pionTPCsignal
+        for region in ["NS", "AS", "BG"]:
+            if self.analysisType in ["central", "semicentral"]:
+                pionTPCnSigma = self.get_pion_TPC_nSigma_inclusive(i,j,3,region=region) if region != "BG" else self.get_pion_TPC_nSigma_inclusive(i,j,3,region="BGHi")
+                if region=='BG':
+                    pionTPCnSigma.Add(self.get_pion_TPC_nSigma_inclusive(i,j,3,region="BGLo"))
+                self.pionTPCnSigmaInc[region][i, j,3] = pionTPCnSigma
+                del pionTPCnSigma
 
-        if self.analysisType in ["central", "semicentral"]:
-            pionTPCnSigma_pionTOFcut = self.get_pion_TPC_nSigma("pion")
-            self.pionTPCnSigma_pionTOFcut[i, j,3] = pionTPCnSigma_pionTOFcut
-            del pionTPCnSigma_pionTOFcut
+                pionTPCnSigma_pionTOFcut = self.get_pion_TPC_nSigma(i,j,3,"pion", region=region) if region != "BG" else self.get_pion_TPC_nSigma(i,j,3,"pion", region="BGHi")
+                if region=='BG':
+                    pionTPCnSigma_pionTOFcut.Add(self.get_pion_TPC_nSigma(i,j,3,"pion", region="BGLo"))
+                self.pionTPCnSigma_pionTOFcut[region][i, j,3] = pionTPCnSigma_pionTOFcut
+                del pionTPCnSigma_pionTOFcut
 
-            pionTPCnSigma_kaonTOFcut = self.get_pion_TPC_nSigma("kaon")
-            self.pionTPCnSigma_kaonTOFcut[i, j,3] = pionTPCnSigma_kaonTOFcut
-            del pionTPCnSigma_kaonTOFcut
+                pionTPCnSigma_kaonTOFcut = self.get_pion_TPC_nSigma(i,j,3,"kaon", region=region) if region != "BG" else self.get_pion_TPC_nSigma(i,j,3,"kaon", region="BGHi")
+                if region=='BG':
+                    pionTPCnSigma_kaonTOFcut.Add(self.get_pion_TPC_nSigma(i,j,3,"kaon", region="BGLo"))
+                self.pionTPCnSigma_kaonTOFcut[region][i, j,3] = pionTPCnSigma_kaonTOFcut
+                del pionTPCnSigma_kaonTOFcut
 
-            pionTPCnSigma_protonTOFcut = self.get_pion_TPC_nSigma("proton")
-            self.pionTPCnSigma_protonTOFcut[i, j,3] = pionTPCnSigma_protonTOFcut
-            del pionTPCnSigma_protonTOFcut
-        else:
-            pionTPCnSigma_pionTOFcut = self.get_pion_TPC_nSigma("pion")
-            self.pionTPCnSigma_pionTOFcut[i, j] = pionTPCnSigma_pionTOFcut
-            del pionTPCnSigma_pionTOFcut
+                pionTPCnSigma_protonTOFcut = self.get_pion_TPC_nSigma(i,j,3,"proton", region=region) if region != "BG" else self.get_pion_TPC_nSigma(i,j,3,"proton", region="BGHi")
+                if region=='BG':
+                    pionTPCnSigma_protonTOFcut.Add(self.get_pion_TPC_nSigma(i,j,3,"proton", region="BGLo"))
+                self.pionTPCnSigma_protonTOFcut[region][i, j,3] = pionTPCnSigma_protonTOFcut
+                del pionTPCnSigma_protonTOFcut
+                
+                pionTPCnSigma_otherTOFcut = self.get_pion_TPC_nSigma(i,j,3,"other", region=region) if region != "BG" else self.get_pion_TPC_nSigma(i,j,3,"other", region="BGHi")
+                if region=='BG':
+                    pionTPCnSigma_otherTOFcut.Add(self.get_pion_TPC_nSigma(i,j,3,"other", region="BGLo"))
+                self.pionTPCnSigma_otherTOFcut[region][i, j,3] = pionTPCnSigma_otherTOFcut
+                del pionTPCnSigma_otherTOFcut
+            else:
+                pionTPCnSigma = self.get_pion_TPC_nSigma_inclusive(i,j,3, region=region) if region != "BG" else self.get_pion_TPC_nSigma_inclusive(i,j,3,region="BGHi")
+                if region=='BG':
+                    pionTPCnSigma.Add(self.get_pion_TPC_nSigma_inclusive(i,j,3,region="BGLo"))
+                self.pionTPCnSigmaInc[region][i, j] = pionTPCnSigma
+                del pionTPCnSigma
 
-            pionTPCnSigma_kaonTOFcut = self.get_pion_TPC_nSigma("kaon")
-            self.pionTPCnSigma_kaonTOFcut[i, j] = pionTPCnSigma_kaonTOFcut
-            del pionTPCnSigma_kaonTOFcut
+                pionTPCnSigma_pionTOFcut = self.get_pion_TPC_nSigma(i,j,3,"pion", region=region) if region != "BG" else self.get_pion_TPC_nSigma(i,j,3,"pion", region="BGHi")
+                if region=='BG':
+                    pionTPCnSigma_pionTOFcut.Add(self.get_pion_TPC_nSigma(i,j,3,"pion", region="BGLo"))
+                self.pionTPCnSigma_pionTOFcut[region][i, j] = pionTPCnSigma_pionTOFcut
+                del pionTPCnSigma_pionTOFcut
 
-            pionTPCnSigma_protonTOFcut = self.get_pion_TPC_nSigma("proton")
-            self.pionTPCnSigma_protonTOFcut[i, j] = pionTPCnSigma_protonTOFcut
-            del pionTPCnSigma_protonTOFcut
+                pionTPCnSigma_kaonTOFcut = self.get_pion_TPC_nSigma(i,j,3,"kaon", region=region) if region != "BG" else self.get_pion_TPC_nSigma(i,j,3,"kaon", region="BGHi")
+                if region=='BG':
+                    pionTPCnSigma_kaonTOFcut.Add(self.get_pion_TPC_nSigma(i,j,3,"kaon", region="BGLo"))
+                self.pionTPCnSigma_kaonTOFcut[region][i, j] = pionTPCnSigma_kaonTOFcut
+                del pionTPCnSigma_kaonTOFcut
 
-        self.fit_PionTPCNSigma(i, j, 3)
-        self.plot_PionTPCNSigmaFit(i, j, 3)
-       
+                pionTPCnSigma_protonTOFcut = self.get_pion_TPC_nSigma(i,j,3,"proton", region=region) if region != "BG" else self.get_pion_TPC_nSigma(i,j,3,"proton", region="BGHi")
+                if region=='BG':
+                    pionTPCnSigma_protonTOFcut.Add(self.get_pion_TPC_nSigma(i,j,3,"proton", region="BGLo"))
+                self.pionTPCnSigma_protonTOFcut[region][i, j] = pionTPCnSigma_protonTOFcut
+                del pionTPCnSigma_protonTOFcut
+                
+                pionTPCnSigma_otherTOFcut = self.get_pion_TPC_nSigma(i,j,3,"other", region=region) if region != "BG" else self.get_pion_TPC_nSigma(i,j,3,"other", region="BGHi")
+                if region=='BG':
+                    pionTPCnSigma_otherTOFcut.Add(self.get_pion_TPC_nSigma(i,j,3,"other", region="BGLo"))
+                self.pionTPCnSigma_otherTOFcut[region][i, j] = pionTPCnSigma_otherTOFcut
+                del pionTPCnSigma_otherTOFcut
+        
+#         if self.analysisType in ["central", "semicentral"]:
+#             pionTPCnSigma = self.get_pion_TPC_nSigma_inclusive_vs_dphi()
+#             self.pionTPCnSigmaInc_vs_dphi[i, j,3] = pionTPCnSigma
+#             del pionTPCnSigma
+# 
+#             pionTPCnSigma_pionTOFcut = self.get_pion_TPC_nSigma_vs_dphi("pion")
+#             self.pionTPCnSigma_pionTOFcut_vs_dphi[i, j,3] = pionTPCnSigma_pionTOFcut
+#             del pionTPCnSigma_pionTOFcut
+# 
+#             pionTPCnSigma_kaonTOFcut = self.get_pion_TPC_nSigma_vs_dphi("kaon")
+#             self.pionTPCnSigma_kaonTOFcut_vs_dphi[i, j,3] = pionTPCnSigma_kaonTOFcut
+#             del pionTPCnSigma_kaonTOFcut
+# 
+#             pionTPCnSigma_protonTOFcut = self.get_pion_TPC_nSigma_vs_dphi("proton")
+#             self.pionTPCnSigma_protonTOFcut_vs_dphi[i, j,3] = pionTPCnSigma_protonTOFcut
+#             del pionTPCnSigma_protonTOFcut
+#         else:
+#             pionTPCnSigma = self.get_pion_TPC_nSigma_inclusive_vs_dphi()
+#             self.pionTPCnSigmaInc_vs_dphi[i, j] = pionTPCnSigma
+#             del pionTPCnSigma
+# 
+#             pionTPCnSigma_pionTOFcut = self.get_pion_TPC_nSigma_vs_dphi("pion")
+#             self.pionTPCnSigma_pionTOFcut_vs_dphi[i, j] = pionTPCnSigma_pionTOFcut
+#             del pionTPCnSigma_pionTOFcut
+# 
+#             pionTPCnSigma_kaonTOFcut = self.get_pion_TPC_nSigma_vs_dphi("kaon")
+#             self.pionTPCnSigma_kaonTOFcut_vs_dphi[i, j] = pionTPCnSigma_kaonTOFcut
+#             del pionTPCnSigma_kaonTOFcut
+# 
+#             pionTPCnSigma_protonTOFcut = self.get_pion_TPC_nSigma_vs_dphi("proton")
+#             self.pionTPCnSigma_protonTOFcut_vs_dphi[i, j] = pionTPCnSigma_protonTOFcut
+#             del pionTPCnSigma_protonTOFcut
+
+        self.fit_PionTPCNSigma(i, j, 3, "NS")
+        self.fit_PionTPCNSigma(i, j, 3, "AS")
+        self.fit_PionTPCNSigma(i, j, 3, "BG")
+        self.plot_PionTPCNSigmaFit(i, j, 3, "NS")
+        self.plot_PionTPCNSigmaFit(i, j, 3, "AS")
+        self.plot_PionTPCNSigmaFit(i, j, 3, "BG")
+        # self.plot_PionTPCNSigmaVsDphi(i, j, 3)
+        # self.plot_PionTPCNSigmaVsDphi(i, j, 3, dphi_range=(-np.pi/2, 3*np.pi/2))
+        # dphi_bins = np.linspace(-np.pi/2, 3*np.pi/2, 4)
+        # for dphi_bin in zip(dphi_bins[:-1], dphi_bins[1:]):
+        #     self.plot_PionTPCNSigmaVsDphi(i, j, 3, dphi_range=dphi_bin)
+
+#         nom_vec = np.vectorize(lambda x:x.n)
+#         std_vec = np.vectorize(lambda x:x.s)
+#         average_response = np.mean(nom_vec(np.array(list(self.ResponseMatrices.values()))), axis=0).flatten()
+#         average_response_error = np.mean(std_vec(np.array(list(self.ResponseMatrices.values()))), axis=0).flatten()
+#         fig = plt.figure()
+#         plt.errorbar(x=np.arange(0, 9), y=average_response, yerr=average_response_error, fmt="o")
+#         fig.savefig("average_response_matrix.png")
+# 
+#         response = nom_vec(np.array(list(self.ResponseMatrices.values())))
+#         response_error = std_vec(np.array(list(self.ResponseMatrices.values())))
+#         fig = plt.figure()
+#         for resp_bin in range(4):
+#             plt.errorbar(x=np.arange(0, 9)+resp_bin/5, y=response[resp_bin,: ].flatten(), yerr=response_error[resp_bin,: ].flatten(), fmt="ko", alpha=1-resp_bin/4, )
+#         plt.ylim(0, 1.1)
+#         fig.savefig("response_matrix.png")
+
+        
+        self.fill_inclusive_yield(i, j)
 
         # get the background subtracted correlation functions
         if hists_to_fill is None or hists_to_fill.get("BGSubtractedSE"):
@@ -849,29 +1174,39 @@ class JetHadron(
                 i, j, 3
             )
             for species in ["pion", "proton", "kaon"]:
-                self.fill_dPhi_correlation_functions_for_species(i, j, 3, species)
+                self.fill_dPhi_correlation_functions_for_true_species(i, j, 3, species)
+                self.fill_dPhi_correlation_functions_for_enhanced_species(i, j, 3, species)
                 self.fill_dPhi_dpionTPCnSigma_correlation_functions(i, j, 3, species)
                 self.fill_normalized_BG_subtracted_AccCorrected_SE_correlation_functions_w_pionTPCnSigma(
                     i, j, 3, species
                 )
-                self.fill_normalized_background_subtracted_dPhi_for_species(
+                self.fill_normalized_background_subtracted_dPhi_for_true_species(
                     i, j, 3, species
                 )
-                self.fill_dPhi_correlation_functions_for_species_in_z_vertex_bins(i, j, 3, species)
-                self.fill_normalized_background_subtracted_dPhi_for_species_in_z_vertex_bins(
+                self.fill_normalized_background_subtracted_dPhi_for_enhanced_species(
                     i, j, 3, species
                 )
-                self.fill_yield_for_species(i, j, species)
-                self.fill_yield_for_species_in_z_vertex_bins(i, j, species)
+                self.fill_dPhi_correlation_functions_for_true_species_in_z_vertex_bins(i, j, 3, species)
+                self.fill_dPhi_correlation_functions_for_enhanced_species_in_z_vertex_bins(i, j, 3, species)
+                self.fill_normalized_background_subtracted_dPhi_for_true_species_in_z_vertex_bins(
+                    i, j, 3, species
+                )
+                self.fill_normalized_background_subtracted_dPhi_for_enhanced_species_in_z_vertex_bins(
+                    i, j, 3, species
+                )
+                self.fill_yield_for_true_species(i, j, species)
+                self.fill_yield_for_true_species_in_z_vertex_bins(i, j, species)
+                self.fill_yield_for_enhanced_species(i, j, species)
+                self.fill_yield_for_enhanced_species_in_z_vertex_bins(i, j, species)
                 
-                print(
-                    f"Inclusive yield for {species} in p_T^assoc bin {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV, p_T^trig bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, event plane angle inclusive: {self.get_yield_for_species(i,j,3,species)}"
+                debug_logger.debug(
+                    f"Inclusive yield for {species} in p_T^assoc bin {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV, p_T^trig bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, event plane angle inclusive: {self.get_yield_for_true_species(i,j,3,species)}"
                 )
-                print(
-                    f"NS yield for {species} in p_T^assoc bin {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV, p_T^trig bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, event plane angle inclusive: {self.get_yield_for_species(i,j,3,species, 'NS')}"
+                debug_logger.debug(
+                    f"NS yield for {species} in p_T^assoc bin {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV, p_T^trig bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, event plane angle inclusive: {self.get_yield_for_true_species(i,j,3,species, 'NS')}"
                 )
-                print(
-                    f"AS yield for {species} in p_T^assoc bin {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV, p_T^trig bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, event plane angle inclusive: {self.get_yield_for_species(i,j,3,species, 'AS')}"
+                debug_logger.debug(
+                    f"AS yield for {species} in p_T^assoc bin {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV, p_T^trig bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV, event plane angle inclusive: {self.get_yield_for_true_species(i,j,3,species, 'AS')}"
                 )
 
         print("\a")
@@ -894,24 +1229,32 @@ class JetHadron(
         del Ntrigs
 
     @print_function_name_with_description_on_call(description="")
-    def fill_N_assoc(self, i, j, k):
-        Nassoc = self.get_N_assoc()
+    def fill_N_assoc(self, i, j, k, region):
+        if region == "BG":
+            Nassoc = self.get_N_assoc('BGHi')+self.get_N_assoc('BGLo')
+        else:
+            Nassoc = self.get_N_assoc(region)
+
         if self.analysisType in ["central", "semicentral"]:
-            self.N_assoc[i, j, k] = Nassoc
+            self.N_assoc[region][i, j, k] = Nassoc
         elif self.analysisType == "pp":
-            self.N_assoc[i, j] = Nassoc
+            self.N_assoc[region][i, j] = Nassoc
         del Nassoc
 
     @print_function_name_with_description_on_call(description="")
-    def fill_N_assoc_for_species(self, i, j, k, species):
-        Nassoc = self.get_N_assoc_for_species(species)
+    def fill_N_assoc_for_species(self, i, j, k, species, region):
+        if region == "BG":
+            Nassoc = self.get_N_assoc_for_species(i,j,k,species, "BGHi")+self.get_N_assoc_for_species(i,j,k,species, "BGLo")
+        else:
+            Nassoc = self.get_N_assoc_for_species(i,j,k,species, region)
+
         if self.analysisType in ["central", "semicentral"]:
-            self.N_assoc_for_species[species][i, j, k] = Nassoc
+            self.N_assoc_for_species[region][species][i, j, k] = Nassoc
         elif self.analysisType == "pp":
-            self.N_assoc_for_species[species][i, j] = Nassoc
+            self.N_assoc_for_species[region][species][i, j] = Nassoc
         del Nassoc
 
-    @print_function_name_with_description_on_call(description="")
+    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
     def fill_SE_correlation_function(self, i, j, k):
         SEcorr = self.get_SE_correlation_function()
         if self.analysisType in ["central", "semicentral"]:
@@ -920,7 +1263,7 @@ class JetHadron(
             self.SEcorrs[i, j] = SEcorr
         del SEcorr
 
-    @print_function_name_with_description_on_call(description="")
+    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
     def fill_ME_correlation_function(self, i, j, k):
         if j >= 2:
             self.set_pT_assoc_range(2, 7)
@@ -937,7 +1280,7 @@ class JetHadron(
             self.ME_norm_systematics[i, j] = ME_norm_error
         del NormMEcorr
 
-    @print_function_name_with_description_on_call(description="")
+    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
     def fill_AccCorrected_SE_correlation_function(self, i, j, k):
         AccCorrectedSEcorr = self.get_acceptance_corrected_correlation_function()
         if self.analysisType in ["central", "semicentral"]:
@@ -955,7 +1298,7 @@ class JetHadron(
             self.AccCorrectedSEcorrsZV[i, j] = AccCorrectedSEcorr
         del AccCorrectedSEcorr
 
-    @print_function_name_with_description_on_call(description="")
+    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
     def fill_NormAccCorrected_SE_correlation_function(self, i, j, k):
         NormAccCorrectedSEcorr = (
             self.get_normalized_acceptance_corrected_correlation_function()
@@ -977,7 +1320,7 @@ class JetHadron(
             self.NormAccCorrectedSEcorrsZV[i, j] = NormAccCorrectedSEcorr
         del NormAccCorrectedSEcorr
 
-    @print_function_name_with_description_on_call(description="")
+    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
     def fill_dPhi_correlation_functions(self, i, j, k):
         dPhiBGHi, nbins_hi, binwidth = self.get_dPhi_projection_in_dEta_range(
             self.dEtaBGHi
@@ -994,12 +1337,12 @@ class JetHadron(
             self.dEtaSig,
         )
 
-        print(f"Max of dPhiBGHi is {dPhiBGHi.GetMaximum()}")
-        print(f"Max of dPhiBGLo is {dPhiBGLo.GetMaximum()}")
-        print(f"Max of dPhiMid is {dPhiMid.GetMaximum()}")
-        print(f"Number of bins in dPhiBGHi is {nbins_hi}")
-        print(f"Number of bins in dPhiBGLo is {nbins_lo}")
-        print(f"Number of bins in dPhiMid is {nbins_mid}")
+        debug_logger.debug(f"Max of dPhiBGHi is {dPhiBGHi.GetMaximum()}")
+        debug_logger.debug(f"Max of dPhiBGLo is {dPhiBGLo.GetMaximum()}")
+        debug_logger.debug(f"Max of dPhiMid is {dPhiMid.GetMaximum()}")
+        debug_logger.debug(f"Number of bins in dPhiBGHi is {nbins_hi}")
+        debug_logger.debug(f"Number of bins in dPhiBGLo is {nbins_lo}")
+        debug_logger.debug(f"Number of bins in dPhiMid is {nbins_mid}")
         # now lets make a new histogram with the same binning as dPhiBG
         # but with the values of dPhiBG for  bins with dPhi<pi/2 and the sum of the values of dPhiBG and dPhiSig for bins with dPhi>pi/2
         dPhiBGcorrs = dPhiMid.Clone()
@@ -1101,12 +1444,12 @@ class JetHadron(
             self.dEtaSig, in_z_vertex_bins=True
         )
 
-        print(f"Max of dPhiBGHi is {dPhiBGHi.GetMaximum()}")
-        print(f"Max of dPhiBGLo is {dPhiBGLo.GetMaximum()}")
-        print(f"Max of dPhiMid is {dPhiMid.GetMaximum()}")
-        print(f"Number of bins in dPhiBGHi is {nbins_hi}")
-        print(f"Number of bins in dPhiBGLo is {nbins_lo}")
-        print(f"Number of bins in dPhiMid is {nbins_mid}")
+        debug_logger.debug(f"Max of dPhiBGHi is {dPhiBGHi.GetMaximum()}")
+        debug_logger.debug(f"Max of dPhiBGLo is {dPhiBGLo.GetMaximum()}")
+        debug_logger.debug(f"Max of dPhiMid is {dPhiMid.GetMaximum()}")
+        debug_logger.debug(f"Number of bins in dPhiBGHi is {nbins_hi}")
+        debug_logger.debug(f"Number of bins in dPhiBGLo is {nbins_lo}")
+        debug_logger.debug(f"Number of bins in dPhiMid is {nbins_mid}")
         # now lets make a new histogram with the same binning as dPhiBG
         # but with the values of dPhiBG for  bins with dPhi<pi/2 and the sum of the values of dPhiBG and dPhiSig for bins with dPhi>pi/2
         dPhiBGcorrs = dPhiMid.Clone()
@@ -1191,18 +1534,18 @@ class JetHadron(
             self.dPhiSigcorrsZV[i, j] = dPhiSig
         del dPhiBGHi, dPhiBGLo, dPhiBGcorrs, dPhiSig
 
-    @print_function_name_with_description_on_call(description="")
-    def fill_dPhi_correlation_functions_for_species(self, i, j, k, species):
+    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    def fill_dPhi_correlation_functions_for_true_species(self, i, j, k, species):
 
-        dPhiMid, nbins_mid, binwidth = self.get_dPhi_projection_in_dEta_dpionTPCnSigma_range(i,j,k,
+        dPhiMid, nbins_mid, binwidth, dPhiPIDerrMid = self.get_dPhi_projection_in_dEta_range_for_true_species(i,j,k,
             self.dEtaSig, TOFcutSpecies=species
         )
 
-        dPhiBGLo, nbins_lo, binwidth = self.get_dPhi_projection_in_dEta_dpionTPCnSigma_range(i,j,k,
+        dPhiBGLo, nbins_lo, binwidth, dPhiPIDerrLo = self.get_dPhi_projection_in_dEta_range_for_true_species(i,j,k,
             self.dEtaBGLo, TOFcutSpecies=species
         )
 
-        dPhiBGHi, nbins_hi, binwidth = self.get_dPhi_projection_in_dEta_dpionTPCnSigma_range(i,j,k,
+        dPhiBGHi, nbins_hi, binwidth, dPhiPIDerrHi = self.get_dPhi_projection_in_dEta_range_for_true_species(i,j,k,
             self.dEtaBGHi, TOFcutSpecies=species
         )
 
@@ -1210,14 +1553,19 @@ class JetHadron(
         dPhiSig = dPhiMid.Clone()
         dPhiBGcorrs.Reset()
         dPhiSig.Reset()
+
+        dPhiBGPIDerr = dPhiPIDerrMid.Clone()
+        dPhiSigPIDerr = dPhiPIDerrMid.Clone()
+        dPhiBGPIDerr.Reset()
+        dPhiSigPIDerr.Reset()
+
         for iBin in range(1, dPhiBGcorrs.GetNbinsX() + 1):
             if dPhiBGcorrs.GetBinCenter(iBin + 1) < np.pi / 2:
+                # Near Side
                 dPhiBGcorrs.SetBinContent(
                     iBin,
-                    (
-                        dPhiBGLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
-                        + dPhiBGHi.GetBinContent(iBin) /((nbins_hi+1)*binwidth)
-                    )
+                    (dPhiBGLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiBGHi.GetBinContent(iBin) /((nbins_hi+1)*binwidth))
                     /2
                 )
                 dPhiBGcorrs.SetBinError(
@@ -1231,13 +1579,42 @@ class JetHadron(
                     )
                     ** 0.5,
                 )
+
                 dPhiSig.SetBinContent(
                     iBin, dPhiMid.GetBinContent(iBin)/((nbins_mid+1)*binwidth)
                 )
                 dPhiSig.SetBinError(
                     iBin, dPhiMid.GetBinError(iBin)/((nbins_mid+1)*binwidth)
                 )
+
+                dPhiBGPIDerr.SetBinContent(
+                    iBin,
+                    (dPhiPIDerrLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiPIDerrHi.GetBinContent(iBin) /((nbins_hi+1)*binwidth))
+                    /2
+                )
+                dPhiBGPIDerr.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiPIDerrLo.GetBinError(iBin)/((nbins_lo+1)*binwidth)) ** 2
+                            + (dPhiPIDerrHi.GetBinError(iBin)/((nbins_hi+1)*binwidth)) ** 2
+                        )
+                        /4
+                    )
+                    ** 0.5,
+                )
+
+                dPhiSigPIDerr.SetBinContent(
+                    iBin, dPhiPIDerrMid.GetBinContent(iBin)/((nbins_mid+1)*binwidth)
+                )
+                dPhiSigPIDerr.SetBinError(
+                    iBin, dPhiPIDerrMid.GetBinError(iBin)/((nbins_mid+1)*binwidth)
+                )
+
             else:
+                # Away Side
+
                 dPhiBGcorrs.SetBinContent(
                     iBin,
                     (
@@ -1259,6 +1636,7 @@ class JetHadron(
                     )
                     ** 0.5,
                 )
+
                 dPhiSig.SetBinContent(
                     iBin,
                     (
@@ -1280,26 +1658,74 @@ class JetHadron(
                     )
                     ** 0.5,
                 )
+
+                dPhiBGPIDerr.SetBinContent(
+                    iBin,
+                    (
+                        dPhiPIDerrLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiPIDerrHi.GetBinContent(iBin) /((nbins_hi+1)*binwidth)
+                        + dPhiPIDerrMid.GetBinContent(iBin) /((nbins_mid+1)*binwidth)
+                    )
+                    /3
+                )
+                dPhiBGPIDerr.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiPIDerrHi.GetBinError(iBin)/((nbins_hi+1)*binwidth))**2
+                            + (dPhiPIDerrLo.GetBinError(iBin)/((nbins_lo+1)*binwidth))**2
+                            + (dPhiPIDerrMid.GetBinError(iBin)/((nbins_mid+1)*binwidth))**2
+                        )
+                        /9
+                    )
+                    ** 0.5,
+                )
+
+                dPhiSigPIDerr.SetBinContent(
+                    iBin,
+                    (
+                        dPhiPIDerrLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiPIDerrHi.GetBinContent(iBin)/((nbins_hi +1)*binwidth)
+                        + dPhiPIDerrMid.GetBinContent(iBin)/((nbins_mid +1)*binwidth)
+                    )
+                    /3
+                )
+                dPhiSigPIDerr.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiPIDerrHi.GetBinError(iBin)/((nbins_hi+1)*binwidth)) ** 2
+                            + (dPhiPIDerrLo.GetBinError(iBin)/((nbins_lo+1)*binwidth)) ** 2
+                            + (dPhiPIDerrMid.GetBinError(iBin)/((nbins_mid+1)*binwidth)) ** 2
+                        )
+                        /9
+                    )
+                    ** 0.5,
+                )
         if self.analysisType in ["central", "semicentral"]:
-            self.dPhiBGcorrsForSpecies[species][i, j, k] = dPhiBGcorrs
-            self.dPhiSigcorrsForSpecies[species][i, j, k] = dPhiSig
+            self.dPhiBGcorrsForTrueSpecies[species][i, j, k] = dPhiBGcorrs
+            self.dPhiSigcorrsForTrueSpecies[species][i, j, k] = dPhiSig
+            self.dPhiBGPIDErrForTrueSpecies[species][i, j, k] = dPhiBGPIDerr
+            self.dPhiSigPIDErrForTrueSpecies[species][i, j, k] = dPhiSigPIDerr
         elif self.analysisType == "pp":
-            self.dPhiBGcorrsForSpecies[species][i, j] = dPhiBGcorrs
-            self.dPhiSigcorrsForSpecies[species][i, j] = dPhiSig
+            self.dPhiBGcorrsForTrueSpecies[species][i, j] = dPhiBGcorrs
+            self.dPhiSigcorrsForTrueSpecies[species][i, j] = dPhiSig
+            self.dPhiBGPIDErrForTrueSpecies[species][i, j] = dPhiBGPIDerr
+            self.dPhiSigPIDErrForTrueSpecies[species][i, j] = dPhiSigPIDerr
         del dPhiSig
     
     @print_function_name_with_description_on_call(description="")
-    def fill_dPhi_correlation_functions_for_species_in_z_vertex_bins(self, i, j, k, species):
+    def fill_dPhi_correlation_functions_for_true_species_in_z_vertex_bins(self, i, j, k, species):
 
-        dPhiMid, nbins_mid, binwidth = self.get_dPhi_projection_in_dEta_dpionTPCnSigma_range(i,j,k,
+        dPhiMid, nbins_mid, binwidth, dPhiPIDerrMid = self.get_dPhi_projection_in_dEta_range_for_true_species(i,j,k,
             self.dEtaSig, TOFcutSpecies=species, in_z_vertex_bins=True
         )
 
-        dPhiBGLo, nbins_lo, binwidth = self.get_dPhi_projection_in_dEta_dpionTPCnSigma_range(i,j,k,
+        dPhiBGLo, nbins_lo, binwidth, dPhiPIDerrLo = self.get_dPhi_projection_in_dEta_range_for_true_species(i,j,k,
             self.dEtaBGLo, TOFcutSpecies=species, in_z_vertex_bins=True
         )
 
-        dPhiBGHi, nbins_hi, binwidth = self.get_dPhi_projection_in_dEta_dpionTPCnSigma_range(i,j,k,
+        dPhiBGHi, nbins_hi, binwidth, dPhiPIDerrHi = self.get_dPhi_projection_in_dEta_range_for_true_species(i,j,k,
             self.dEtaBGHi, TOFcutSpecies=species, in_z_vertex_bins=True
         )
 
@@ -1307,8 +1733,16 @@ class JetHadron(
         dPhiSig = dPhiMid.Clone()
         dPhiBGcorrs.Reset()
         dPhiSig.Reset()
+
+        dPhiBGPIDerr = dPhiPIDerrMid.Clone()
+        dPhiSigPIDerr = dPhiPIDerrMid.Clone()
+        dPhiBGPIDerr.Reset()
+        dPhiSigPIDerr.Reset()
+
         for iBin in range(1, dPhiBGcorrs.GetNbinsX() + 1):
             if dPhiBGcorrs.GetBinCenter(iBin + 1) < np.pi / 2:
+                # Near Side
+
                 dPhiBGcorrs.SetBinContent(
                     iBin,
                     (
@@ -1328,13 +1762,43 @@ class JetHadron(
                     )
                     ** 0.5,
                 )
+
                 dPhiSig.SetBinContent(
                     iBin, dPhiMid.GetBinContent(iBin)/((nbins_mid+1)*binwidth)
                 )
                 dPhiSig.SetBinError(
                     iBin, dPhiMid.GetBinError(iBin)/((nbins_mid+1)*binwidth)
                 )
+
+                dPhiBGPIDerr.SetBinContent(
+                    iBin,
+                    (
+                        dPhiPIDerrLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiPIDerrHi.GetBinContent(iBin)/((nbins_hi+1)*binwidth)
+                    )
+                    /2
+                )
+                dPhiBGPIDerr.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiPIDerrLo.GetBinError(iBin)/((nbins_lo+1)*binwidth)) ** 2
+                            + (dPhiPIDerrHi.GetBinError(iBin)/((nbins_hi+1)*binwidth)) ** 2
+                        )
+                        /4
+                    )
+                    ** 0.5,
+                )
+
+                dPhiSigPIDerr.SetBinContent(
+                    iBin, dPhiPIDerrMid.GetBinContent(iBin)/((nbins_mid+1)*binwidth)
+                )
+                dPhiSigPIDerr.SetBinError(
+                    iBin, dPhiPIDerrMid.GetBinError(iBin)/((nbins_mid+1)*binwidth)
+                )
             else:
+                # Away Side
+
                 dPhiBGcorrs.SetBinContent(
                     iBin,
                     (
@@ -1356,6 +1820,7 @@ class JetHadron(
                     )
                     ** 0.5,
                 )
+
                 dPhiSig.SetBinContent(
                     iBin,
                     (
@@ -1377,12 +1842,280 @@ class JetHadron(
                     )
                     ** 0.5,
                 )
+
+                dPhiBGPIDerr.SetBinContent(
+                    iBin,
+                    (
+                        dPhiPIDerrLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiPIDerrHi.GetBinContent(iBin)/((nbins_hi+1)*binwidth)
+                        + dPhiPIDerrMid.GetBinContent(iBin)/((nbins_mid+1)*binwidth)
+                    )
+                    /3
+                )
+                dPhiBGPIDerr.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiPIDerrLo.GetBinError(iBin)/((nbins_lo+1)*binwidth)) ** 2
+                            + (dPhiPIDerrHi.GetBinError(iBin)/((nbins_hi+1)*binwidth)) ** 2
+                            + (dPhiPIDerrMid.GetBinError(iBin)/((nbins_mid+1)*binwidth)) ** 2
+                        )
+                        /9
+                    )
+                    ** 0.5,
+                )
+
+                dPhiSigPIDerr.SetBinContent(
+                    iBin,
+                    (
+                        dPhiPIDerrLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiPIDerrHi.GetBinContent(iBin)/((nbins_hi+1)*binwidth)
+                        + dPhiPIDerrMid.GetBinContent(iBin)/((nbins_mid+1)*binwidth)
+                    )
+                    /3
+                )
+                dPhiSigPIDerr.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiPIDerrLo.GetBinError(iBin)/((nbins_lo+1)*binwidth)) ** 2
+                            + (dPhiPIDerrHi.GetBinError(iBin)/((nbins_hi+1)*binwidth)) ** 2
+                            + (dPhiPIDerrMid.GetBinError(iBin)/((nbins_mid+1)*binwidth)) ** 2
+                        )
+                        /9
+                    )
+                    ** 0.5,
+                )
+
         if self.analysisType in ["central", "semicentral"]:
-            self.dPhiBGcorrsForSpeciesZV[species][i, j, k] = dPhiBGcorrs
-            self.dPhiSigcorrsForSpeciesZV[species][i, j, k] = dPhiSig
+            self.dPhiBGcorrsForTrueSpeciesZV[species][i, j, k] = dPhiBGcorrs
+            self.dPhiSigcorrsForTrueSpeciesZV[species][i, j, k] = dPhiSig
+            self.dPhiBGPIDErrForTrueSpeciesZV[species][i, j, k] = dPhiBGPIDerr
+            self.dPhiSigPIDErrForTrueSpeciesZV[species][i, j, k] = dPhiSigPIDerr
         elif self.analysisType == "pp":
-            self.dPhiBGcorrsForSpeciesZV[species][i, j] = dPhiBGcorrs
-            self.dPhiSigcorrsForSpeciesZV[species][i, j] = dPhiSig
+            self.dPhiBGcorrsForTrueSpeciesZV[species][i, j] = dPhiBGcorrs
+            self.dPhiSigcorrsForTrueSpeciesZV[species][i, j] = dPhiSig
+            self.dPhiBGPIDErrForTrueSpeciesZV[species][i, j] = dPhiBGPIDerr
+            self.dPhiSigPIDErrForTrueSpeciesZV[species][i, j] = dPhiSigPIDerr
+        del dPhiSig
+    
+    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    def fill_dPhi_correlation_functions_for_enhanced_species(self, i, j, k, species):
+
+        dPhiMid, nbins_mid, binwidth = self.get_dPhi_projection_in_dEta_range_for_enhanced_species(i,j,k,
+            self.dEtaSig, TOFcutSpecies=species
+        )
+
+        dPhiBGLo, nbins_lo, binwidth = self.get_dPhi_projection_in_dEta_range_for_enhanced_species(i,j,k,
+            self.dEtaBGLo, TOFcutSpecies=species
+        )
+
+        dPhiBGHi, nbins_hi, binwidth = self.get_dPhi_projection_in_dEta_range_for_enhanced_species(i,j,k,
+            self.dEtaBGHi, TOFcutSpecies=species
+        )
+
+        dPhiBGcorrs = dPhiMid.Clone()
+        dPhiSig = dPhiMid.Clone()
+        dPhiBGcorrs.Reset()
+        dPhiSig.Reset()
+
+
+        for iBin in range(1, dPhiBGcorrs.GetNbinsX() + 1):
+            if dPhiBGcorrs.GetBinCenter(iBin + 1) < np.pi / 2:
+                # Near Side
+                dPhiBGcorrs.SetBinContent(
+                    iBin,
+                    (dPhiBGLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiBGHi.GetBinContent(iBin) /((nbins_hi+1)*binwidth))
+                    /2
+                )
+                dPhiBGcorrs.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiBGLo.GetBinError(iBin)/((nbins_lo+1)*binwidth)) ** 2
+                            + (dPhiBGHi.GetBinError(iBin)/((nbins_hi+1)*binwidth)) ** 2
+                        )
+                        /4
+                    )
+                    ** 0.5,
+                )
+
+                dPhiSig.SetBinContent(
+                    iBin, dPhiMid.GetBinContent(iBin)/((nbins_mid+1)*binwidth)
+                )
+                dPhiSig.SetBinError(
+                    iBin, dPhiMid.GetBinError(iBin)/((nbins_mid+1)*binwidth)
+                )
+
+                
+
+            else:
+                # Away Side
+
+                dPhiBGcorrs.SetBinContent(
+                    iBin,
+                    (
+                        dPhiBGLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiBGHi.GetBinContent(iBin) /((nbins_hi+1)*binwidth)
+                        + dPhiMid.GetBinContent(iBin) /((nbins_mid+1)*binwidth)
+                    )
+                    /3
+                )
+                dPhiBGcorrs.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiBGHi.GetBinError(iBin)/((nbins_hi+1)*binwidth))**2
+                            + (dPhiBGLo.GetBinError(iBin)/((nbins_lo+1)*binwidth))**2
+                            + (dPhiMid.GetBinError(iBin)/((nbins_mid+1)*binwidth))**2
+                        )
+                        /9
+                    )
+                    ** 0.5,
+                )
+
+                dPhiSig.SetBinContent(
+                    iBin,
+                    (
+                        dPhiBGLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiBGHi.GetBinContent(iBin)/((nbins_hi +1)*binwidth)
+                        + dPhiMid.GetBinContent(iBin)/((nbins_mid +1)*binwidth)
+                    )
+                    /3
+                )
+                dPhiSig.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiBGHi.GetBinError(iBin)/((nbins_hi+1)*binwidth)) ** 2
+                            + (dPhiBGLo.GetBinError(iBin)/((nbins_lo+1)*binwidth)) ** 2
+                            + (dPhiMid.GetBinError(iBin)/((nbins_mid+1)*binwidth)) ** 2
+                        )
+                        /9
+                    )
+                    ** 0.5,
+                )
+
+                
+        if self.analysisType in ["central", "semicentral"]:
+            self.dPhiBGcorrsForEnhancedSpecies[species][i, j, k] = dPhiBGcorrs
+            self.dPhiSigcorrsForEnhancedSpecies[species][i, j, k] = dPhiSig
+
+        elif self.analysisType == "pp":
+            self.dPhiBGcorrsForEnhancedSpecies[species][i, j] = dPhiBGcorrs
+            self.dPhiSigcorrsForEnhancedSpecies[species][i, j] = dPhiSig
+
+        del dPhiSig
+    
+    @print_function_name_with_description_on_call(description="")
+    def fill_dPhi_correlation_functions_for_enhanced_species_in_z_vertex_bins(self, i, j, k, species):
+
+        dPhiMid, nbins_mid, binwidth = self.get_dPhi_projection_in_dEta_range_for_enhanced_species(i,j,k,
+            self.dEtaSig, TOFcutSpecies=species, in_z_vertex_bins=True
+        )
+
+        dPhiBGLo, nbins_lo, binwidth = self.get_dPhi_projection_in_dEta_range_for_enhanced_species(i,j,k,
+            self.dEtaBGLo, TOFcutSpecies=species, in_z_vertex_bins=True
+        )
+
+        dPhiBGHi, nbins_hi, binwidth = self.get_dPhi_projection_in_dEta_range_for_enhanced_species(i,j,k,
+            self.dEtaBGHi, TOFcutSpecies=species, in_z_vertex_bins=True
+        )
+
+        dPhiBGcorrs = dPhiMid.Clone()
+        dPhiSig = dPhiMid.Clone()
+        dPhiBGcorrs.Reset()
+        dPhiSig.Reset()
+
+
+        for iBin in range(1, dPhiBGcorrs.GetNbinsX() + 1):
+            if dPhiBGcorrs.GetBinCenter(iBin + 1) < np.pi / 2:
+                # Near Side
+
+                dPhiBGcorrs.SetBinContent(
+                    iBin,
+                    (
+                        dPhiBGLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiBGHi.GetBinContent(iBin) /((nbins_hi+1)*binwidth)
+                    )
+                    /2
+                )
+                dPhiBGcorrs.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiBGLo.GetBinError(iBin)/((nbins_lo+1)*binwidth)) ** 2
+                            + (dPhiBGHi.GetBinError(iBin)/((nbins_hi+1)*binwidth)) ** 2
+                        )
+                        /4
+                    )
+                    ** 0.5,
+                )
+
+                dPhiSig.SetBinContent(
+                    iBin, dPhiMid.GetBinContent(iBin)/((nbins_mid+1)*binwidth)
+                )
+                dPhiSig.SetBinError(
+                    iBin, dPhiMid.GetBinError(iBin)/((nbins_mid+1)*binwidth)
+                )
+
+                
+            else:
+                # Away Side
+
+                dPhiBGcorrs.SetBinContent(
+                    iBin,
+                    (
+                        dPhiBGLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiBGHi.GetBinContent(iBin) /((nbins_hi+1)*binwidth)
+                        + dPhiMid.GetBinContent(iBin) /((nbins_mid+1)*binwidth)
+                    )
+                    /3
+                )
+                dPhiBGcorrs.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiBGHi.GetBinError(iBin)/((nbins_hi+1)*binwidth))**2
+                            + (dPhiBGLo.GetBinError(iBin)/((nbins_lo+1)*binwidth))**2
+                            + (dPhiMid.GetBinError(iBin)/((nbins_mid+1)*binwidth))**2
+                        )
+                        /9
+                    )
+                    ** 0.5,
+                )
+
+                dPhiSig.SetBinContent(
+                    iBin,
+                    (
+                        dPhiBGLo.GetBinContent(iBin)/((nbins_lo+1)*binwidth)
+                        + dPhiBGHi.GetBinContent(iBin)/((nbins_hi +1)*binwidth)
+                        + dPhiMid.GetBinContent(iBin)/((nbins_mid +1)*binwidth)
+                    )
+                    /3
+                )
+                dPhiSig.SetBinError(
+                    iBin,
+                    (
+                        (
+                            (dPhiBGHi.GetBinError(iBin)/((nbins_hi+1)*binwidth)) ** 2
+                            + (dPhiBGLo.GetBinError(iBin)/((nbins_lo+1)*binwidth)) ** 2
+                            + (dPhiMid.GetBinError(iBin)/((nbins_mid+1)*binwidth)) ** 2
+                        )
+                        /9
+                    )
+                    ** 0.5,
+                )
+
+                
+
+        if self.analysisType in ["central", "semicentral"]:
+            self.dPhiBGcorrsForEnhancedSpeciesZV[species][i, j, k] = dPhiBGcorrs
+            self.dPhiSigcorrsForEnhancedSpeciesZV[species][i, j, k] = dPhiSig
+        elif self.analysisType == "pp":
+            self.dPhiBGcorrsForEnhancedSpeciesZV[species][i, j] = dPhiBGcorrs
+            self.dPhiSigcorrsForEnhancedSpeciesZV[species][i, j] = dPhiSig
         del dPhiSig
 
     @print_function_name_with_description_on_call(description="")
@@ -1398,7 +2131,7 @@ class JetHadron(
             self.dPhiSigdpionTPCnSigmacorrs[TOFcutSpecies][i, j] = dPhiSig
         del dPhiSig
 
-    @print_function_name_with_description_on_call(description="")
+    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
     def fill_BG_subtracted_AccCorrected_SE_correlation_functions(self, i, j, k):
         if self.analysisType in ["central", "semicentral"]:
             NSCorr = self.get_BG_subtracted_AccCorrectedSEdPhiSigNScorr(i, j, k)  # type: ignore
@@ -1430,7 +2163,7 @@ class JetHadron(
             self.BGSubtractedAccCorrectedSEdPhiSigAScorrsminValsZV[i, j] = ASminVal
         del NSCorr, ASCorr
 
-    @print_function_name_with_description_on_call(description="")
+    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
     def fill_normalized_BG_subtracted_AccCorrected_SE_correlation_functions(
         self, i, j, k
     ):
@@ -1463,75 +2196,165 @@ class JetHadron(
     ):
 
         if self.analysisType in ["central", "semicentral"]:
-            Corr = self.get_normalized_BG_subtracted_AccCorrectedSEdPhiSig_for_species(
+            Corr = self.get_normalized_BG_subtracted_AccCorrectedSEdPhiSig_for_true_species(
                 i, j, k, species
             )
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrs[
                 species
             ][i, j, k] = Corr
         elif self.analysisType == "pp":
-            Corr, minVal = self.get_normalized_BG_subtracted_AccCorrectedSEdPhiSig_for_species(i, j, k, species)  # type: ignore
+            Corr, minVal = self.get_normalized_BG_subtracted_AccCorrectedSEdPhiSig_for_true_species(i, j, k, species)  # type: ignore
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrs[species][i, j] = Corr  # type: ignore
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrsminVals[species][i, j] = minVal  # type: ignore
         del Corr
 
-    @print_function_name_with_description_on_call(description="")
-    def fill_normalized_background_subtracted_dPhi_for_species(self, i, j, k, species):
+    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    def fill_normalized_background_subtracted_dPhi_for_true_species(self, i, j, k, species):
         if self.analysisType in ["central", "semicentral"]:
-            Corr = self.get_normalized_background_subtracted_dPhi_for_species(
+            Corr = self.get_normalized_background_subtracted_dPhi_for_true_species(
                 i, j, k, species
             )
-            self.NormalizedBGSubtracteddPhiForSpecies[species][i, j, k] = Corr
+            self.NormalizedBGSubtracteddPhiForTrueSpecies[species][i, j, k] = Corr
         elif self.analysisType == "pp":
-            Corr, minVal = self.get_normalized_background_subtracted_dPhi_for_species(i, j, k, species)  # type: ignore
-            self.NormalizedBGSubtracteddPhiForSpecies[species][i, j] = Corr  # type: ignore
-            self.NormalizedBGSubtracteddPhiForSpeciesminVals[species][i, j] = minVal  # type: ignore
+            Corr, minVal = self.get_normalized_background_subtracted_dPhi_for_true_species(i, j, k, species)  # type: ignore
+            self.NormalizedBGSubtracteddPhiForTrueSpecies[species][i, j] = Corr  # type: ignore
+            self.NormalizedBGSubtracteddPhiForTrueSpeciesminVals[species][i, j] = minVal  # type: ignore
+        del Corr
+   
+    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    def fill_normalized_background_subtracted_dPhi_for_enhanced_species(self, i, j, k, species):
+        if self.analysisType in ["central", "semicentral"]:
+            Corr = self.get_normalized_background_subtracted_dPhi_for_enhanced_species(
+                i, j, k, species
+            )
+            self.dPhiSigPIDErrForTrueSpecies[species][i, j, k] = Corr
+        elif self.analysisType == "pp":
+            Corr, minVal = self.get_normalized_background_subtracted_dPhi_for_enhanced_species(i, j, k, species)  # type: ignore
+            self.NormalizedBGSubtracteddPhiForEnhancedSpecies[species][i, j] = Corr  # type: ignore
+            self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminVals[species][i, j] = minVal  # type: ignore
         del Corr
     
     @print_function_name_with_description_on_call(description="")
-    def fill_normalized_background_subtracted_dPhi_for_species_in_z_vertex_bins(self, i, j, k, species):
+    def fill_normalized_background_subtracted_dPhi_for_true_species_in_z_vertex_bins(self, i, j, k, species):
         if self.analysisType in ["central", "semicentral"]:
-            Corr = self.get_normalized_background_subtracted_dPhi_for_species(
+            Corr = self.get_normalized_background_subtracted_dPhi_for_true_species(
                 i, j, k, species, in_z_vertex_bins=True
             )
-            self.NormalizedBGSubtracteddPhiForSpeciesZV[species][i, j, k] = Corr
+            self.NormalizedBGSubtracteddPhiForTrueSpeciesZV[species][i, j, k] = Corr
         elif self.analysisType == "pp":
-            Corr, minVal = self.get_normalized_background_subtracted_dPhi_for_species(i, j, k, species, in_z_vertex_bins=True)  # type: ignore
-            self.NormalizedBGSubtracteddPhiForSpeciesZV[species][i, j] = Corr  # type: ignore
-            self.NormalizedBGSubtracteddPhiForSpeciesminValsZV[species][i, j] = minVal  # type: ignore
+            Corr, minVal = self.get_normalized_background_subtracted_dPhi_for_true_species(i, j, k, species, in_z_vertex_bins=True)  # type: ignore
+            self.NormalizedBGSubtracteddPhiForTrueSpeciesZV[species][i, j] = Corr  # type: ignore
+            self.NormalizedBGSubtracteddPhiForTrueSpeciesminValsZV[species][i, j] = minVal  # type: ignore
         del Corr
-
-    @print_function_name_with_description_on_call(description="")
-    def fill_yield_for_species(self, i, j, species):
-        yield_, yield_err_ = self.get_yield_for_species(i, j, 3, species)
-        self.Yields[species][i, j] = yield_
-        self.YieldErrs[species][i, j] = yield_err_
-        yield_NS, yield_err_NS = self.get_yield_for_species(
-            i, j, 3, species, region="NS"
-        )
-        self.YieldsNS[species][i, j] = yield_NS
-        self.YieldErrsNS[species][i, j] = yield_err_NS
-        yield_AS, yield_err_AS = self.get_yield_for_species(
-            i, j, 3, species, region="AS"
-        )
-        self.YieldsAS[species][i, j] = yield_AS
-        self.YieldErrsAS[species][i, j] = yield_err_AS
     
     @print_function_name_with_description_on_call(description="")
-    def fill_yield_for_species_in_z_vertex_bins(self, i, j, species):
-        yield_, yield_err_ = self.get_yield_for_species(i, j, 3, species, in_z_vertex_bins=True)
-        self.YieldsZV[species][i, j] = yield_
-        self.YieldErrsZV[species][i, j] = yield_err_
-        yield_NS, yield_err_NS = self.get_yield_for_species(
+    def fill_normalized_background_subtracted_dPhi_for_enhanced_species_in_z_vertex_bins(self, i, j, k, species):
+        if self.analysisType in ["central", "semicentral"]:
+            Corr = self.get_normalized_background_subtracted_dPhi_for_enhanced_species(
+                i, j, k, species, in_z_vertex_bins=True
+            )
+            self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV[species][i, j, k] = Corr
+        elif self.analysisType == "pp":
+            Corr, minVal = self.get_normalized_background_subtracted_dPhi_for_enhanced_species(i, j, k, species, in_z_vertex_bins=True)  # type: ignore
+            self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV[species][i, j] = Corr  # type: ignore
+            self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminValsZV[species][i, j] = minVal  # type: ignore
+        del Corr
+
+    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    def fill_yield_for_true_species(self, i, j, species):
+        yield_, yield_err_ = self.get_yield_for_true_species(i, j, 3, species)
+        self.YieldsTrue[species][i, j] = yield_
+        self.YieldErrsTrue[species][i, j] = yield_err_
+        yield_NS, yield_err_NS = self.get_yield_for_true_species(
+            i, j, 3, species, region="NS"
+        )
+        self.YieldsTrueNS[species][i, j] = yield_NS
+        self.YieldErrsTrueNS[species][i, j] = yield_err_NS
+        yield_AS, yield_err_AS = self.get_yield_for_true_species(
+            i, j, 3, species, region="AS"
+        )
+        self.YieldsTrueAS[species][i, j] = yield_AS
+        self.YieldErrsTrueAS[species][i, j] = yield_err_AS
+    
+    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    def fill_yield_for_enhanced_species(self, i, j, species):
+        yield_, yield_err_ = self.get_yield_for_enhanced_species(i, j, 3, species)
+        self.YieldsEnhanced[species][i, j] = yield_
+        self.YieldErrsEnhanced[species][i, j] = yield_err_
+        yield_NS, yield_err_NS = self.get_yield_for_enhanced_species(
+            i, j, 3, species, region="NS"
+        )
+        self.YieldsEnhancedNS[species][i, j] = yield_NS
+        self.YieldErrsEnhancedNS[species][i, j] = yield_err_NS
+        yield_AS, yield_err_AS = self.get_yield_for_enhanced_species(
+            i, j, 3, species, region="AS"
+        )
+        self.YieldsEnhancedAS[species][i, j] = yield_AS
+        self.YieldErrsEnhancedAS[species][i, j] = yield_err_AS
+    
+    @print_function_name_with_description_on_call(description="")
+    def fill_yield_for_true_species_in_z_vertex_bins(self, i, j, species):
+        yield_, yield_err_ = self.get_yield_for_true_species(i, j, 3, species, in_z_vertex_bins=True)
+        self.YieldsTrueZV[species][i, j] = yield_
+        self.YieldErrsTrueZV[species][i, j] = yield_err_
+        yield_NS, yield_err_NS = self.get_yield_for_true_species(
             i, j, 3, species, region="NS", in_z_vertex_bins=True
         )
-        self.YieldsNSZV[species][i, j] = yield_NS
-        self.YieldErrsNSZV[species][i, j] = yield_err_NS
-        yield_AS, yield_err_AS = self.get_yield_for_species(
+        self.YieldsTrueNSZV[species][i, j] = yield_NS
+        self.YieldErrsTrueNSZV[species][i, j] = yield_err_NS
+        yield_AS, yield_err_AS = self.get_yield_for_true_species(
             i, j, 3, species, region="AS", in_z_vertex_bins=True
         )
-        self.YieldsASZV[species][i, j] = yield_AS
-        self.YieldErrsASZV[species][i, j] = yield_err_AS
+        self.YieldsTrueASZV[species][i, j] = yield_AS
+        self.YieldErrsTrueASZV[species][i, j] = yield_err_AS
+    
+    @print_function_name_with_description_on_call(description="")
+    def fill_yield_for_enhanced_species_in_z_vertex_bins(self, i, j, species):
+        yield_, yield_err_ = self.get_yield_for_true_species(i, j, 3, species, in_z_vertex_bins=True)
+        self.YieldsEnhancedZV[species][i, j] = yield_
+        self.YieldErrsEnhancedZV[species][i, j] = yield_err_
+        yield_NS, yield_err_NS = self.get_yield_for_true_species(
+            i, j, 3, species, region="NS", in_z_vertex_bins=True
+        )
+        self.YieldsEnhancedNSZV[species][i, j] = yield_NS
+        self.YieldErrsEnhancedNSZV[species][i, j] = yield_err_NS
+        yield_AS, yield_err_AS = self.get_yield_for_true_species(
+            i, j, 3, species, region="AS", in_z_vertex_bins=True
+        )
+        self.YieldsEnhancedASZV[species][i, j] = yield_AS
+        self.YieldErrsEnhancedASZV[species][i, j] = yield_err_AS
+
+    @print_function_name_with_description_on_call(description="", logging_level=logging.INFO)
+    def fill_inclusive_yield(self, i, j,):
+        yield_, yield_err_ = self.get_inclusive_yield(i, j, 3)
+        self.YieldsTrue["inclusive"][i, j] = yield_
+        self.YieldErrsTrue["inclusive"][i, j] = yield_err_
+        yield_NS, yield_err_NS = self.get_inclusive_yield(
+            i, j, 3, region="NS"
+        )
+        self.YieldsTrueNS["inclusive"][i, j] = yield_NS
+        self.YieldErrsTrueNS["inclusive"][i, j] = yield_err_NS
+        yield_AS, yield_err_AS = self.get_inclusive_yield(
+            i, j, 3, region="AS"
+        )
+        self.YieldsTrueAS["inclusive"][i, j] = yield_AS
+        self.YieldErrsTrueAS["inclusive"][i, j] = yield_err_AS
+    
+    @print_function_name_with_description_on_call(description="")
+    def fill_inclusive_yield_in_z_vertex_bins(self, i, j):
+        yield_, yield_err_ = self.get_inclusive_yield(i, j, 3, in_z_vertex_bins=True)
+        self.YieldsTrueZV['inclusive'][i, j] = yield_
+        self.YieldErrsTrueZV['inclusive'][i, j] = yield_err_
+        yield_NS, yield_err_NS = self.get_inclusive_yield(
+            i, j, 3, region="NS", in_z_vertex_bins=True
+        )
+        self.YieldsTrueNSZV['inclusive'][i, j] = yield_NS
+        self.YieldErrsTrueNSZV['inclusive'][i, j] = yield_err_NS
+        yield_AS, yield_err_AS = self.get_inclusive_yield(
+            i, j, 3, region="AS", in_z_vertex_bins=True
+        )
+        self.YieldsTrueASZV['inclusive'][i, j] = yield_AS
+        self.YieldErrsTrueASZV['inclusive'][i, j] = yield_err_AS
 
     @print_function_name_with_description_on_call(description="")
     def set_pT_epAngle_bin(self, i, j, k):
@@ -1641,6 +2464,7 @@ class JetHadron(
             self.init_bool_dict()
         )
         self.ME_norm_sliding_window_has_changed = True
+        self.resetUnfoldingResults = True
 
     def __repr__(self) -> str:
         string_rep = f"""JetHadron object for {self.analysisType} events\n

@@ -1,4 +1,3 @@
-from math import erf
 import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,16 +6,35 @@ import matplotlib.cm as cm
 from matplotlib.pyplot import Axes
 from abc import ABC, abstractmethod
 import ROOT
+import uncertainties
+from uncertainties import unumpy as unp
+from uncertainties.umath import erf, fsum, fabs
+from sklearn.preprocessing import normalize
+import logging
+import seaborn as sns
+
+from PionTPCNSigmaFitter import PionTPCNSigmaFitter
+debug_logger = logging.getLogger('debug')
+error_logger = logging.getLogger('error')
+info_logger = logging.getLogger('info')
 
 
-def print_function_name_with_description_on_call(description):
+def print_function_name_with_description_on_call(description, logging_level=logging.DEBUG):
     """
     Prints the name of the function and a description of what it does
     """
 
     def function_wrapper(function):
         def method_wrapper(self, *args, **kwargs):
-            print(f"{function.__name__} in {self.__class__.__name__}:\n\t{description}")
+            if logging_level == logging.DEBUG:
+                logger = debug_logger
+            elif logging_level == logging.INFO:
+                logger = info_logger
+            elif logging_level == logging.ERROR:
+                logger = error_logger
+            else:
+                raise ValueError(f"Unknown logging level {logging_level}")
+            logger.log(level=logging_level, msg=f"{function.__name__} in {self.__class__.__name__}:\n\t{description}")
             return function(self, *args, **kwargs)
 
         return method_wrapper
@@ -135,7 +153,7 @@ class PlotMixin:
             numEPBins = 1  # inclusive only
         for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
             for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
-                print(
+                debug_logger.info(
                     f"pTtrig: {self.pTtrigBinEdges[i]} - {self.pTtrigBinEdges[i+1]}, pTassoc: {self.pTassocBinEdges[j]} - {self.pTassocBinEdges[j+1]}"
                 )  # type:ignore
                 figBG, axBG = plt.subplots(1, numEPBins, figsize=(20, 8), sharey=True)
@@ -202,16 +220,16 @@ class PlotMixin:
                     f"Background-subtracted $\\Delta \\phi$ {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c"
                 )  # type:ignore
                 figSigminusBGNormINC.suptitle(
-                    f"Normalized, background-subtracted $\\Delta \\phi$ {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c"
+                    f"Normalized, background-subtracted $\\Delta \\phi$"
                 )  # type:ignore
                 figSigminusBGNormINCPion.suptitle(
-                    f"Normalized, background-subtracted $\\Delta \\phi$ for pions {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c"
+                    f"Normalized, background-subtracted $\\Delta \\phi$ for pions"
                 )  # type:ignore
                 figSigminusBGNormINCProton.suptitle(
-                    f"Normalized, background-subtracted $\\Delta \\phi$ for protons {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c"
+                    f"Normalized, background-subtracted $\\Delta \\phi$ for protons"
                 )  # type:ignore
                 figSigminusBGNormINCKaon.suptitle(
-                    f"Normalized, background-subtracted $\\Delta \\phi$ for kaons {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c"
+                    f"Normalized, background-subtracted $\\Delta \\phi$ for kaons"
                 )  # type:ignore
 
                 figBGZV.suptitle(
@@ -230,16 +248,16 @@ class PlotMixin:
                     f"Background-subtracted $\\Delta \\phi$ {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c"
                 )  # type:ignore
                 figSigminusBGNormINCZV.suptitle(
-                    f"Normalized, background-subtracted $\\Delta \\phi$ {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c"
+                    f"Normalized, background-subtracted $\\Delta \\phi$"
                 )  # type:ignore
                 figSigminusBGNormINCPionZV.suptitle(
-                    f"Normalized, background-subtracted $\\Delta \\phi$ for pions {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c"
+                    f"Normalized, background-subtracted $\\Delta \\phi$ for pions"
                 )  # type:ignore
                 figSigminusBGNormINCProtonZV.suptitle(
-                    f"Normalized, background-subtracted $\\Delta \\phi$ for protons {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c"
+                    f"Normalized, background-subtracted $\\Delta \\phi$ for protons"
                 )  # type:ignore
                 figSigminusBGNormINCKaonZV.suptitle(
-                    f"Normalized, background-subtracted $\\Delta \\phi$ for kaons {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c"
+                    f"Normalized, background-subtracted $\\Delta \\phi$ for kaons"
                 )  # type:ignore
 
                 # remove margins
@@ -376,28 +394,34 @@ class PlotMixin:
                         self.plot_normalized_background_subtracted_dPhi_INC_in_z_vertex_bins(
                             i, j, k, axSigminusBGNormINCZV, RPFErrorINCZV
                         )
-                        self.plot_normalized_background_subtracted_dPhi_for_species(
+                        self.plot_normalized_background_subtracted_dPhi_for_true_species(
                             i, j, k, "pion", axSigminusBGNormINCPion, RPFErrorINC
                         )
-                        self.plot_normalized_background_subtracted_dPhi_for_species_in_z_vertex_bins(
+                        self.plot_normalized_background_subtracted_dPhi_for_true_species_in_z_vertex_bins(
                             i, j, k, "pion", axSigminusBGNormINCPionZV, RPFErrorINCZV
                         )
+                        self.plot_normalized_background_subtracted_dPhi_for_enhanced_species(i,j,k,"pion", axSigminusBGNormINCPion, RPFErrorINC)
+                        self.plot_normalized_background_subtracted_dPhi_for_enhanced_species_in_z_vertex_bins(i,j,k,"pion", axSigminusBGNormINCPionZV, RPFErrorINCZV)
                         self.plot_pionTPCnSigma_vs_dphi(i, j, k, "pion")
 
-                        self.plot_normalized_background_subtracted_dPhi_for_species(
+                        self.plot_normalized_background_subtracted_dPhi_for_true_species(
                             i, j, k, "proton", axSigminusBGNormINCProton, RPFErrorINC
                         )
-                        self.plot_normalized_background_subtracted_dPhi_for_species_in_z_vertex_bins(
+                        self.plot_normalized_background_subtracted_dPhi_for_true_species_in_z_vertex_bins(
                             i, j, k, "proton", axSigminusBGNormINCProtonZV, RPFErrorINCZV
                         )
+                        self.plot_normalized_background_subtracted_dPhi_for_enhanced_species(i,j,k,"proton", axSigminusBGNormINCProton, RPFErrorINC)
+                        self.plot_normalized_background_subtracted_dPhi_for_enhanced_species_in_z_vertex_bins(i,j,k,"proton", axSigminusBGNormINCProtonZV, RPFErrorINCZV)
                         self.plot_pionTPCnSigma_vs_dphi(i, j, k, "proton")
 
-                        self.plot_normalized_background_subtracted_dPhi_for_species(
+                        self.plot_normalized_background_subtracted_dPhi_for_true_species(
                             i, j, k, "kaon", axSigminusBGNormINCKaon, RPFErrorINC
                         )
-                        self.plot_normalized_background_subtracted_dPhi_for_species_in_z_vertex_bins(
+                        self.plot_normalized_background_subtracted_dPhi_for_true_species_in_z_vertex_bins(
                             i, j, k, "kaon", axSigminusBGNormINCKaonZV, RPFErrorINCZV
                         )
+                        self.plot_normalized_background_subtracted_dPhi_for_enhanced_species(i,j,k,"kaon", axSigminusBGNormINCKaon, RPFErrorINC)
+                        self.plot_normalized_background_subtracted_dPhi_for_enhanced_species_in_z_vertex_bins(i,j,k,"kaon", axSigminusBGNormINCKaonZV, RPFErrorINCZV)
                         self.plot_pionTPCnSigma_vs_dphi(i, j, k, "kaon")
 
                     elif self.analysisType in ["pp"]:  # type:ignore
@@ -483,38 +507,47 @@ class PlotMixin:
                             i, j, k, axSigminusBGNormINCZV, normErrorINCZV
                         )
 
-                        self.plot_normalized_background_subtracted_dPhi_for_species(
+                        self.plot_normalized_background_subtracted_dPhi_for_true_species(
                             i, j, k, "pion", axSigminusBGNormINCPion, normErrorINC
                         )
 
-                        self.plot_normalized_background_subtracted_dPhi_for_species_in_z_vertex_bins(
+                        self.plot_normalized_background_subtracted_dPhi_for_true_species_in_z_vertex_bins(
                             i, j, k, "pion", axSigminusBGNormINCPionZV, normErrorINCZV
                         )
-                        self.plot_pionTPCnSigma_vs_dphi(i, j, k, "pion")
 
-                        self.plot_normalized_background_subtracted_dPhi_for_species(
+                        self.plot_normalized_background_subtracted_dPhi_for_enhanced_species(i,j,k,"pion", axSigminusBGNormINCPion, normErrorINC)
+                        self.plot_normalized_background_subtracted_dPhi_for_enhanced_species_in_z_vertex_bins(i,j,k,"pion", axSigminusBGNormINCPionZV, normErrorINCZV)
+                        # self.plot_pionTPCnSigma_vs_dphi(i, j, k, "pion")
+
+                        self.plot_normalized_background_subtracted_dPhi_for_true_species(
                             i, j, k, "proton", axSigminusBGNormINCProton, normErrorINC
                         )
                         
-                        self.plot_normalized_background_subtracted_dPhi_for_species_in_z_vertex_bins(
+                        self.plot_normalized_background_subtracted_dPhi_for_true_species_in_z_vertex_bins(
                             i, j, k, "proton", axSigminusBGNormINCProtonZV, normErrorINCZV
                         )
-                        self.plot_pionTPCnSigma_vs_dphi(i, j, k, "proton")
+                        self.plot_normalized_background_subtracted_dPhi_for_enhanced_species(i,j,k,"proton", axSigminusBGNormINCProton, normErrorINC)
+                        self.plot_normalized_background_subtracted_dPhi_for_enhanced_species_in_z_vertex_bins(i,j,k,"proton", axSigminusBGNormINCProtonZV, normErrorINCZV)
+                        # self.plot_pionTPCnSigma_vs_dphi(i, j, k, "proton")
 
-                        self.plot_normalized_background_subtracted_dPhi_for_species(
+                        self.plot_normalized_background_subtracted_dPhi_for_true_species(
                             i, j, k, "kaon", axSigminusBGNormINCKaon, normErrorINC
                         )
 
-                        self.plot_normalized_background_subtracted_dPhi_for_species_in_z_vertex_bins(
+                        self.plot_normalized_background_subtracted_dPhi_for_true_species_in_z_vertex_bins(
                             i, j, k, "kaon", axSigminusBGNormINCKaonZV, normErrorINCZV
                         )
-                        self.plot_pionTPCnSigma_vs_dphi(i, j, k, "kaon")
+                        self.plot_normalized_background_subtracted_dPhi_for_enhanced_species(i,j,k,"kaon", axSigminusBGNormINCKaon, normErrorINC)
+                        self.plot_normalized_background_subtracted_dPhi_for_enhanced_species_in_z_vertex_bins(i,j,k,"kaon", axSigminusBGNormINCKaonZV, normErrorINCZV)
+                        # self.plot_pionTPCnSigma_vs_dphi(i, j, k, "kaon")
 
-                        self.plot_pion_tpc_nSigma("pion", i, j,k)
-                        self.plot_pion_tpc_nSigma("kaon", i, j,k)
-                        self.plot_pion_tpc_nSigma("proton", i, j,k)
+                        # self.plot_pion_tpc_nSigma("pion", i, j,k)
+                        # self.plot_pion_tpc_nSigma("kaon", i, j,k)
+                        # self.plot_pion_tpc_nSigma("proton", i, j,k)
 
-                        self.plot_PionTPCNSigmaFit(i,j,k)
+                        self.plot_PionTPCNSigmaFit(i,j,k, "NS")
+                        self.plot_PionTPCNSigmaFit(i,j,k, "AS")
+                        self.plot_PionTPCNSigmaFit(i,j,k, "BG")
 
                  
 
@@ -592,47 +625,57 @@ class PlotMixin:
                     )
                     axSigminusBGNormINC.legend()
 
-                    if self.analysisType in ['central', 'semicentral']:
-                        fit_params = self.PionTPCNSigmaFitObjs[i,j, k].popt
-                    else:
-                        fit_params = self.PionTPCNSigmaFitObjs[i,j].popt
-                    mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk = fit_params
+#                     if self.analysisType in ['central', 'semicentral']:
+#                         fit_params = self.PionTPCNSigmaFitObjs[i,j, k].popt
+#                         fit_errors = self.PionTPCNSigmaFitObjs[i,j, k].pcov
+#                         fit_func = self.PionTPCNSigmaFitObjs[i,j, k].upiKpInc_generalized_fit
+#                     else:
+#                         fit_params = self.PionTPCNSigmaFitObjs[i,j].popt
+#                         fit_errors = self.PionTPCNSigmaFitObjs[i,j].pcov
+#                         fit_func = self.PionTPCNSigmaFitObjs[i,j].upiKpInc_generalized_fit
+#                     mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = uncertainties.correlated_values(fit_params, fit_errors)
+#                     int_x = np.linspace(-10, 10, 1000)
+#                     int_y = fit_func(int_x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak)
+# 
+# 
+#                     protonEnhNorm = np.trapz(int_y[:1000], int_x)
+#                     pionEnhNorm  = np.trapz(int_y[1000:2000], int_x)
+#                     kaonEnhNorm  = np.trapz(int_y[2000:3000], int_x)
+#                     inclusiveNorm= np.trapz(int_y[3000:], int_x)
+#                     
+#                     gpp = np.trapz(generalized_gauss(int_x, mup, sigp, app, alphap), int_x)/protonEnhNorm
+#                     gppi = np.trapz(gauss(int_x, mupi, sigpi, apip), int_x)/protonEnhNorm
+#                     gpk = np.trapz(generalized_gauss(int_x, muk, sigk, akp, alphak), int_x)/protonEnhNorm
+#                     gpip = np.trapz(generalized_gauss(int_x, mup, sigp, appi, alphap), int_x)/pionEnhNorm
+#                     gpipi = np.trapz(gauss(int_x, mupi, sigpi, apipi), int_x)/pionEnhNorm
+#                     gpik = np.trapz(generalized_gauss(int_x, muk, sigk, akpi, alphak), int_x)/pionEnhNorm
+#                     gkp = np.trapz(generalized_gauss(int_x, mup, sigp, apk, alphap), int_x)/kaonEnhNorm
+#                     gkpi = np.trapz(gauss(int_x, mupi, sigpi, apik), int_x)/kaonEnhNorm
+#                     gkk = np.trapz(generalized_gauss(int_x, muk, sigk, akk, alphak), int_x)/kaonEnhNorm
+#                     gincp = np.trapz(generalized_gauss(int_x, mup, sigp, apinc, alphap), int_x)/inclusiveNorm
+#                     gincpi = np.trapz(gauss(int_x, mupi, sigpi, apiinc), int_x)/inclusiveNorm
+#                     ginck = np.trapz(generalized_gauss(int_x, muk, sigk, akinc, alphak), int_x)/inclusiveNorm
 
-                    protonEnhNorm = -(np.pi/2)**.5*(
-                        akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
-                        app*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                        apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
-                        )
-                    pionEnhNorm = -(np.pi/2)**.5*(
-                        akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
-                        appi*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                        apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
-                        )
-                    kaonEnhNorm = -(np.pi/2)**.5*(
-                        apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)) + 
-                        apk*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                        akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk))
-                        )
                     
-                    fpp = -(np.pi/2)**.5*(app*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/protonEnhNorm
-                    fpip = -(np.pi/2)**.5*(apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/protonEnhNorm
-                    fkp = -(np.pi/2)**.5*(akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/protonEnhNorm
-                    fppi = -(np.pi/2)**.5*(appi*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/pionEnhNorm
-                    fpipi = -(np.pi/2)**.5*(apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/pionEnhNorm
-                    fkpi = -(np.pi/2)**.5*(akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/pionEnhNorm
-                    fpk = -(np.pi/2)**.5*(apk*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/kaonEnhNorm
-                    fpik = -(np.pi/2)**.5*(apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/kaonEnhNorm
-                    fkk = -(np.pi/2)**.5*(akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/kaonEnhNorm
+#                     determinant_factor = -(fkk*fppi*fpip-fkk*fpipi*fpp+fkp*fpik*fppi-fkp*fpipi*fpk-fkpi*fpik*fpp+fkpi*fppi*fpk)
+# 
+#                     inv_mat = unp.ulinalg.pinv(np.array([[fpipi, fppi, fkpi], [fpip, fpp, fkp], [fpik, fpk, fkk]]))
+#                     # Calculate the L1 norm of each row
+#                     row_sums = np.array([fsum(unp.fabs(inv_mat[0])), fsum(unp.fabs(inv_mat[1])), fsum(unp.fabs(inv_mat[2]))])
+#                     
+#                     # Divide each row by its corresponding L1 norm
+#                     inv_mat = inv_mat / row_sums[:, np.newaxis]
+#                     
+#                     
+#                     pion_comp_str = f"pi: {inv_mat[0,0]:.3f} p:{inv_mat[0,1]:.3f} k:{inv_mat[0,2]:.3f}"
+#                     proton_comp_str = f"pi: {inv_mat[1,0]:.3f} p:{inv_mat[1,1]:.3f} k:{inv_mat[1,2]:.3f}"
+#                     kaon_comp_str = f"pi: {inv_mat[2,0]:.3f} p:{inv_mat[2,1]:.3f} k:{inv_mat[2,2]:.3f}"
 
-                    
-                    determinant_factor = fkpi*fpip*fpk - fkp*fpipi*fpk - fkpi*fpik*fpp + fkk*fpipi*fpp + fkp*fpik*fppi - fkk*fpip*fppi
-                    
-                    
-                    pion_comp_str = f"pi: {(-fkp*fpk+fkk*fpp)/determinant_factor:.3f} p:{(fkpi*fpk-fppi*fkk)/determinant_factor:.3f} k:{(-fkpi*fpp+fppi*fkp)/determinant_factor:.3f}"
-                    proton_comp_str = f"pi: {(fkp*fpik-fkk*fpip)/determinant_factor:.3f} p:{(-fkpi*fpik+fpipi*fkk)/determinant_factor:.3f} k:{(fkpi*fpip-fpipi*fkp)/determinant_factor:.3f}"
-                    kaon_comp_str = f"pi: {(fpip*fpk-fpik*fpp)/determinant_factor:.3f} p:{(-fpipi*fpk+fpik*fppi)/determinant_factor:.3f} k:{(fpipi*fpp-fppi*fpip)/determinant_factor:.3f}"
-
-
+                    panel_pp_text1 = "ALICE Work In Progress" + "\n" + r"pp $\sqrt{s_{NN}}$=5.02TeV"+ "\n" + f"{self.pTtrigBinEdges[i]}"+r"$<p_{T unc, jet}^{ch+ne}<$"+f"{self.pTtrigBinEdges[i+1]}" + "\n"  + "anti-$k_T$ R=0.2"
+                    panel_pp_text2 =  f"{self.pTassocBinEdges[j]}"+r"$<p_T^{assoc.}<$"+f"{self.pTassocBinEdges[j+1]}" + "\n" + r"$p_T^{ch}$ c, $E_T^{clus}>$3.0 GeV" + "\n" + r"$p_T^{lead, ch} >$ 5.0 GeV/c"
+                    x_locs_pp = [0.65, 0.8]
+                    y_locs_pp = [0.75, 0.75]
+                    font_size = 20
 
                     yticks = axSigminusBGNormINCPion.get_yticks()
                     axSigminusBGNormINCPion.set_yticks(yticks)
@@ -643,7 +686,10 @@ class PlotMixin:
                     axSigminusBGNormINCPion.axhline(
                         y=0, color="k", linestyle="--", linewidth=0.5
                     )
-                    axSigminusBGNormINCPion.text(0.35, 0.8, pion_comp_str, transform=axSigminusBGNormINCPion.transAxes)
+                    axSigminusBGNormINCPion.text(x_locs_pp[0], y_locs_pp[0], panel_pp_text1, 
+                                                 fontsize=font_size, ha='right', transform=axSigminusBGNormINCPion.transAxes)
+                    axSigminusBGNormINCPion.text(x_locs_pp[1], y_locs_pp[1], panel_pp_text2,
+                                                    fontsize=font_size, ha='right', transform=axSigminusBGNormINCPion.transAxes)
                     axSigminusBGNormINCPion.legend()
 
                     yticks = axSigminusBGNormINCProton.get_yticks()
@@ -655,7 +701,10 @@ class PlotMixin:
                     axSigminusBGNormINCProton.axhline(
                         y=0, color="k", linestyle="--", linewidth=0.5
                     )
-                    axSigminusBGNormINCProton.text(0.35, 0.8, proton_comp_str, transform=axSigminusBGNormINCProton.transAxes)
+                    axSigminusBGNormINCProton.text(x_locs_pp[0], y_locs_pp[0], panel_pp_text1,
+                                                   fontsize=font_size, ha='right', transform=axSigminusBGNormINCProton.transAxes)
+                    axSigminusBGNormINCProton.text(x_locs_pp[1], y_locs_pp[1], panel_pp_text2,
+                                                    fontsize=font_size, ha='right', transform=axSigminusBGNormINCProton.transAxes)
                     axSigminusBGNormINCProton.legend()
 
                     yticks = axSigminusBGNormINCKaon.get_yticks()
@@ -667,7 +716,10 @@ class PlotMixin:
                     axSigminusBGNormINCKaon.axhline(
                         y=0, color="k", linestyle="--", linewidth=0.5
                     )
-                    axSigminusBGNormINCKaon.text(0.35, 0.8, kaon_comp_str, transform=axSigminusBGNormINCKaon.transAxes)
+                    axSigminusBGNormINCKaon.text(x_locs_pp[0], y_locs_pp[0], panel_pp_text1,
+                                                    fontsize=font_size, ha='right', transform=axSigminusBGNormINCKaon.transAxes)
+                    axSigminusBGNormINCKaon.text(x_locs_pp[1], y_locs_pp[1], panel_pp_text2,
+                                                    fontsize=font_size, ha='right', transform=axSigminusBGNormINCKaon.transAxes)
                     axSigminusBGNormINCKaon.legend()
                     
                     #Z-Vertex binned
@@ -731,46 +783,60 @@ class PlotMixin:
                     )
                     axSigminusBGNormINCZV.legend()
 
-                    if self.analysisType in ['central', 'semicentral']:
-                        fit_params = self.PionTPCNSigmaFitObjs[i,j, k].popt
-                    else:
-                        fit_params = self.PionTPCNSigmaFitObjs[i,j].popt
-                    mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk = fit_params
+#                     if self.analysisType in ['central', 'semicentral']:
+#                         fit_params = self.PionTPCNSigmaFitObjs[i,j, k].popt
+#                         fit_errors = self.PionTPCNSigmaFitObjs[i,j, k].pcov
+#                     else:
+#                         fit_params = self.PionTPCNSigmaFitObjs[i,j].popt
+#                         fit_errors = self.PionTPCNSigmaFitObjs[i,j].pcov
+#                     mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc,  = uncertainties.correlated_values(fit_params, fit_errors)
+# 
+#                     protonEnhNorm = -(np.pi/2)**.5*(
+#                         akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
+#                         app*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                         apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
+#                         )
+#                     pionEnhNorm = -(np.pi/2)**.5*(
+#                         akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
+#                         appi*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                         apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
+#                         )
+#                     kaonEnhNorm = -(np.pi/2)**.5*(
+#                         apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)) + 
+#                         apk*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                         akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk))
+#                         )
+#                     
+#                     fpp = -(np.pi/2)**.5*(app*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/protonEnhNorm
+#                     fpip = -(np.pi/2)**.5*(apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/protonEnhNorm
+#                     fkp = -(np.pi/2)**.5*(akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/protonEnhNorm
+#                     fppi = -(np.pi/2)**.5*(appi*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/pionEnhNorm
+#                     fpipi = -(np.pi/2)**.5*(apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/pionEnhNorm
+#                     fkpi = -(np.pi/2)**.5*(akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/pionEnhNorm
+#                     fpk = -(np.pi/2)**.5*(apk*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/kaonEnhNorm
+#                     fpik = -(np.pi/2)**.5*(apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/kaonEnhNorm
+#                     fkk = -(np.pi/2)**.5*(akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/kaonEnhNorm
+# 
+#                     
+#                     determinant_factor = -(fkk*fppi*fpip-fkk*fpipi*fpp+fkp*fpik*fppi-fkp*fpipi*fpk-fkpi*fpik*fpp+fkpi*fppi*fpk)
+#                     
+#                     
+#                     inv_mat = unp.ulinalg.pinv(np.array([[fpipi, fppi, fkpi], [fpip, fpp, fkp], [fpik, fpk, fkk]]))
+#                     
+#                     row_sums = np.array([fsum(unp.fabs(inv_mat[0])), fsum(unp.fabs(inv_mat[1])), fsum(unp.fabs(inv_mat[2]))])
+# 
+#                     inv_mat = inv_mat/row_sums[:,np.newaxis]
+# 
+#                     
+#                     pion_comp_str = f"pi: {inv_mat[0,0]:.3f} p:{inv_mat[0,1]:.3f} k:{inv_mat[0,2]:.3f}"
+#                     proton_comp_str = f"pi: {inv_mat[1,0]:.3f} p:{inv_mat[1,1]:.3f} k:{inv_mat[1,2]:.3f}"
+#                     kaon_comp_str = f"pi: {inv_mat[2,0]:.3f} p:{inv_mat[2,1]:.3f} k:{inv_mat[2,2]:.3f}"
 
-                    protonEnhNorm = -(np.pi/2)**.5*(
-                        akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
-                        app*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                        apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
-                        )
-                    pionEnhNorm = -(np.pi/2)**.5*(
-                        akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
-                        appi*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                        apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
-                        )
-                    kaonEnhNorm = -(np.pi/2)**.5*(
-                        apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)) + 
-                        apk*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                        akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk))
-                        )
-                    
-                    fpp = -(np.pi/2)**.5*(app*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/protonEnhNorm
-                    fpip = -(np.pi/2)**.5*(apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/protonEnhNorm
-                    fkp = -(np.pi/2)**.5*(akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/protonEnhNorm
-                    fppi = -(np.pi/2)**.5*(appi*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/pionEnhNorm
-                    fpipi = -(np.pi/2)**.5*(apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/pionEnhNorm
-                    fkpi = -(np.pi/2)**.5*(akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/pionEnhNorm
-                    fpk = -(np.pi/2)**.5*(apk*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/kaonEnhNorm
-                    fpik = -(np.pi/2)**.5*(apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/kaonEnhNorm
-                    fkk = -(np.pi/2)**.5*(akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/kaonEnhNorm
-
-                    
-                    determinant_factor = fkpi*fpip*fpk - fkp*fpipi*fpk - fkpi*fpik*fpp + fkk*fpipi*fpp + fkp*fpik*fppi - fkk*fpip*fppi
-                    
-                    
-                    pion_comp_str = f"pi: {(-fkp*fpk+fkk*fpp)/determinant_factor:.3f} p:{(fkpi*fpk-fppi*fkk)/determinant_factor:.3f} k:{(-fkpi*fpp+fppi*fkp)/determinant_factor:.3f}"
-                    proton_comp_str = f"pi: {(fkp*fpik-fkk*fpip)/determinant_factor:.3f} p:{(-fkpi*fpik+fpipi*fkk)/determinant_factor:.3f} k:{(fkpi*fpip-fpipi*fkp)/determinant_factor:.3f}"
-                    kaon_comp_str = f"pi: {(fpip*fpk-fpik*fpp)/determinant_factor:.3f} p:{(-fpipi*fpk+fpik*fppi)/determinant_factor:.3f} k:{(fpipi*fpp-fppi*fpip)/determinant_factor:.3f}"
-
+                    panel_pp_text1 = "ALICE Work In Progress" + "\n" + r"pp $\sqrt{s_{NN}}$=5.02TeV"+ "\n" + f"{self.pTtrigBinEdges[i]}"+r"$<p_{T unc, jet}^{ch+ne}<$"+f"{self.pTtrigBinEdges[i+1]}" + "\n"  + "anti-$k_T$ R=0.2"
+                    panel_pp_text2 =  f"{self.pTassocBinEdges[j]}"+r"$<p_T^{assoc.}<$"+f"{self.pTassocBinEdges[j+1]}" + "\n" + r"$p_T^{ch}$ c, $E_T^{clus}>$3.0 GeV" + "\n" + r"$p_T^{lead, ch} >$ 5.0 GeV/c"
+                    x_locs_pp = [0.65, 0.8]
+                    y_locs_pp = [0.75, 0.75]
+                    font_size = 20
 
 
                     yticks = axSigminusBGNormINCPionZV.get_yticks()
@@ -782,7 +848,16 @@ class PlotMixin:
                     axSigminusBGNormINCPionZV.axhline(
                         y=0, color="k", linestyle="--", linewidth=0.5
                     )
-                    axSigminusBGNormINCPionZV.text(0.35, 0.8, pion_comp_str, transform=axSigminusBGNormINCPionZV.transAxes)
+                    axSigminusBGNormINCPionZV.text(x_locs_pp[0], y_locs_pp[0],
+                                panel_pp_text1,
+                                fontsize=font_size,
+                                ha='right',
+                                    transform=axSigminusBGNormINCPionZV.transAxes) # type:ignore
+                    axSigminusBGNormINCPionZV.text(x_locs_pp[1], y_locs_pp[1],
+                                panel_pp_text2,
+                                fontsize=font_size,
+                                ha='right',
+                                    transform=axSigminusBGNormINCPionZV.transAxes) # type:ignore
                     axSigminusBGNormINCPionZV.legend()
 
                     yticks = axSigminusBGNormINCProtonZV.get_yticks()
@@ -794,7 +869,16 @@ class PlotMixin:
                     axSigminusBGNormINCProtonZV.axhline(
                         y=0, color="k", linestyle="--", linewidth=0.5
                     )
-                    axSigminusBGNormINCProtonZV.text(0.35, 0.8, proton_comp_str, transform=axSigminusBGNormINCProtonZV.transAxes)
+                    axSigminusBGNormINCProtonZV.text(x_locs_pp[0], y_locs_pp[0],
+                                                     panel_pp_text1,
+                                                     fontsize=font_size,
+                                                     ha='right',
+                                                     transform=axSigminusBGNormINCProtonZV.transAxes)  # type:ignore
+                    axSigminusBGNormINCProtonZV.text(x_locs_pp[1], y_locs_pp[1],
+                                                     panel_pp_text2,
+                                                        fontsize=font_size,
+                                                        ha='right',
+                                                        transform=axSigminusBGNormINCProtonZV.transAxes)  # type:ignore
                     axSigminusBGNormINCProtonZV.legend()
 
                     yticks = axSigminusBGNormINCKaonZV.get_yticks()
@@ -806,7 +890,16 @@ class PlotMixin:
                     axSigminusBGNormINCKaonZV.axhline(
                         y=0, color="k", linestyle="--", linewidth=0.5
                     )
-                    axSigminusBGNormINCKaonZV.text(0.35, 0.8, kaon_comp_str, transform=axSigminusBGNormINCKaonZV.transAxes)
+                    axSigminusBGNormINCKaonZV.text(x_locs_pp[0], y_locs_pp[0],
+                                                     panel_pp_text1,
+                                                     fontsize=font_size,
+                                                     ha='right',
+                                                     transform=axSigminusBGNormINCKaonZV.transAxes)  # type:ignore
+                    axSigminusBGNormINCKaonZV.text(x_locs_pp[1], y_locs_pp[1],
+                                                     panel_pp_text2,
+                                                        fontsize=font_size,
+                                                        ha='right',
+                                                        transform=axSigminusBGNormINCKaonZV.transAxes)  # type:ignore
                     axSigminusBGNormINCKaonZV.legend()
 
                    
@@ -940,45 +1033,53 @@ class PlotMixin:
                     panel2_text = r"Pb-Pb $\sqrt{s_{NN}}$=5.02TeV, "+("0-10\%" if self.analysisType=="central" else "30-50\%") + "\n" + f"{self.pTtrigBinEdges[i]}"+r"$<p_{T unc, jet}^{ch+ne}<$"+f"{self.pTtrigBinEdges[i+1]}" + "\n"  + "anti-$k_T$ R=0.2"
                     panel3_text = "ALICE Work In Progress" + "\n" + r"Background: 0.8 $< |\Delta \eta |< $1.2" + "\n" + r"Signal: $|\Delta \eta | <$ 0.6 for $|\Delta \phi| > \pi/2$" + "\n" +r"Signal: $|\Delta \eta | <$ 1.2 for $\pi/2 < \Delta \phi < 3\pi/2$"
                     
-                    if self.analysisType in ['central', 'semicentral']:
-                        fit_params = self.PionTPCNSigmaFitObjs[i,j, k].popt
-                    else:
-                        fit_params = self.PionTPCNSigmaFitObjs[i,j].popt
-                    mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk = fit_params
+#                     if self.analysisType in ['central', 'semicentral']:
+#                         fit_params = self.PionTPCNSigmaFitObjs[i,j, k].popt
+#                         fit_errors = self.PionTPCNSigmaFitObjs[i,j, k].pcov
+#                     else:
+#                         fit_params = self.PionTPCNSigmaFitObjs[i,j].popt
+#                         fit_errors = self.PionTPCNSigmaFitObjs[i,j].pcov
+#                     mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc = uncertainties.correlated_values(fit_params, fit_errors)
+# 
+#                     protonEnhNorm = -(np.pi/2)**.5*(
+#                         akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
+#                         app*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                         apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
+#                         )
+#                     pionEnhNorm = -(np.pi/2)**.5*(
+#                         akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
+#                         appi*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                         apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
+#                         )
+#                     kaonEnhNorm = -(np.pi/2)**.5*(
+#                         apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)) + 
+#                         apk*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                         akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk))
+#                         )
+#                     
+#                     fpp = -(np.pi/2)**.5*(app*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/protonEnhNorm
+#                     fpip = -(np.pi/2)**.5*(apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/protonEnhNorm
+#                     fkp = -(np.pi/2)**.5*(akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/protonEnhNorm
+#                     fppi = -(np.pi/2)**.5*(appi*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/pionEnhNorm
+#                     fpipi = -(np.pi/2)**.5*(apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/pionEnhNorm
+#                     fkpi = -(np.pi/2)**.5*(akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/pionEnhNorm
+#                     fpk = -(np.pi/2)**.5*(apk*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/kaonEnhNorm
+#                     fpik = -(np.pi/2)**.5*(apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/kaonEnhNorm
+#                     fkk = -(np.pi/2)**.5*(akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/kaonEnhNorm
+# 
+#                     
+#                     determinant_factor = -(fkk*fppi*fpip-fkk*fpipi*fpp+fkp*fpik*fppi-fkp*fpipi*fpk-fkpi*fpik*fpp+fkpi*fppi*fpk)
+#                     
+#                     
+#                     inv_mat = unp.ulinalg.pinv(np.array([[fpipi, fppi, fkpi], [fpip, fpp, fkp], [fpik, fpk, fkk]]))
+# 
+#                     row_sums = np.array([fsum(unp.fabs(inv_mat[0])), fsum(unp.fabs(inv_mat[1])), fsum(unp.fabs(inv_mat[2]))])
+#                     inv_mat = inv_mat/row_sums[:,np.newaxis]                    
+#                     
+#                     pion_comp_str = f"pi: {inv_mat[0,0]:.3f} p:{inv_mat[0,1]:.3f} k:{inv_mat[0,2]:.3f}"
+#                     proton_comp_str = f"pi: {inv_mat[1,0]:.3f} p:{inv_mat[1,1]:.3f} k:{inv_mat[1,2]:.3f}"
+#                     kaon_comp_str = f"pi: {inv_mat[2,0]:.3f} p:{inv_mat[2,1]:.3f} k:{inv_mat[2,2]:.3f}"
 
-                    protonEnhNorm = -(np.pi/2)**.5*(
-                        akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
-                        app*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                        apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
-                        )
-                    pionEnhNorm = -(np.pi/2)**.5*(
-                        akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
-                        appi*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                        apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
-                        )
-                    kaonEnhNorm = -(np.pi/2)**.5*(
-                        apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)) + 
-                        apk*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                        akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk))
-                        )
-                    
-                    fpp = -(np.pi/2)**.5*(app*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/protonEnhNorm
-                    fpip = -(np.pi/2)**.5*(apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/protonEnhNorm
-                    fkp = -(np.pi/2)**.5*(akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/protonEnhNorm
-                    fppi = -(np.pi/2)**.5*(appi*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/pionEnhNorm
-                    fpipi = -(np.pi/2)**.5*(apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/pionEnhNorm
-                    fkpi = -(np.pi/2)**.5*(akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/pionEnhNorm
-                    fpk = -(np.pi/2)**.5*(apk*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/kaonEnhNorm
-                    fpik = -(np.pi/2)**.5*(apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/kaonEnhNorm
-                    fkk = -(np.pi/2)**.5*(akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/kaonEnhNorm
-
-                    
-                    determinant_factor = fkpi*fpip*fpk - fkp*fpipi*fpk - fkpi*fpik*fpp + fkk*fpipi*fpp + fkp*fpik*fppi - fkk*fpip*fppi
-                    
-                    
-                    pion_comp_str = f"pi: {(-fkp*fpk+fkk*fpp)/determinant_factor:.3f} p:{(fkpi*fpk-fppi*fkk)/determinant_factor:.3f} k:{(-fkpi*fpp+fppi*fkp)/determinant_factor:.3f}"
-                    proton_comp_str = f"pi: {(fkp*fpik-fkk*fpip)/determinant_factor:.3f} p:{(-fkpi*fpik+fpipi*fkk)/determinant_factor:.3f} k:{(fkpi*fpip-fpipi*fkp)/determinant_factor:.3f}"
-                    kaon_comp_str = f"pi: {(fpip*fpk-fpik*fpp)/determinant_factor:.3f} p:{(-fpipi*fpk+fpik*fppi)/determinant_factor:.3f} k:{(fpipi*fpp-fppi*fpip)/determinant_factor:.3f}"
 
                     
 
@@ -1092,7 +1193,7 @@ class PlotMixin:
                                                     ha='right',
                                                     transform = axSigminusBGNormINCPion[1].transAxes)
                     axSigminusBGNormINCPion[2].text(x_locs[2], y_locs[2],
-                                                    panel3_text + '\n'+pion_comp_str,
+                                                    panel3_text, 
                                                     fontsize=font_size,
                                                     ha='right',
                                                     transform = axSigminusBGNormINCPion[2].transAxes)
@@ -1108,7 +1209,7 @@ class PlotMixin:
                                                     ha='right',
                                                     transform = axSigminusBGNormINCProton[1].transAxes)
                     axSigminusBGNormINCProton[2].text(x_locs[2], y_locs[2],
-                                                    panel3_text  + '\n'+proton_comp_str,
+                                                    panel3_text,
                                                     fontsize=font_size,
                                                     ha='right',
                                                     transform = axSigminusBGNormINCProton[2].transAxes)
@@ -1124,7 +1225,7 @@ class PlotMixin:
                                                     ha='right',
                                                     transform = axSigminusBGNormINCKaon[1].transAxes)
                     axSigminusBGNormINCKaon[2].text(x_locs[2], y_locs[2],
-                                                    panel3_text  + '\n'+kaon_comp_str,
+                                                    panel3_text,
                                                     fontsize=font_size,
                                                     ha='right',
                                                     transform = axSigminusBGNormINCKaon[2].transAxes)
@@ -1259,45 +1360,51 @@ class PlotMixin:
                     panel2_text = r"Pb-Pb $\sqrt{s_{NN}}$=5.02TeV, "+("0-10\%" if self.analysisType=="central" else "30-50\%") + "\n" + f"{self.pTtrigBinEdges[i]}"+r"$<p_{T unc, jet}^{ch+ne}<$"+f"{self.pTtrigBinEdges[i+1]}" + "\n"  + "anti-$k_T$ R=0.2"
                     panel3_text = "ALICE Work In Progress" + "\n" + r"Background: 0.8 $< |\Delta \eta |< $1.2" + "\n" + r"Signal: $|\Delta \eta | <$ 0.6 for $|\Delta \phi| > \pi/2$" + "\n" +r"Signal: $|\Delta \eta | <$ 1.2 for $\pi/2 < \Delta \phi < 3\pi/2$"
                     
-                    if self.analysisType in ['central', 'semicentral']:
-                        fit_params = self.PionTPCNSigmaFitObjs[i,j, k].popt
-                    else:
-                        fit_params = self.PionTPCNSigmaFitObjs[i,j].popt
-                    mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk = fit_params
-
-                    protonEnhNorm = -(np.pi/2)**.5*(
-                        akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
-                        app*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                        apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
-                        )
-                    pionEnhNorm = -(np.pi/2)**.5*(
-                        akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
-                        appi*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                        apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
-                        )
-                    kaonEnhNorm = -(np.pi/2)**.5*(
-                        apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)) + 
-                        apk*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                        akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk))
-                        )
-                    
-                    fpp = -(np.pi/2)**.5*(app*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/protonEnhNorm
-                    fpip = -(np.pi/2)**.5*(apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/protonEnhNorm
-                    fkp = -(np.pi/2)**.5*(akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/protonEnhNorm
-                    fppi = -(np.pi/2)**.5*(appi*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/pionEnhNorm
-                    fpipi = -(np.pi/2)**.5*(apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/pionEnhNorm
-                    fkpi = -(np.pi/2)**.5*(akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/pionEnhNorm
-                    fpk = -(np.pi/2)**.5*(apk*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/kaonEnhNorm
-                    fpik = -(np.pi/2)**.5*(apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/kaonEnhNorm
-                    fkk = -(np.pi/2)**.5*(akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/kaonEnhNorm
-
-                    
-                    determinant_factor = fkpi*fpip*fpk - fkp*fpipi*fpk - fkpi*fpik*fpp + fkk*fpipi*fpp + fkp*fpik*fppi - fkk*fpip*fppi
-                    
-                    
-                    pion_comp_str = f"pi: {(-fkp*fpk+fkk*fpp)/determinant_factor:.3f} p:{(fkpi*fpk-fppi*fkk)/determinant_factor:.3f} k:{(-fkpi*fpp+fppi*fkp)/determinant_factor:.3f}"
-                    proton_comp_str = f"pi: {(fkp*fpik-fkk*fpip)/determinant_factor:.3f} p:{(-fkpi*fpik+fpipi*fkk)/determinant_factor:.3f} k:{(fkpi*fpip-fpipi*fkp)/determinant_factor:.3f}"
-                    kaon_comp_str = f"pi: {(fpip*fpk-fpik*fpp)/determinant_factor:.3f} p:{(-fpipi*fpk+fpik*fppi)/determinant_factor:.3f} k:{(fpipi*fpp-fppi*fpip)/determinant_factor:.3f}"
+#                     if self.analysisType in ['central', 'semicentral']:
+#                         fit_params = self.PionTPCNSigmaFitObjs[i,j, k].popt
+#                         fit_errors = self.PionTPCNSigmaFitObjs[i,j, k].pcov
+#                     else:
+#                         fit_params = self.PionTPCNSigmaFitObjs[i,j].popt
+#                         fit_errors = self.PionTPCNSigmaFitObjs[i,j].pcov
+#                     mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc = uncertainties.correlated_values(fit_params, fit_errors)
+# 
+#                     protonEnhNorm = -(np.pi/2)**.5*(
+#                         akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
+#                         app*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                         apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
+#                         )
+#                     pionEnhNorm = -(np.pi/2)**.5*(
+#                         akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
+#                         appi*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                         apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
+#                         )
+#                     kaonEnhNorm = -(np.pi/2)**.5*(
+#                         apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)) + 
+#                         apk*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                         akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk))
+#                         )
+#                     
+#                     fpp = -(np.pi/2)**.5*(app*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/protonEnhNorm
+#                     fpip = -(np.pi/2)**.5*(apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/protonEnhNorm
+#                     fkp = -(np.pi/2)**.5*(akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/protonEnhNorm
+#                     fppi = -(np.pi/2)**.5*(appi*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/pionEnhNorm
+#                     fpipi = -(np.pi/2)**.5*(apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/pionEnhNorm
+#                     fkpi = -(np.pi/2)**.5*(akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/pionEnhNorm
+#                     fpk = -(np.pi/2)**.5*(apk*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/kaonEnhNorm
+#                     fpik = -(np.pi/2)**.5*(apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/kaonEnhNorm
+#                     fkk = -(np.pi/2)**.5*(akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/kaonEnhNorm
+# 
+#                     
+#                     determinant_factor = -(fkk*fppi*fpip-fkk*fpipi*fpp+fkp*fpik*fppi-fkp*fpipi*fpk-fkpi*fpik*fpp+fkpi*fppi*fpk)
+#                     
+#                     inv_mat = unp.ulinalg.pinv(np.array([[fpipi, fppi, fkpi], [fpip, fpp, fkp], [fpik, fpk, fkk]]))
+#                     
+#                     row_sums = np.array([fsum(unp.fabs(inv_mat[0])), fsum(unp.fabs(inv_mat[1])), fsum(unp.fabs(inv_mat[2]))])
+#                     inv_mat = inv_mat/row_sums[:,np.newaxis]
+#                     
+#                     pion_comp_str = f"pi: {inv_mat[0,0]:.3f} p:{inv_mat[0,1]:.3f} k:{inv_mat[0,2]:.3f}"
+#                     proton_comp_str = f"pi: {inv_mat[1,0]:.3f} p:{inv_mat[1,1]:.3f} k:{inv_mat[1,2]:.3f}"
+#                     kaon_comp_str = f"pi: {inv_mat[2,0]:.3f} p:{inv_mat[2,1]:.3f} k:{inv_mat[2,2]:.3f}"
 
                     
 
@@ -1411,7 +1518,7 @@ class PlotMixin:
                                                     ha='right',
                                                     transform = axSigminusBGNormINCPionZV[1].transAxes)
                     axSigminusBGNormINCPionZV[2].text(x_locs[2], y_locs[2],
-                                                    panel3_text + '\n'+pion_comp_str,
+                                                    panel3_text,
                                                     fontsize=font_size,
                                                     ha='right',
                                                     transform = axSigminusBGNormINCPionZV[2].transAxes)
@@ -1443,7 +1550,7 @@ class PlotMixin:
                                                     ha='right',
                                                     transform = axSigminusBGNormINCKaonZV[1].transAxes)
                     axSigminusBGNormINCKaonZV[2].text(x_locs[2], y_locs[2],
-                                                    panel3_text  + '\n'+kaon_comp_str,
+                                                    panel3_text,
                                                     fontsize=font_size,
                                                     ha='right',
                                                     transform = axSigminusBGNormINCKaonZV[2].transAxes)
@@ -1571,17 +1678,18 @@ class PlotMixin:
                 plt.close(figSigminusBGNormINCProtonZV)
                 plt.close(figSigminusBGNormINCKaonZV)
 
-                self.plot_pion_tpc_signal(i, j)
+                # self.plot_pion_tpc_signal(i, j)
                 
-                
+        self.plot_inclusive_yield()
+        self.plot_inclusive_yield_in_z_vertex_bins()
 
-        self.plot_yield_for_species("pion")
-        self.plot_yield_for_species("kaon")
-        self.plot_yield_for_species("proton")
+        self.plot_yield_for_true_species("pion")
+        self.plot_yield_for_true_species("kaon")
+        self.plot_yield_for_true_species("proton")
 
-        self.plot_yield_for_species_in_z_vertex_bins("pion")
-        self.plot_yield_for_species_in_z_vertex_bins("kaon")
-        self.plot_yield_for_species_in_z_vertex_bins("proton")
+        self.plot_yield_for_true_species_in_z_vertex_bins("pion")
+        self.plot_yield_for_true_species_in_z_vertex_bins("kaon")
+        self.plot_yield_for_true_species_in_z_vertex_bins("proton")
 
 
 
@@ -1598,20 +1706,20 @@ class PlotMixin:
             self.plot_RPFs_for_species_in_z_vertex_bins(withSignal=True)
             self.plot_optimal_parameters(0)
             self.plot_optimal_parameters(1)
-            self.plot_optimal_parameters_for_species(0, "pion")
-            self.plot_optimal_parameters_for_species(0, "proton")
-            self.plot_optimal_parameters_for_species(0, "kaon")
-            self.plot_optimal_parameters_for_species(1, "pion")
-            self.plot_optimal_parameters_for_species(1, "proton")
-            self.plot_optimal_parameters_for_species(1, "kaon")
+            self.plot_optimal_parameters_for_true_species(0, "pion")
+            self.plot_optimal_parameters_for_true_species(0, "proton")
+            self.plot_optimal_parameters_for_true_species(0, "kaon")
+            self.plot_optimal_parameters_for_true_species(1, "pion")
+            self.plot_optimal_parameters_for_true_species(1, "proton")
+            self.plot_optimal_parameters_for_true_species(1, "kaon")
             self.plot_optimal_parameters_in_z_vertex_bins(0)
             self.plot_optimal_parameters_in_z_vertex_bins(1)
-            self.plot_optimal_parameters_for_species_in_z_vertex_bins(0, "pion")
-            self.plot_optimal_parameters_for_species_in_z_vertex_bins(0, "proton")
-            self.plot_optimal_parameters_for_species_in_z_vertex_bins(0, "kaon")
-            self.plot_optimal_parameters_for_species_in_z_vertex_bins(1, "pion")
-            self.plot_optimal_parameters_for_species_in_z_vertex_bins(1, "proton")
-            self.plot_optimal_parameters_for_species_in_z_vertex_bins(1, "kaon")
+            self.plot_optimal_parameters_for_true_species_in_z_vertex_bins(0, "pion")
+            self.plot_optimal_parameters_for_true_species_in_z_vertex_bins(0, "proton")
+            self.plot_optimal_parameters_for_true_species_in_z_vertex_bins(0, "kaon")
+            self.plot_optimal_parameters_for_true_species_in_z_vertex_bins(1, "pion")
+            self.plot_optimal_parameters_for_true_species_in_z_vertex_bins(1, "proton")
+            self.plot_optimal_parameters_for_true_species_in_z_vertex_bins(1, "kaon")
 
 
         if self.analysisType in ["central", "semicentral"]:
@@ -1764,11 +1872,11 @@ class PlotMixin:
                 x_binsNormINC,
                 bin_contentNormINCPbPb - RPFErrors[:, k] / N_trig_PbPb
                 if k != 3
-                else bin_contentNormINCPbPb
+                else bin_contentNormINCPbPb*3
                 - np.sqrt(np.sum(RPFErrors ** 2, axis=1) ) / N_trig_PbPb,
                 bin_contentNormINCPbPb + RPFErrors[:, k] / N_trig_PbPb
                 if k != 3
-                else bin_contentNormINCPbPb
+                else bin_contentNormINCPbPb*3
                 + np.sqrt(np.sum(RPFErrors**2, axis=1) ) / N_trig_PbPb,
                 alpha=0.3,
                 color="green",
@@ -2722,92 +2830,346 @@ class PlotMixin:
         )  # type:ignore
 
     @print_function_name_with_description_on_call(description="")
-    def plot_PionTPCNSigmaFit(self, i,j, k):
+    def plot_PionTPCNSigmaFit(self, i,j, k, region):
         """
         Plot the fit of the pion TPC nSigma distribution
         """
         if self.analysisType in ["central", "semicentral"]:
-            pionEnh = self.pionTPCnSigma_pionTOFcut[i,j, k]
-            protonEnh = self.pionTPCnSigma_protonTOFcut[i,j, k]
-            kaonEnh = self.pionTPCnSigma_kaonTOFcut[i,j, k]
+            pionEnh = self.pionTPCnSigma_pionTOFcut[region][i,j, k]
+            protonEnh = self.pionTPCnSigma_protonTOFcut[region][i,j, k]
+            kaonEnh = self.pionTPCnSigma_kaonTOFcut[region][i,j, k]
+            inclusive = self.pionTPCnSigmaInc[region][i,j,k]
         else:
-            pionEnh = self.pionTPCnSigma_pionTOFcut[i,j]
-            protonEnh = self.pionTPCnSigma_protonTOFcut[i,j]
-            kaonEnh = self.pionTPCnSigma_kaonTOFcut[i,j]
-
-        x_vals = [pionEnh.GetBinCenter(i) for i in range(1, pionEnh.GetNbinsX() + 1)]
-        y_vals_pi = [pionEnh.GetBinContent(i) for i in range(1, pionEnh.GetNbinsX() + 1)]
-        y_vals_pr = [protonEnh.GetBinContent(i) for i in range(1, protonEnh.GetNbinsX() + 1)]
-        y_vals_ka = [kaonEnh.GetBinContent(i) for i in range(1, kaonEnh.GetNbinsX() + 1)]
-        y_err_pi = [pionEnh.GetBinError(i) for i in range(1, pionEnh.GetNbinsX() + 1)]
-        y_err_pr = [protonEnh.GetBinError(i) for i in range(1, protonEnh.GetNbinsX() + 1)]
-        y_err_ka = [kaonEnh.GetBinError(i) for i in range(1, kaonEnh.GetNbinsX() + 1)]
+            pionEnh = self.pionTPCnSigma_pionTOFcut[region][i,j]
+            protonEnh = self.pionTPCnSigma_protonTOFcut[region][i,j]
+            kaonEnh = self.pionTPCnSigma_kaonTOFcut[region][i,j]
+            inclusive= self.pionTPCnSigmaInc[region][i,j]
 
 
-        fig, ax = plt.subplots(3, 1, figsize=(10, 30))
-        ax[0].errorbar(x_vals, y_vals_pi, yerr=y_err_pi, fmt="o", label="Pion Enhanced")
-        ax[1].errorbar(x_vals, y_vals_pr, yerr=y_err_pr, fmt="o", label="Proton Enhanced")
-        ax[2].errorbar(x_vals, y_vals_ka, yerr=y_err_ka, fmt="o", label="Kaon Enhanced")
+        x_vals = [pionEnh.GetBinCenter(bin) for bin in range(1, pionEnh.GetNbinsX() + 1)]
+        y_vals_pi = [pionEnh.GetBinContent(bin) for bin in range(1, pionEnh.GetNbinsX() + 1)]
+        y_vals_pr = [protonEnh.GetBinContent(bin) for bin in range(1, protonEnh.GetNbinsX() + 1)]
+        y_vals_ka = [kaonEnh.GetBinContent(bin) for bin in range(1, kaonEnh.GetNbinsX() + 1)]
+        y_vals_inc = [inclusive.GetBinContent(bin) for bin in range(1, inclusive.GetNbinsX() + 1)]
+        y_err_pi = [pionEnh.GetBinError(bin) for bin in range(1, pionEnh.GetNbinsX() + 1)]
+        y_err_pr = [protonEnh.GetBinError(bin) for bin in range(1, protonEnh.GetNbinsX() + 1)]
+        y_err_ka = [kaonEnh.GetBinError(bin) for bin in range(1, kaonEnh.GetNbinsX() + 1)]
+        y_err_inc =  [inclusive.GetBinError(bin) for bin in range(1, inclusive.GetNbinsX() + 1)]
+
+
+        fig, ax = plt.subplots(3, 2, figsize=(20, 20))
+        ax[0,0].errorbar(x_vals, y_vals_pi, yerr=y_err_pi, fmt="o", label="Pion Enhanced")
+        ax[0,1].errorbar(x_vals, y_vals_pr, yerr=y_err_pr, fmt="o", label="Proton Enhanced")
+        ax[1,0].errorbar(x_vals, y_vals_ka, yerr=y_err_ka, fmt="o", label="Kaon Enhanced")
+        ax[1,1].errorbar(x_vals, y_vals_inc, yerr=y_err_inc, fmt='o', label='Inclusive')
 
         if self.analysisType in ["central", "semicentral"]:
-            fitter = self.PionTPCNSigmaFitObjs[i,j,k]
+            fitter = self.PionTPCNSigmaFitObjs[region][i,j,k]
         else:
-            fitter = self.PionTPCNSigmaFitObjs[i,j]
-        mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk = fitter.popt
-        mup_err, mupi_err, muk_err, sigp_err, sigpi_err, sigk_err, app_err, apip_err, akp_err, appi_err, apipi_err, akpi_err, apk_err, apik_err, akk_err = np.sqrt(np.diag(fitter.pcov))
-        x_vals = np.linspace(-5, 5, 1000)
-        y = fitter.piKp_enhanced_fit(x_vals, *fitter.popt)
-        fit_err = fitter.piKp_enhanced_error(x_vals, *fitter.popt, fitter.pcov)
-        ax[0].plot(x_vals, y[:1000], label=f"Total Fit")
-        ax[1].plot(x_vals, y[1000:2000], label=f"Total Fit")
-        ax[2].plot(x_vals, y[2000:], label=f"Total Fit")
+            fitter = self.PionTPCNSigmaFitObjs[region][i,j]
+        mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = fitter.popt
+        mup_err, mupi_err, muk_err, sigp_err, sigpi_err, sigk_err, app_err, apip_err, akp_err, appi_err, apipi_err, akpi_err, apk_err, apik_err, akk_err, apinc_err, apiinc_err, akinc_err, alphap_err, alphak_err = np.sqrt(np.diag(fitter.pcov))
+        x_vals = np.linspace(-10, 10, 1000)
+        y = fitter.piKpInc_generalized_fit(x_vals, *fitter.popt)
+        fit_err = fitter.piKpInc_generalized_error(x_vals, *fitter.popt, fitter.pcov)
+        ax[0,0].plot(x_vals, y[:1000], label=f"Total Fit")
+        ax[0,1].plot(x_vals, y[1000:2000], label=f"Total Fit")
+        ax[1,0].plot(x_vals, y[2000:3000], label=f"Total Fit")
+        ax[1,1].plot(x_vals, y[3000:], label='Total Fit')
 
-        ax[0].fill_between(x_vals, y[:1000] - fit_err, y[:1000] + fit_err, alpha=0.5)
-        ax[1].fill_between(x_vals, y[1000:2000] - fit_err, y[1000:2000] + fit_err, alpha=0.5)
-        ax[2].fill_between(x_vals, y[2000:] - fit_err, y[2000:] + fit_err, alpha=0.5)
+        ax[0,0].fill_between(x_vals, y[:1000] - fit_err[:1000], y[:1000] + fit_err[:1000], alpha=0.5)
+        ax[0,1].fill_between(x_vals, y[1000:2000] - fit_err[1000:2000], y[1000:2000] + fit_err[1000:2000], alpha=0.5)
+        ax[1,0].fill_between(x_vals, y[2000:3000] - fit_err[2000:3000], y[2000:3000] + fit_err[2000:3000], alpha=0.5)
+        ax[1,1].fill_between(x_vals, y[3000:] - fit_err[3000:], y[3000:]+fit_err[3000:], alpha=0.5)
+        #TODO: This fraction is incorrectly cited
+        ax[0,0].plot(x_vals, fitter.gauss(x_vals, mupi, sigpi, apipi), label=f"Pion, Mean: {mupi:.2f}, Sigma: {sigpi:.2f}, Fraction: {apipi/(apipi+appi+akpi):.2f}+-{np.sqrt(1/(apipi+appi+akpi)**4*((appi+akpi)**2*apipi_err**2+apipi**2*(appi_err+akpi_err)**2)):.2f}")
+        ax[0,0].plot(x_vals, fitter.generalized_gauss(x_vals, mup, sigp, appi, alphap), label=f"Proton, Mean: {mup:.2f}, Sigma: {sigp:.2f}, Fraction: {appi/(apipi+appi+akpi):.2f}+-{np.sqrt(1/(apipi+appi+akpi)**4*((apipi+akpi)**2*appi_err**2+appi**2*(apipi_err+akpi_err)**2)):.2f}")
+        ax[0,0].plot(x_vals, fitter.generalized_gauss(x_vals, muk, sigk, akpi, alphak), label=f"Kaon, Mean: {muk:.2f}, Sigma: {sigk:.2f}, Fraction: {akpi/(apipi+appi+akpi):.2f}+-{np.sqrt(1/(apipi+appi+akpi)**4*((apipi+appi)**2*akpi_err**2+akpi**2*(apipi_err+appi_err)**2)):.2f}")
 
-        ax[0].plot(x_vals, fitter.gauss(x_vals, mupi, sigpi, apipi), label=f"Pion, Mean: {mupi:.2f}, Sigma: {sigpi:.2f}, Fraction: {apipi/(apipi+appi+akpi):.2f}+-{np.sqrt(1/(apipi+appi+akpi)**4*((appi+akpi)**2*apipi_err**2+apipi**2*(appi_err+akpi_err)**2)):.2f}")
-        ax[0].plot(x_vals, fitter.gauss(x_vals, mup, sigp, appi), label=f"Proton, Mean: {mup:.2f}, Sigma: {sigp:.2f}, Fraction: {appi/(apipi+appi+akpi):.2f}+-{np.sqrt(1/(apipi+appi+akpi)**4*((apipi+akpi)**2*appi_err**2+appi**2*(apipi_err+akpi_err)**2)):.2f}")
-        ax[0].plot(x_vals, fitter.gauss(x_vals, muk, sigk, akpi), label=f"Kaon, Mean: {muk:.2f}, Sigma: {sigk:.2f}, Fraction: {akpi/(apipi+appi+akpi):.2f}+-{np.sqrt(1/(apipi+appi+akpi)**4*((apipi+appi)**2*akpi_err**2+akpi**2*(apipi_err+appi_err)**2)):.2f}")
+        ax[0,1].plot(x_vals, fitter.gauss(x_vals, mupi, sigpi, apip), label=f"Pion, Mean: {mupi:.2f}, Sigma: {sigpi:.2f}, Fraction: {apip/(apip+app+akp):.2f}+-{np.sqrt(1/(apip+app+akp)**4*((app+akp)**2*apip_err**2+apip**2*(app_err+akp_err)**2)):.2f}")
+        ax[0,1].plot(x_vals, fitter.generalized_gauss(x_vals, mup, sigp, app, alphap), label=f"Proton, Mean: {mup:.2f}, Sigma: {sigp:.2f}, Fraction: {app/(apip+app+akp):.2f}+-{np.sqrt(1/(apip+app+akp)**4*((apip+akp)**2*app_err**2+app**2*(apip_err+akp_err)**2)):.2f}")
+        ax[0,1].plot(x_vals, fitter.generalized_gauss(x_vals, muk, sigk, akp, alphak), label=f"Kaon, Mean: {muk:.2f}, Sigma: {sigk:.2f}, Fraction: {akp/(apip+app+akp):.2f}+-{np.sqrt(1/(apip+app+akp)**4*((apip+app)**2*akp_err**2+akp**2*(apip_err+app_err)**2)):.2f}")
 
-        ax[1].plot(x_vals, fitter.gauss(x_vals, mupi, sigpi, apip), label=f"Pion, Mean: {mupi:.2f}, Sigma: {sigpi:.2f}, Fraction: {apip/(apip+app+akp):.2f}+-{np.sqrt(1/(apip+app+akp)**4*((app+akp)**2*apip_err**2+apip**2*(app_err+akp_err)**2)):.2f}")
-        ax[1].plot(x_vals, fitter.gauss(x_vals, mup, sigp, app), label=f"Proton, Mean: {mup:.2f}, Sigma: {sigp:.2f}, Fraction: {app/(apip+app+akp):.2f}+-{np.sqrt(1/(apip+app+akp)**4*((apip+akp)**2*app_err**2+app**2*(apip_err+akp_err)**2)):.2f}")
-        ax[1].plot(x_vals, fitter.gauss(x_vals, muk, sigk, akp), label=f"Kaon, Mean: {muk:.2f}, Sigma: {sigk:.2f}, Fraction: {akp/(apip+app+akp):.2f}+-{np.sqrt(1/(apip+app+akp)**4*((apip+app)**2*akp_err**2+akp**2*(apip_err+app_err)**2)):.2f}")
+        ax[1,0].plot(x_vals, fitter.gauss(x_vals, mupi, sigpi, apik), label=f"Pion, Mean: {mupi:.2f}, Sigma: {sigpi:.2f}, Fraction: {apik/(apik+apk+akk):.2f}+-{np.sqrt(1/(apik+apk+akk)**4*((apk+akk)**2*apik_err**2+apik**2*(apk_err+akk_err)**2)):.2f}")
+        ax[1,0].plot(x_vals, fitter.generalized_gauss(x_vals, mup, sigp, apk, alphap), label=f"Proton, Mean: {mup:.2f}, Sigma: {sigp:.2f}, Fraction: {apk/(apik+apk+akk):.2f}+-{np.sqrt(1/(apik+apk+akk)**4*((apik+akk)**2*apk_err**2+apk**2*(apik_err+akk_err)**2)):.2f}")
+        ax[1,0].plot(x_vals, fitter.generalized_gauss(x_vals, muk, sigk, akk, alphak), label=f"Kaon, Mean: {muk:.2f}, Sigma: {sigk:.2f}, Fraction: {akk/(apik+apk+akk):.2f}+-{np.sqrt(1/(apik+apk+akk)**4*((apik+apk)**2*akk_err**2+akk**2*(apik_err+apk_err)**2)):.2f}")
+        
+        ax[1,1].plot(x_vals, fitter.gauss(x_vals, mupi, sigpi, apiinc), label=f"Pion, Mean: {mupi:.2f}, Sigma: {sigpi:.2f}, Fraction: {apiinc/(apiinc+apinc+akinc):.2f}+-{np.sqrt(1/(apiinc+apinc+akinc)**4*((apinc+akinc)**2*apiinc_err**2+apiinc**2*(apinc_err+akinc_err)**2)):.2f}")
+        ax[1,1].plot(x_vals, fitter.generalized_gauss(x_vals, mup, sigp, apinc, alphap), label=f"Proton, Mean: {mup:.2f}, Sigma: {sigp:.2f}, Fraction: {apinc/(apiinc+apinc+akinc):.2f}+-{np.sqrt(1/(apiinc+apinc+akinc)**4*((apiinc+akinc)**2*apk_err**2+apinc**2*(apiinc_err+akinc_err)**2)):.2f}")
+        ax[1,1].plot(x_vals, fitter.generalized_gauss(x_vals, muk, sigk, akinc, alphak), label=f"Kaon, Mean: {muk:.2f}, Sigma: {sigk:.2f}, Fraction: {akinc/(apiinc+apinc+akinc):.2f}+-{np.sqrt(1/(apiinc+apinc+akinc)**4*((apiinc+apinc)**2*akinc_err**2+akinc**2*(apiinc_err+apinc_err)**2)):.2f}")
 
-        ax[2].plot(x_vals, fitter.gauss(x_vals, mupi, sigpi, apik), label=f"Pion, Mean: {mupi:.2f}, Sigma: {sigpi:.2f}, Fraction: {apik/(apik+apk+akk):.2f}+-{np.sqrt(1/(apik+apk+akk)**4*((apk+akk)**2*apik_err**2+apik**2*(apk_err+akk_err)**2)):.2f}")
-        ax[2].plot(x_vals, fitter.gauss(x_vals, mup, sigp, apk), label=f"Proton, Mean: {mup:.2f}, Sigma: {sigp:.2f}, Fraction: {apk/(apik+apk+akk):.2f}+-{np.sqrt(1/(apik+apk+akk)**4*((apik+akk)**2*apk_err**2+apk**2*(apik_err+akk_err)**2)):.2f}")
-        ax[2].plot(x_vals, fitter.gauss(x_vals, muk, sigk, akk), label=f"Kaon, Mean: {muk:.2f}, Sigma: {sigk:.2f}, Fraction: {akk/(apik+apk+akk):.2f}+-{np.sqrt(1/(apik+apk+akk)**4*((apik+apk)**2*akk_err**2+akk**2*(apik_err+apk_err)**2)):.2f}")
+        response = self.get_response_matrix(i,j,k, fitter.popt, fitter.pcov, fitter.upiKpInc_generalized_fit, fitter.ugauss, fitter.ugeneralized_gauss, region)
+        nom_vec = np.vectorize(lambda x:x.n)
+        std_vec = np.vectorize(lambda x:x.s)
+        response_nom = nom_vec(response)
+        response_err = std_vec(response)
+        sns.heatmap(response_nom, ax=ax[2,0], vmin=0, vmax=1, annot=True, fmt=".2f", cmap="viridis")
+        sns.heatmap(response_err, ax=ax[2,1], vmin=0, vmax=1, annot=True, fmt=".2f", cmap="viridis")
 
-
-        ax[0].legend()
-        ax[1].legend()
-        ax[2].legend()
+        ax[0,0].legend()
+        ax[0,1].legend()
+        ax[1,0].legend()
+        ax[1,1].legend()
         
         fig.suptitle(
             f"TPC nSigma Fit for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c"
         )  # type:ignore
         fig.tight_layout()
         fig.savefig(
-            f"{self.base_save_path}{self.epString}/TPCnSigmaFit_pTtrig_{self.pTtrigBinEdges[i]}_{self.pTtrigBinEdges[i+1]}_pTassoc_{self.pTassocBinEdges[j]}_{self.pTassocBinEdges[j+1]}.png"
+            f"{self.base_save_path}{self.epString}/TPCnSigmaFit_{region}_pTtrig_{self.pTtrigBinEdges[i]}_{self.pTtrigBinEdges[i+1]}_pTassoc_{self.pTassocBinEdges[j]}_{self.pTassocBinEdges[j+1]}.png"
         )  # type:ignore
+    
+    @print_function_name_with_description_on_call(description="")
+    def plot_PionTPCNSigmaVsDphi(self, i,j, k, dphi_range: tuple=None, do_fit: bool=True):
+        """
+        Plot the fit of the pion TPC nSigma distribution
+        """
+        if self.analysisType in ["central", "semicentral"]:
+            pionEnh = self.pionTPCnSigma_pionTOFcut_vs_dphi[i,j, k]
+            protonEnh = self.pionTPCnSigma_protonTOFcut_vs_dphi[i,j, k]
+            kaonEnh = self.pionTPCnSigma_kaonTOFcut_vs_dphi[i,j, k]
+            inclusive = self.pionTPCnSigmaInc_vs_dphi[i,j,k]
+        else:
+            pionEnh = self.pionTPCnSigma_pionTOFcut_vs_dphi[i,j]
+            protonEnh = self.pionTPCnSigma_protonTOFcut_vs_dphi[i,j]
+            kaonEnh = self.pionTPCnSigma_kaonTOFcut_vs_dphi[i,j]
+            inclusive= self.pionTPCnSigmaInc_vs_dphi[i,j]
+
+
+        # I want to draw each of pionEnh, protonEnh, and kaonEnh and inclusive as a lego plot
+
+        fig, ax = plt.subplots(3, 2, figsize=(20, 20))
+        fig.suptitle(
+            f"TPC nSigma for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c"
+        )  # type:ignore
+
+        if dphi_range is not None:
+            pionEnh.GetXaxis().SetRangeUser(dphi_range[0], dphi_range[1])
+            protonEnh.GetXaxis().SetRangeUser(dphi_range[0], dphi_range[1])
+            kaonEnh.GetXaxis().SetRangeUser(dphi_range[0], dphi_range[1])
+            inclusive.GetXaxis().SetRangeUser(dphi_range[0], dphi_range[1])
+
+            pionEnh = pionEnh.ProjectionY(f"pionEnh_{i}_{j}_{k}")
+            protonEnh = protonEnh.ProjectionY(f"protonEnh_{i}_{j}_{k}")
+            kaonEnh = kaonEnh.ProjectionY(f"kaonEnh_{i}_{j}_{k}")
+            inclusive = inclusive.ProjectionY(f"inclusive_{i}_{j}_{k}")
+
+            x = np.array([pionEnh.GetBinCenter(bin_x) for bin_x in range(1, pionEnh.GetNbinsX() + 1)])
+            pion_bin_contents = np.zeros(pionEnh.GetNbinsX())
+            pion_bin_errors = np.zeros(pionEnh.GetNbinsX())
+            proton_bin_contents = np.zeros(protonEnh.GetNbinsX())
+            proton_bin_errors = np.zeros(protonEnh.GetNbinsX())
+            kaon_bin_contents = np.zeros(kaonEnh.GetNbinsX())
+            kaon_bin_errors = np.zeros(kaonEnh.GetNbinsX())
+            inclusive_bin_contents = np.zeros(inclusive.GetNbinsX())
+            inclusive_bin_errors = np.zeros(inclusive.GetNbinsX())
+
+            for _xind in range(0, pionEnh.GetNbinsX()):
+                pion_bin_contents[_xind] = pionEnh.GetBinContent(_xind+1)
+                pion_bin_errors[_xind] = pionEnh.GetBinError(_xind+1)
+                proton_bin_contents[_xind] = protonEnh.GetBinContent(_xind+1)
+                proton_bin_errors[_xind] = protonEnh.GetBinError(_xind+1)
+                kaon_bin_contents[_xind] = kaonEnh.GetBinContent(_xind+1)
+                kaon_bin_errors[_xind] = kaonEnh.GetBinError(_xind+1)
+                inclusive_bin_contents[_xind] = inclusive.GetBinContent(_xind+1)
+                inclusive_bin_errors[_xind] = inclusive.GetBinError(_xind+1)
+
+
+            ax[0,0].errorbar(
+                x, pion_bin_contents, yerr=pion_bin_errors, fmt="o", label="Pion"
+            )
+            ax[0,1].errorbar(
+                x, proton_bin_contents, yerr=proton_bin_errors, fmt="o", label="Proton"
+            )
+            ax[1,0].errorbar(
+                x, kaon_bin_contents, yerr=kaon_bin_errors, fmt="o", label="Kaon"
+            )
+            ax[1,1].errorbar(
+                x, inclusive_bin_contents, yerr=inclusive_bin_errors, fmt="o", label="Inclusive"
+            )
+
+            if do_fit:
+                y = [pion_bin_contents, proton_bin_contents, kaon_bin_contents, inclusive_bin_contents]
+                yerr = [pion_bin_errors, proton_bin_errors, kaon_bin_errors, inclusive_bin_errors]
+                if self.analysisType in ["central", "semicentral"]:
+                    fitter = PionTPCNSigmaFitter(p0=self.PionTPCNSigmaFitObjs[i,j,k].p0, p0_bounds=self.PionTPCNSigmaFitObjs[i,j,k].p0_bounds, w_inclusive=True, generalized=True)
+                else:
+                    fitter = PionTPCNSigmaFitter(p0=self.PionTPCNSigmaFitObjs[i,j].p0, p0_bounds=self.PionTPCNSigmaFitObjs[i,j].p0_bounds, w_inclusive=True, generalized=True)
+
+                _, _, chi2 = fitter.fit(x, y, yerr)
+                fig.suptitle(f"TPC nSigma for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c; Chi2 {chi2}")
+
+                mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = fitter.popt
+                mup_err, mupi_err, muk_err, sigp_err, sigpi_err, sigk_err, app_err, apip_err, akp_err, appi_err, apipi_err, akpi_err, apk_err, apik_err, akk_err, apinc_err, apiinc_err, akinc_err, alphap_err, alphak_err = np.sqrt(np.diag(fitter.pcov))
+                x_vals = np.linspace(-10, 10, 1000)
+                y = fitter.piKpInc_generalized_fit(x_vals, *fitter.popt)
+                fit_err = fitter.piKpInc_generalized_error(x_vals, *fitter.popt, fitter.pcov)
+                ax[0,0].plot(x_vals, y[:1000], label=f"Total Fit")
+                ax[0,1].plot(x_vals, y[1000:2000], label=f"Total Fit")
+                ax[1,0].plot(x_vals, y[2000:3000], label=f"Total Fit")
+                ax[1,1].plot(x_vals, y[3000:], label='Total Fit')
+
+                ax[0,0].fill_between(x_vals, y[:1000] - fit_err[:1000], y[:1000] + fit_err[:1000], alpha=0.5)
+                ax[0,1].fill_between(x_vals, y[1000:2000] - fit_err[1000:2000], y[1000:2000] + fit_err[1000:2000], alpha=0.5)
+                ax[1,0].fill_between(x_vals, y[2000:3000] - fit_err[2000:3000], y[2000:3000] + fit_err[2000:3000], alpha=0.5)
+                ax[1,1].fill_between(x_vals, y[3000:] - fit_err[3000:], y[3000:]+fit_err[3000:], alpha=0.5)
+                #TODO: This fraction is incorrectly cited
+                ax[0,0].plot(x_vals, fitter.gauss(x_vals, mupi, sigpi, apipi), label=f"Pion, Mean: {mupi:.2f}, Sigma: {sigpi:.2f}, Fraction: {apipi/(apipi+appi+akpi):.2f}+-{np.sqrt(1/(apipi+appi+akpi)**4*((appi+akpi)**2*apipi_err**2+apipi**2*(appi_err+akpi_err)**2)):.2f}")
+                ax[0,0].plot(x_vals, fitter.generalized_gauss(x_vals, mup, sigp, appi, alphap), label=f"Proton, Mean: {mup:.2f}, Sigma: {sigp:.2f}, Fraction: {appi/(apipi+appi+akpi):.2f}+-{np.sqrt(1/(apipi+appi+akpi)**4*((apipi+akpi)**2*appi_err**2+appi**2*(apipi_err+akpi_err)**2)):.2f}")
+                ax[0,0].plot(x_vals, fitter.generalized_gauss(x_vals, muk, sigk, akpi, alphak), label=f"Kaon, Mean: {muk:.2f}, Sigma: {sigk:.2f}, Fraction: {akpi/(apipi+appi+akpi):.2f}+-{np.sqrt(1/(apipi+appi+akpi)**4*((apipi+appi)**2*akpi_err**2+akpi**2*(apipi_err+appi_err)**2)):.2f}")
+
+                ax[0,1].plot(x_vals, fitter.gauss(x_vals, mupi, sigpi, apip), label=f"Pion, Mean: {mupi:.2f}, Sigma: {sigpi:.2f}, Fraction: {apip/(apip+app+akp):.2f}+-{np.sqrt(1/(apip+app+akp)**4*((app+akp)**2*apip_err**2+apip**2*(app_err+akp_err)**2)):.2f}")
+                ax[0,1].plot(x_vals, fitter.generalized_gauss(x_vals, mup, sigp, app, alphap), label=f"Proton, Mean: {mup:.2f}, Sigma: {sigp:.2f}, Fraction: {app/(apip+app+akp):.2f}+-{np.sqrt(1/(apip+app+akp)**4*((apip+akp)**2*app_err**2+app**2*(apip_err+akp_err)**2)):.2f}")
+                ax[0,1].plot(x_vals, fitter.generalized_gauss(x_vals, muk, sigk, akp, alphak), label=f"Kaon, Mean: {muk:.2f}, Sigma: {sigk:.2f}, Fraction: {akp/(apip+app+akp):.2f}+-{np.sqrt(1/(apip+app+akp)**4*((apip+app)**2*akp_err**2+akp**2*(apip_err+app_err)**2)):.2f}")
+
+                ax[1,0].plot(x_vals, fitter.gauss(x_vals, mupi, sigpi, apik), label=f"Pion, Mean: {mupi:.2f}, Sigma: {sigpi:.2f}, Fraction: {apik/(apik+apk+akk):.2f}+-{np.sqrt(1/(apik+apk+akk)**4*((apk+akk)**2*apik_err**2+apik**2*(apk_err+akk_err)**2)):.2f}")
+                ax[1,0].plot(x_vals, fitter.generalized_gauss(x_vals, mup, sigp, apk, alphap), label=f"Proton, Mean: {mup:.2f}, Sigma: {sigp:.2f}, Fraction: {apk/(apik+apk+akk):.2f}+-{np.sqrt(1/(apik+apk+akk)**4*((apik+akk)**2*apk_err**2+apk**2*(apik_err+akk_err)**2)):.2f}")
+                ax[1,0].plot(x_vals, fitter.generalized_gauss(x_vals, muk, sigk, akk, alphak), label=f"Kaon, Mean: {muk:.2f}, Sigma: {sigk:.2f}, Fraction: {akk/(apik+apk+akk):.2f}+-{np.sqrt(1/(apik+apk+akk)**4*((apik+apk)**2*akk_err**2+akk**2*(apik_err+apk_err)**2)):.2f}")
+                
+                ax[1,1].plot(x_vals, fitter.gauss(x_vals, mupi, sigpi, apiinc), label=f"Pion, Mean: {mupi:.2f}, Sigma: {sigpi:.2f}, Fraction: {apiinc/(apiinc+apinc+akinc):.2f}+-{np.sqrt(1/(apiinc+apinc+akinc)**4*((apinc+akinc)**2*apiinc_err**2+apiinc**2*(apinc_err+akinc_err)**2)):.2f}")
+                ax[1,1].plot(x_vals, fitter.generalized_gauss(x_vals, mup, sigp, apinc, alphap), label=f"Proton, Mean: {mup:.2f}, Sigma: {sigp:.2f}, Fraction: {apinc/(apiinc+apinc+akinc):.2f}+-{np.sqrt(1/(apiinc+apinc+akinc)**4*((apiinc+akinc)**2*apk_err**2+apinc**2*(apiinc_err+akinc_err)**2)):.2f}")
+                ax[1,1].plot(x_vals, fitter.generalized_gauss(x_vals, muk, sigk, akinc, alphak), label=f"Kaon, Mean: {muk:.2f}, Sigma: {sigk:.2f}, Fraction: {akinc/(apiinc+apinc+akinc):.2f}+-{np.sqrt(1/(apiinc+apinc+akinc)**4*((apiinc+apinc)**2*akinc_err**2+akinc**2*(apiinc_err+apinc_err)**2)):.2f}")
+
+                # Response matrix 
+                int_x = np.linspace(-10, 10, 1000)
+                int_y = fitter.piKpInc_generalized_fit(int_x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak)
+
+
+                pionEnhNorm  = np.trapz(int_y[:1000], int_x)
+                protonEnhNorm = np.trapz(int_y[1000:2000], int_x)
+                kaonEnhNorm  = np.trapz(int_y[2000:3000], int_x)
+                inclusiveNorm= np.trapz(int_y[3000:], int_x)
+                mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = uncertainties.correlated_values(fitter.popt, fitter.pcov)
+                gpp = np.trapz(fitter.ugeneralized_gauss(int_x, mup, sigp, app, alphap), int_x)/protonEnhNorm
+                gppi = np.trapz(fitter.ugauss(int_x, mupi, sigpi, apip), int_x)/protonEnhNorm
+                gpk = np.trapz(fitter.ugeneralized_gauss(int_x, muk, sigk, akp, alphak), int_x)/protonEnhNorm
+
+                gpip = np.trapz(fitter.ugeneralized_gauss(int_x, mup, sigp, appi, alphap), int_x)/pionEnhNorm
+                gpipi = np.trapz(fitter.ugauss(int_x, mupi, sigpi, apipi), int_x)/pionEnhNorm
+                gpik = np.trapz(fitter.ugeneralized_gauss(int_x, muk, sigk, akpi, alphak), int_x)/pionEnhNorm
+
+                gkp = np.trapz(fitter.ugeneralized_gauss(int_x, mup, sigp, apk, alphap), int_x)/kaonEnhNorm
+                gkpi = np.trapz(fitter.ugauss(int_x, mupi, sigpi, apik), int_x)/kaonEnhNorm
+                gkk = np.trapz(fitter.ugeneralized_gauss(int_x, muk, sigk, akk, alphak), int_x)/kaonEnhNorm
+
+                gincp = np.trapz(fitter.ugeneralized_gauss(int_x, mup, sigp, apinc, alphap), int_x)/inclusiveNorm
+                gincpi = np.trapz(fitter.ugauss(int_x, mupi, sigpi, apiinc), int_x)/inclusiveNorm
+                ginck = np.trapz(fitter.ugeneralized_gauss(int_x, muk, sigk, akinc, alphak), int_x)/inclusiveNorm
+                
+
+                debug_logger.debug(f"{[[gpipi, gppi, gkpi], [gpip, gpp, gkp], [gpik, gpk, gkk]]=}")
+                debug_logger.debug(f"{[gincpi, gincp, ginck]=}")
+
+                if self.analysisType in ['central', 'semicentral']:
+                    A = np.array([
+                        [
+                            (gpipi/gincpi)*self.N_assoc_for_species['pion'][i,j,k], (gpip/gincp)*self.N_assoc_for_species['pion'][i,j,k], (gpik/ginck)*self.N_assoc_for_species['pion'][i,j,k]
+                        ],
+                        [
+                            (gppi/gincpi)*self.N_assoc_for_species['proton'][i,j,k], (gpp/gincp)*self.N_assoc_for_species['proton'][i,j,k], (gpk/ginck)*self.N_assoc_for_species['proton'][i,j,k]
+                        ],
+                        [
+                            (gkpi/gincpi)*self.N_assoc_for_species['kaon'][i,j,k], (gkp/gincp)*self.N_assoc_for_species['kaon'][i,j,k], (gkk/ginck)*self.N_assoc_for_species['kaon'][i,j,k]
+                        ]
+                    ])/self.N_assoc[i,j,k]
+                else:
+                    A = np.array([
+                        [
+                            (gpipi/gincpi)*self.N_assoc_for_species['pion'][i,j], (gpip/gincp)*self.N_assoc_for_species['pion'][i,j], (gpik/ginck)*self.N_assoc_for_species['pion'][i,j]
+                        ],
+                        [
+                            (gppi/gincpi)*self.N_assoc_for_species['proton'][i,j], (gpp/gincp)*self.N_assoc_for_species['proton'][i,j], (gpk/ginck)*self.N_assoc_for_species['proton'][i,j]
+                        ],
+                        [
+                            (gkpi/gincpi)*self.N_assoc_for_species['kaon'][i,j], (gkp/gincp)*self.N_assoc_for_species['kaon'][i,j], (gkk/ginck)*self.N_assoc_for_species['kaon'][i,j]
+                        ]
+                    ])/self.N_assoc[i,j]
+                nom = lambda x: x.n
+                std = lambda x: x.s
+                nom_vec = np.vectorize(nom)
+                std_vec = np.vectorize(std)
+                A_nom = nom_vec(A)
+                A_std = std_vec(A)
+                sns.heatmap(A_nom, annot=True, cmap='viridis', fmt='.2f', ax = ax[2,0], vmin=0, vmax=1)
+                sns.heatmap(A_std, annot=True, cmap='viridis', fmt='.2f', ax = ax[2,1], vmin=0, vmax=1)
+                self.ResponseMatrices[f'{dphi_range}']=A
+
+            ax[0,0].legend()
+            ax[0,1].legend()
+            ax[1,0].legend()
+            ax[1,1].legend()
+
+            ax[0,0].set_title("Pion")
+            ax[0,1].set_title("Proton")
+            ax[1,0].set_title("Kaon")
+            ax[1,1].set_title("Inclusive")
+
+            ax[0,0].set_xlabel("TPC nSigma")
+            ax[0,1].set_xlabel("TPC nSigma")
+            ax[1,0].set_xlabel("TPC nSigma")
+            ax[1,1].set_xlabel("TPC nSigma")
+
+            fig.tight_layout()
+            fig.savefig(
+                f"{self.base_save_path}{self.epString}/TPCnSigma_dphi_{dphi_range[0]}_{dphi_range[1]}_pTtrig_{self.pTtrigBinEdges[i]}_{self.pTtrigBinEdges[i+1]}_pTassoc_{self.pTassocBinEdges[j]}_{self.pTassocBinEdges[j+1]}.png"
+            )  # type:ignore
+
+
+        else:
+
+            pion_hist_array = np.zeros((pionEnh.GetNbinsX(), pionEnh.GetNbinsY()))
+            proton_hist_array = np.zeros((protonEnh.GetNbinsX(), protonEnh.GetNbinsY()))
+            kaon_hist_array = np.zeros((kaonEnh.GetNbinsX(), kaonEnh.GetNbinsY()))
+            inclusive_hist_array = np.zeros((inclusive.GetNbinsX(), inclusive.GetNbinsY()))
+
+
+            for _xind in range(0, pionEnh.GetNbinsX()):
+                for _yind in range(0, pionEnh.GetNbinsY()):
+                    pion_hist_array[_xind, _yind] = pionEnh.GetBinContent(_xind+1, _yind+1)
+                    proton_hist_array[_xind, _yind] = protonEnh.GetBinContent(_xind+1, _yind+1)
+                    kaon_hist_array[_xind, _yind] = kaonEnh.GetBinContent(_xind+1, _yind+1)
+                    inclusive_hist_array[_xind, _yind] = inclusive.GetBinContent(_xind+1, _yind+1)
+
+            ax[0,0].imshow(pion_hist_array, origin="lower", extent=[-10, 10, -np.pi/2, 3*np.pi/2], aspect="auto")
+            ax[0,0].set_title("Pion")
+            ax[0,0].set_xlabel(r"$\Delta\phi$")
+
+            ax[0,1].imshow(proton_hist_array, origin="lower", extent=[-10, 10, -np.pi/2, 3*np.pi/2], aspect="auto")
+            ax[0,1].set_title("Proton")
+            ax[0,1].set_xlabel(r"$\Delta\phi$")
+
+            ax[1,0].imshow(kaon_hist_array, origin="lower", extent=[-10, 10, -np.pi/2, 3*np.pi/2], aspect="auto")
+            ax[1,0].set_title("Kaon")
+            ax[1,0].set_xlabel(r"$\Delta\phi$")
+
+            ax[1,1].imshow(inclusive_hist_array, origin="lower", extent=[-10, 10, -np.pi/2, 3*np.pi/2], aspect="auto")
+            ax[1,1].set_title("Inclusive")
+            ax[1,1].set_xlabel(r"$\Delta\phi$")
+
+            fig.tight_layout()
+            fig.savefig(
+                f"{self.base_save_path}{self.epString}/TPCnSigmaVsDphi_pTtrig_{self.pTtrigBinEdges[i]}_{self.pTtrigBinEdges[i+1]}_pTassoc_{self.pTassocBinEdges[j]}_{self.pTassocBinEdges[j+1]}.png"
+            )  # type:ignore
+
+
 
         
 
     @print_function_name_with_description_on_call(description="")
     def plot_RPF_for_species(self, i, j, species, withSignal=False):
-        inPlane = self.dPhiBGcorrsForSpecies[species][i, j, 0]  # type:ignore
-        midPlane = self.dPhiBGcorrsForSpecies[species][i, j, 1]  # type:ignore
-        outPlane = self.dPhiBGcorrsForSpecies[species][i, j, 2]  # type:ignore
+        inPlane = self.dPhiBGcorrsForTrueSpecies[species][i, j, 0]  # type:ignore
+        midPlane = self.dPhiBGcorrsForTrueSpecies[species][i, j, 1]  # type:ignore
+        outPlane = self.dPhiBGcorrsForTrueSpecies[species][i, j, 2]  # type:ignore
         fit_y = []
         fit_y_err = []
         full_x = self.get_bin_centers_as_array(inPlane, forFitting=False)
         for _xind in range(0, len(full_x)):
             fit_y.append(
-                self.RPFObjsForSpecies[species][i, j].simultaneous_fit(full_x[_xind], *self.RPFObjsForSpecies[species][i, j].popt)
+                self.RPFObjsForTrueSpecies[species][i, j].simultaneous_fit(full_x[_xind], *self.RPFObjsForTrueSpecies[species][i, j].popt)
             )  # type:ignore
             fit_y_err.append(
-                self.RPFObjsForSpecies[species][i, j].simultaneous_fit_err(
-                    full_x[_xind], full_x[1] - full_x[0], *self.RPFObjsForSpecies[species][i, j].popt
+                self.RPFObjsForTrueSpecies[species][i, j].simultaneous_fit_err(
+                    full_x[_xind], full_x[1] - full_x[0], *self.RPFObjsForTrueSpecies[species][i, j].popt
                 )
             )  # type:ignore
         fit_y = np.array(fit_y, dtype=np.float64)
@@ -2979,9 +3341,9 @@ class PlotMixin:
         ax[1][0].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.3)
 
         if withSignal:
-            inPlaneSig = self.dPhiSigcorrsForSpecies[species][i, j, 0]  # type:ignore
-            midPlaneSig = self.dPhiSigcorrsForSpecies[species][i, j, 1]  # type:ignore
-            outPlaneSig = self.dPhiSigcorrsForSpecies[species][i, j, 2]  # type:ignore
+            inPlaneSig = self.dPhiSigcorrsForTrueSpecies[species][i, j, 0]  # type:ignore
+            midPlaneSig = self.dPhiSigcorrsForTrueSpecies[species][i, j, 1]  # type:ignore
+            outPlaneSig = self.dPhiSigcorrsForTrueSpecies[species][i, j, 2]  # type:ignore
             
             normalized_data_err = np.sqrt(self.get_bin_contents_as_array(inPlaneSig, False)**2/N_trig[0]**5 + self.get_bin_errors_as_array(inPlaneSig, False)**2/N_trig[0]**2)
             ax[0][1].errorbar(
@@ -3038,91 +3400,102 @@ class PlotMixin:
         ax[0][3].set_title(f"Out-of-Plane")
         ax[0][0].set_title(f"Inclusive")
 
-        if self.analysisType in ['central', 'semicentral']:
-            fit_params_all = [self.PionTPCNSigmaFitObjs[i,j,k].popt for k in range(4)]
-            for ev_i, fit_params in enumerate(fit_params_all):
-                mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk = fit_params
+#         if self.analysisType in ['central', 'semicentral']:
+#             fit_params_all = [self.PionTPCNSigmaFitObjs[i,j,k].popt for k in range(4)]
+#             fit_errs_all =[self.PionTPCNSigmaFitObjs[i,j,k].pcov for k in range(4)]
+#             for ev_i, (fit_params, fit_errs) in enumerate(zip(fit_params_all, fit_errs_all)):
+#                 mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc = uncertainties.correlated_values(fit_params, fit_errs)
+# 
+#                 protonEnhNorm = -(np.pi/2)**.5*(
+#                     akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
+#                     app*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                     apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
+#                     )
+#                 pionEnhNorm = -(np.pi/2)**.5*(
+#                     akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
+#                     appi*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                     apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
+#                     )
+#                 kaonEnhNorm = -(np.pi/2)**.5*(
+#                     apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)) + 
+#                     apk*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                     akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk))
+#                     )
+#                 
+#                 fpp = -(np.pi/2)**.5*(app*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/protonEnhNorm
+#                 fpip = -(np.pi/2)**.5*(apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/protonEnhNorm
+#                 fkp = -(np.pi/2)**.5*(akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/protonEnhNorm
+#                 fppi = -(np.pi/2)**.5*(appi*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/pionEnhNorm
+#                 fpipi = -(np.pi/2)**.5*(apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/pionEnhNorm
+#                 fkpi = -(np.pi/2)**.5*(akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/pionEnhNorm
+#                 fpk = -(np.pi/2)**.5*(apk*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/kaonEnhNorm
+#                 fpik = -(np.pi/2)**.5*(apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/kaonEnhNorm
+#                 fkk = -(np.pi/2)**.5*(akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/kaonEnhNorm
+# 
+#                 
+#                 determinant_factor = -(fkk*fppi*fpip-fkk*fpipi*fpp+fkp*fpik*fppi-fkp*fpipi*fpk-fkpi*fpik*fpp+fkpi*fppi*fpk)
+# 
+# 
+#                 inv_mat = unp.ulinalg.inv(np.array([[fpipi, fppi, fkpi], [fpip, fpp, fkp], [fpik, fpk, fkk]]))
+# 
+#                 row_sums = np.array([fsum(unp.fabs(inv_mat[0])), fsum(unp.fabs(inv_mat[1])), fsum(unp.fabs(inv_mat[2]))])
+#                 
+#                 inv_mat = inv_mat/row_sums[:,np.newaxis]
+#                     
+#                     
+#                 pion_comp_str = f"pi: {inv_mat[0,0]:.3f} p:{inv_mat[0,1]:.3f} k:{inv_mat[0,2]:.3f}"
+#                 proton_comp_str = f"pi: {inv_mat[1,0]:.3f} p:{inv_mat[1,1]:.3f} k:{inv_mat[1,2]:.3f}"
+#                 kaon_comp_str = f"pi: {inv_mat[2,0]:.3f} p:{inv_mat[2,1]:.3f} k:{inv_mat[2,2]:.3f}"
+#                 
+#                 comp_str = pion_comp_str if species=="pion" else proton_comp_str if species=="proton" else kaon_comp_str
+#                 
+# 
+#                 #ax[0][(ev_i+1)%4].text( 0.9, 0.85, f"Composition: {comp_str}", transform = ax[0][(ev_i+1)%4].transAxes, ha='right')
+#         else:
+#             fit_params = self.PionTPCNSigmaFitObjs[i,j].popt
+#             mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk = fit_params
+# 
+#             protonEnhNorm = -(np.pi/2)**.5*(
+#                 akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
+#                 app*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                 apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
+#                 )
+#             pionEnhNorm = -(np.pi/2)**.5*(
+#                 akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
+#                 appi*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                 apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
+#                 )
+#             kaonEnhNorm = -(np.pi/2)**.5*(
+#                 apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)) + 
+#                 apk*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                 akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk))
+#                 )
+#             
+#             fpp = -(np.pi/2)**.5*(app*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/protonEnhNorm
+#             fpip = -(np.pi/2)**.5*(apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/protonEnhNorm
+#             fkp = -(np.pi/2)**.5*(akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/protonEnhNorm
+#             fppi = -(np.pi/2)**.5*(appi*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/pionEnhNorm
+#             fpipi = -(np.pi/2)**.5*(apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/pionEnhNorm
+#             fkpi = -(np.pi/2)**.5*(akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/pionEnhNorm
+#             fpk = -(np.pi/2)**.5*(apk*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/kaonEnhNorm
+#             fpik = -(np.pi/2)**.5*(apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/kaonEnhNorm
+#             fkk = -(np.pi/2)**.5*(akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/kaonEnhNorm
+# 
+#             
+#             determinant_factor = -(fkk*fppi*fpip-fkk*fpipi*fpp+fkp*fpik*fppi-fkp*fpipi*fpk-fkpi*fpik*fpp+fkpi*fppi*fpk)
+#             inv_mat = unp.ulinalg.inv(np.array([[fpipi, fppi, fkpi], [fpip, fpp, fkp], [fpik, fpk, fkk]]))
+# 
+#             row_sums = np.array([fsum(unp.fabs(inv_mat[0])), fsum(unp.fabs(inv_mat[1])), fsum(unp.fabs(inv_mat[2]))])
+#             inv_mat = inv_mat/row_sums[:,np.newaxis]
+#                     
+#                     
+#             pion_comp_str = f"pi: {inv_mat[0,0]:.3f} p:{inv_mat[0,1]:.3f} k:{inv_mat[0,2]:.3f}"
+#             proton_comp_str = f"pi: {inv_mat[1,0]:.3f} p:{inv_mat[1,1]:.3f} k:{inv_mat[1,2]:.3f}"
+#             kaon_comp_str = f"pi: {inv_mat[2,0]:.3f} p:{inv_mat[2,1]:.3f} k:{inv_mat[2,2]:.3f}"
+#             
+#             comp_str = pion_comp_str if species=="pion" else proton_comp_str if species=="proton" else kaon_comp_str
 
-                protonEnhNorm = -(np.pi/2)**.5*(
-                    akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
-                    app*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                    apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
-                    )
-                pionEnhNorm = -(np.pi/2)**.5*(
-                    akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
-                    appi*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                    apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
-                    )
-                kaonEnhNorm = -(np.pi/2)**.5*(
-                    apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)) + 
-                    apk*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                    akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk))
-                    )
-                
-                fpp = -(np.pi/2)**.5*(app*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/protonEnhNorm
-                fpip = -(np.pi/2)**.5*(apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/protonEnhNorm
-                fkp = -(np.pi/2)**.5*(akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/protonEnhNorm
-                fppi = -(np.pi/2)**.5*(appi*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/pionEnhNorm
-                fpipi = -(np.pi/2)**.5*(apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/pionEnhNorm
-                fkpi = -(np.pi/2)**.5*(akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/pionEnhNorm
-                fpk = -(np.pi/2)**.5*(apk*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/kaonEnhNorm
-                fpik = -(np.pi/2)**.5*(apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/kaonEnhNorm
-                fkk = -(np.pi/2)**.5*(akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/kaonEnhNorm
-
-                
-                determinant_factor = fkpi*fpip*fpk - fkp*fpipi*fpk - fkpi*fpik*fpp + fkk*fpipi*fpp + fkp*fpik*fppi - fkk*fpip*fppi
-                
-                comp_str = ''
-                if species=='pion':
-                    comp_str = f"pi: {(-fkp*fpk+fkk*fpp)/determinant_factor:.3f} p:{(fkpi*fpk-fppi*fkk)/determinant_factor:.3f} k:{(-fkpi*fpp+fppi*fkp)/determinant_factor:.3f}"
-                elif species=='proton':
-                    comp_str = f"pi: {(fkp*fpik-fkk*fpip)/determinant_factor:.3f} p:{(-fkpi*fpik+fpipi*fkk)/determinant_factor:.3f} k:{(fkpi*fpip-fpipi*fkp)/determinant_factor:.3f}"
-                elif species=='kaon':
-                    comp_str = f"pi: {(fpip*fpk-fpik*fpp)/determinant_factor:.3f} p:{(-fpipi*fpk+fpik*fppi)/determinant_factor:.3f} k:{(fpipi*fpp-fppi*fpip)/determinant_factor:.3f}"
-
-                ax[0][(ev_i+1)%4].text( 0.9, 0.85, f"Composition: {comp_str}", transform = ax[0][(ev_i+1)%4].transAxes, ha='right')
-        else:
-            fit_params = self.PionTPCNSigmaFitObjs[i,j].popt
-            mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk = fit_params
-
-            protonEnhNorm = -(np.pi/2)**.5*(
-                akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
-                app*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
-                )
-            pionEnhNorm = -(np.pi/2)**.5*(
-                akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
-                appi*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
-                )
-            kaonEnhNorm = -(np.pi/2)**.5*(
-                apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)) + 
-                apk*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
-                akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk))
-                )
-            
-            fpp = -(np.pi/2)**.5*(app*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/protonEnhNorm
-            fpip = -(np.pi/2)**.5*(apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/protonEnhNorm
-            fkp = -(np.pi/2)**.5*(akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/protonEnhNorm
-            fppi = -(np.pi/2)**.5*(appi*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/pionEnhNorm
-            fpipi = -(np.pi/2)**.5*(apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/pionEnhNorm
-            fkpi = -(np.pi/2)**.5*(akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/pionEnhNorm
-            fpk = -(np.pi/2)**.5*(apk*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/kaonEnhNorm
-            fpik = -(np.pi/2)**.5*(apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/kaonEnhNorm
-            fkk = -(np.pi/2)**.5*(akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/kaonEnhNorm
-
-            
-            determinant_factor = fkpi*fpip*fpk - fkp*fpipi*fpk - fkpi*fpik*fpp + fkk*fpipi*fpp + fkp*fpik*fppi - fkk*fpip*fppi
-            
-            comp_str = ''
-            if species=='pion':
-                comp_str = f"pi: {(-fkp*fpk+fkk*fpp)/determinant_factor:.3f} p:{(fkpi*fpk-fppi*fkk)/determinant_factor:.3f} k:{(-fkpi*fpp+fppi*fkp)/determinant_factor:.3f}"
-            elif species=='proton':
-                comp_str = f"pi: {(fkp*fpik-fkk*fpip)/determinant_factor:.3f} p:{(-fkpi*fpik+fpipi*fkk)/determinant_factor:.3f} k:{(fkpi*fpip-fpipi*fkp)/determinant_factor:.3f}"
-            elif species=='kaon':
-                comp_str = f"pi: {(fpip*fpk-fpik*fpp)/determinant_factor:.3f} p:{(-fpipi*fpk+fpik*fppi)/determinant_factor:.3f} k:{(fpipi*fpp-fppi*fpip)/determinant_factor:.3f}"
-
-            ax[0][0].text( 0.9, 0.85, f"Composition: {comp_str}", transform = ax[0][0].transAxes, ha='right')
+            #ax[0][0].text( 0.9, 0.85, f"Composition: {comp_str}", transform = ax[0][0].transAxes, ha='right')
         # add text to the axes that says "inclusive = (in+mid+out)/3"
         #ax[0][3].text( 0.1, 0.1, "Inclusive = (In+Mid+Out)", transform = ax[0][3].transAxes,)
         fig.suptitle(
@@ -3132,6 +3505,358 @@ class PlotMixin:
         fig.savefig(
             f"{self.base_save_path}RPF{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}{'withSig' if withSignal else ''}{species}.png"
         )  # type:ignore
+    
+    @print_function_name_with_description_on_call(description="")
+    def plot_RPF_for_species_in_z_vertex_bins(self, i, j, species, withSignal=False):
+        inPlane = self.dPhiBGcorrsForTrueSpeciesZV[species][i, j, 0]  # type:ignore
+        midPlane = self.dPhiBGcorrsForTrueSpeciesZV[species][i, j, 1]  # type:ignore
+        outPlane = self.dPhiBGcorrsForTrueSpeciesZV[species][i, j, 2]  # type:ignore
+        fit_y = []
+        fit_y_err = []
+        full_x = self.get_bin_centers_as_array(inPlane, forFitting=False)
+        for _xind in range(0, len(full_x)):
+            fit_y.append(
+                self.RPFObjsForTrueSpeciesZV[species][i, j].simultaneous_fit(full_x[_xind], *self.RPFObjsForTrueSpeciesZV[species][i, j].popt)
+            )  # type:ignore
+            fit_y_err.append(
+                self.RPFObjsForTrueSpeciesZV[species][i, j].simultaneous_fit_err(
+                    full_x[_xind], full_x[1] - full_x[0], *self.RPFObjsForTrueSpeciesZV[species][i, j].popt
+                )
+            )  # type:ignore
+        fit_y = np.array(fit_y, dtype=np.float64)
+        fit_y_err = np.array(fit_y_err, dtype=np.float64)
+
+        fig, ax = plt.subplots(
+            2,
+            4,
+            figsize=(20, 8),
+            sharey="row",
+            sharex=True,
+            gridspec_kw={"height_ratios": [0.8, 0.2]},
+        )
+        # remove margins between plots
+        fig.subplots_adjust(wspace=0, hspace=0)
+
+        N_trig = self.N_trigs[i] # type:ignore
+
+        #++++++++++++++++++IN-PLANE+++++++++++++++++++
+        ax[0][1].plot(full_x, fit_y[:, 0]/N_trig[0], label="RPF Fit")
+        normalized_err = np.sqrt(fit_y[:,0]**2/N_trig[0]**5 + fit_y_err[:,0]**2/N_trig[0]**2)
+        ax[0][1].fill_between(
+            full_x,
+            fit_y[:, 0]/N_trig[0] - normalized_err,
+            fit_y[:, 0]/N_trig[0] + normalized_err,
+            alpha=0.3,
+        )
+        normalized_data_err = np.sqrt(self.get_bin_contents_as_array(inPlane, False)**2/N_trig[0]**5 + self.get_bin_errors_as_array(inPlane, False)**2/N_trig[0]**2)
+        ax[0][1].errorbar(
+            full_x,
+            self.get_bin_contents_as_array(inPlane, False)/N_trig[0],
+            yerr=normalized_data_err,
+            fmt="o",
+            ms=2,
+            label="Background",
+        )
+        ratVal = (self.get_bin_contents_as_array(inPlane, False) - fit_y[:, 0]) / fit_y[
+            :, 0
+        ]
+        ratErr = (
+            1
+            / fit_y[:, 0]
+            * np.sqrt(
+                self.get_bin_errors_as_array(inPlane, False) ** 2
+                + (self.get_bin_contents_as_array(inPlane, False) / fit_y[:, 0]) ** 2
+                * fit_y_err[:, 0] ** 2
+            )
+        )
+        ax[1][1].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.3)
+
+        
+        #++++++++++++++++++MID-PLANE+++++++++++++++++++
+        ax[0][2].plot(full_x, fit_y[:, 1]/N_trig[1], label="RPF Fit")
+        normalized_err = np.sqrt(fit_y[:,1]**2/N_trig[1]**5 + fit_y_err[:,1]**2/N_trig[1]**2)
+        ax[0][2].fill_between(
+            full_x,
+            fit_y[:, 1]/N_trig[1] - normalized_err,
+            fit_y[:, 1]/N_trig[1] + normalized_err,
+            alpha=0.3,
+        )
+        normalized_data_err = np.sqrt(self.get_bin_contents_as_array(midPlane, False)**2/N_trig[1]**5 + self.get_bin_errors_as_array(midPlane, False)**2/N_trig[1]**2)
+        ax[0][2].errorbar(
+            full_x,
+            self.get_bin_contents_as_array(midPlane, False)/N_trig[1],
+            yerr=normalized_data_err,
+            fmt="o",
+            ms=2,
+            label="Background",
+        )
+        ratVal = (
+            self.get_bin_contents_as_array(midPlane, False) - fit_y[:, 1]
+        ) / fit_y[:, 1]
+        ratErr = (
+            1
+            / fit_y[:, 1]
+            * np.sqrt(
+                self.get_bin_errors_as_array(midPlane, False) ** 2
+                + (self.get_bin_contents_as_array(midPlane, False) / fit_y[:, 1]) ** 2
+                * fit_y_err[:, 1] ** 2
+            )
+        )
+        ax[1][2].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.3)
+        
+        ax[0][3].plot(full_x, fit_y[:, 2]/N_trig[2], label="RPF Fit")
+        normalized_err = np.sqrt(fit_y[:,2]**2/N_trig[2]**5 + fit_y_err[:,2]**2/N_trig[2]**2)
+        ax[0][3].fill_between(
+            full_x,
+            fit_y[:, 2]/N_trig[2] - normalized_err,
+            fit_y[:, 2]/N_trig[2] + normalized_err,
+            alpha=0.3,
+        )
+        normalized_data_err = np.sqrt(self.get_bin_contents_as_array(outPlane, False)**2/N_trig[2]**5 + self.get_bin_errors_as_array(outPlane, False)**2/N_trig[2]**2)
+        ax[0][3].errorbar(
+            full_x,
+            self.get_bin_contents_as_array(outPlane, False)/N_trig[2],
+            yerr=normalized_data_err,
+            fmt="o",
+            ms=2,
+            label="Background",
+        )
+        ratVal = (
+            self.get_bin_contents_as_array(outPlane, False) - fit_y[:, 2]
+        ) / fit_y[:, 2]
+        ratErr = (
+            1
+            / fit_y[:, 2]
+            * np.sqrt(
+                self.get_bin_errors_as_array(outPlane, False) ** 2
+                + (self.get_bin_contents_as_array(outPlane, False) / fit_y[:, 2]) ** 2
+                * fit_y_err[:, 2] ** 2
+            )
+        )
+        ax[1][3].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.3)
+        
+        ax[0][0].plot(full_x, (fit_y[:,0]/N_trig[0]+fit_y[:,1]/N_trig[1]+fit_y[:,2]/N_trig[2])/3, label="RPF Fit")
+        normalized_err = np.sqrt(np.sum(fit_y, axis=1)**2/N_trig[3]**5 + np.sum(fit_y_err**2, axis=1)/N_trig[3]**2)
+        ax[0][0].fill_between(
+            full_x,
+            (fit_y[:,0]/N_trig[0]+fit_y[:,1]/N_trig[1]+fit_y[:,2]/N_trig[2])/3 - normalized_err/3,
+            (fit_y[:,0]/N_trig[0]+fit_y[:,1]/N_trig[1]+fit_y[:,2]/N_trig[2])/3 + normalized_err/3,
+            alpha=0.3,
+        )
+        normalized_data_err = np.sqrt((self.get_bin_contents_as_array(inPlane, False) + self.get_bin_contents_as_array(midPlane, False) + self.get_bin_contents_as_array(outPlane, False))**2/N_trig[3]**5 + (self.get_bin_errors_as_array(inPlane, False)**2 + self.get_bin_errors_as_array(midPlane, False)**2 + self.get_bin_errors_as_array(outPlane, False)**2)/N_trig[3]**2)
+        ax[0][0].errorbar(
+            full_x,
+            ((
+                self.get_bin_contents_as_array(inPlane, False)/N_trig[0]
+                + self.get_bin_contents_as_array(midPlane, False)/N_trig[1]
+                + self.get_bin_contents_as_array(outPlane, False)/N_trig[2]
+            )
+            )/3,
+            yerr=normalized_data_err/3,
+            fmt="o",
+            ms=2,
+            label="Background",
+        )
+        
+        ratVal = (
+            (
+                self.get_bin_contents_as_array(inPlane, False)
+                - fit_y[:, 0]
+            ) / fit_y[:, 0]
+                + 
+            (
+            self.get_bin_contents_as_array(midPlane, False)
+                - fit_y[:, 1]
+            ) / fit_y[:, 1]
+                + 
+            (
+            self.get_bin_contents_as_array(outPlane, False)
+                - fit_y[:, 2]
+            ) / fit_y[:, 2]
+            ) / 3
+
+        ratErr = 1/3 * np.sqrt(
+            self.get_bin_contents_as_array(inPlane, False)**2/fit_y[:, 0]**4 * fit_y_err[:, 0]**2 
+            +
+            self.get_bin_contents_as_array(midPlane, False)**2/fit_y[:, 1]**4 * fit_y_err[:, 1]**2
+            +
+            self.get_bin_contents_as_array(outPlane, False)**2/fit_y[:, 2]**4 * fit_y_err[:, 2]**2
+            + 
+            1/fit_y[:, 0]**2 * self.get_bin_errors_as_array(inPlane, False)**2
+            +
+            1/fit_y[:, 1]**2 * self.get_bin_errors_as_array(midPlane, False)**2
+            +
+            1/fit_y[:, 2]**2 * self.get_bin_errors_as_array(outPlane, False)**2 
+         )
+        
+        ax[1][0].fill_between(full_x, ratVal - ratErr, ratVal + ratErr, alpha=0.3)
+
+        if withSignal:
+            inPlaneSig = self.dPhiSigcorrsForTrueSpeciesZV[species][i, j, 0]  # type:ignore
+            midPlaneSig = self.dPhiSigcorrsForTrueSpeciesZV[species][i, j, 1]  # type:ignore
+            outPlaneSig = self.dPhiSigcorrsForTrueSpeciesZV[species][i, j, 2]  # type:ignore
+            
+            normalized_data_err = np.sqrt(self.get_bin_contents_as_array(inPlaneSig, False)**2/N_trig[0]**5 + self.get_bin_errors_as_array(inPlaneSig, False)**2/N_trig[0]**2)
+            ax[0][1].errorbar(
+                full_x,
+                self.get_bin_contents_as_array(inPlaneSig, False)/N_trig[0],
+                yerr=normalized_data_err,
+                fmt="o",
+                ms=2,
+                label="Signal",
+            )
+            # plot (data-fit)/fit on axRatio
+            # error will be 1/fit*sqrt(data_err**2+(data/fit)**2*fit_err**2)
+            normalized_data_err = np.sqrt(self.get_bin_contents_as_array(midPlaneSig, False)**2/N_trig[1]**5 + self.get_bin_errors_as_array(midPlaneSig, False)**2/N_trig[1]**2)
+            ax[0][2].errorbar(
+                full_x,
+                self.get_bin_contents_as_array(midPlaneSig, False)/N_trig[1],
+                yerr=normalized_data_err,
+                fmt="o",
+                ms=2,
+                label="Signal",
+            )
+            normalized_data_err = np.sqrt(self.get_bin_contents_as_array(outPlaneSig, False)**2/N_trig[2]**5 + self.get_bin_errors_as_array(outPlaneSig, False)**2/N_trig[2]**2)
+            ax[0][3].errorbar(
+                full_x,
+                self.get_bin_contents_as_array(outPlaneSig, False)/N_trig[2],
+                yerr=normalized_data_err,
+                fmt="o",
+                ms=2,
+                label="Signal",
+            )
+            normalized_data_err = np.sqrt((self.get_bin_contents_as_array(inPlaneSig, False) + self.get_bin_contents_as_array(midPlaneSig, False) + self.get_bin_contents_as_array(outPlaneSig, False))**2/N_trig[3]**5 + (self.get_bin_errors_as_array(inPlaneSig, False)**2 + self.get_bin_errors_as_array(midPlaneSig, False)**2 + self.get_bin_errors_as_array(outPlaneSig, False)**2)/N_trig[3]**2)
+            ax[0][0].errorbar(
+                full_x,
+                ((
+                    self.get_bin_contents_as_array(inPlaneSig, False)/N_trig[0]
+                    + self.get_bin_contents_as_array(midPlaneSig, False)/N_trig[1]
+                    + self.get_bin_contents_as_array(outPlaneSig, False)/N_trig[2]
+                )
+                )/3,
+                yerr=normalized_data_err/3,
+                fmt="o",
+                ms=2,
+                label="Signal",
+            )
+
+        ax[0][3].legend()
+        [x.set_xlabel(r"$\Delta\phi$") for x in ax[0]]
+        [x.set_xlabel(r"$\Delta\phi$") for x in ax[1]]
+        [x.autoscale(enable=True, axis="y", tight=True) for x in ax[1]]
+        [x.autoscale(enable=True, axis="y", tight=True) for x in ax[0]]
+        ax[0][0].set_ylabel(r"$\frac{1}{N_trig}\frac{1}{a*\epsilon}\frac{dN}{d\Delta\phi}$")
+        ax[0][1].set_title(f"In-Plane")
+        ax[0][2].set_title(f"Mid-Plane")
+        ax[0][3].set_title(f"Out-of-Plane")
+        ax[0][0].set_title(f"Inclusive")
+
+#         if self.analysisType in ['central', 'semicentral']:
+#             fit_params_all = [self.PionTPCNSigmaFitObjs[i,j,k].popt for k in range(4)]
+#             fit_errs_all =[self.PionTPCNSigmaFitObjs[i,j,k].pcov for k in range(4)]
+#             for ev_i, (fit_params, fit_errs) in enumerate(zip(fit_params_all, fit_errs_all)):
+#                 mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc = uncertainties.correlated_values(fit_params, fit_errs)
+# 
+#                 protonEnhNorm = -(np.pi/2)**.5*(
+#                     akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
+#                     app*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                     apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
+#                     )
+#                 pionEnhNorm = -(np.pi/2)**.5*(
+#                     akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
+#                     appi*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                     apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
+#                     )
+#                 kaonEnhNorm = -(np.pi/2)**.5*(
+#                     apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)) + 
+#                     apk*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                     akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk))
+#                     )
+#                 
+#                 fpp = -(np.pi/2)**.5*(app*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/protonEnhNorm
+#                 fpip = -(np.pi/2)**.5*(apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/protonEnhNorm
+#                 fkp = -(np.pi/2)**.5*(akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/protonEnhNorm
+#                 fppi = -(np.pi/2)**.5*(appi*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/pionEnhNorm
+#                 fpipi = -(np.pi/2)**.5*(apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/pionEnhNorm
+#                 fkpi = -(np.pi/2)**.5*(akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/pionEnhNorm
+#                 fpk = -(np.pi/2)**.5*(apk*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/kaonEnhNorm
+#                 fpik = -(np.pi/2)**.5*(apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/kaonEnhNorm
+#                 fkk = -(np.pi/2)**.5*(akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/kaonEnhNorm
+# 
+#                 
+#                 determinant_factor = -(fkk*fppi*fpip-fkk*fpipi*fpp+fkp*fpik*fppi-fkp*fpipi*fpk-fkpi*fpik*fpp+fkpi*fppi*fpk)
+# 
+# 
+#                 inv_mat = unp.ulinalg.inv(np.array([[fpipi, fppi, fkpi], [fpip, fpp, fkp], [fpik, fpk, fkk]]))
+# 
+#                 row_sums = np.array([fsum(unp.fabs(inv_mat[0])), fsum(unp.fabs(inv_mat[1])), fsum(unp.fabs(inv_mat[2]))])
+#                 
+#                 inv_mat = inv_mat/row_sums[:,np.newaxis]
+#                     
+#                     
+#                 pion_comp_str = f"pi: {inv_mat[0,0]:.3f} p:{inv_mat[0,1]:.3f} k:{inv_mat[0,2]:.3f}"
+#                 proton_comp_str = f"pi: {inv_mat[1,0]:.3f} p:{inv_mat[1,1]:.3f} k:{inv_mat[1,2]:.3f}"
+#                 kaon_comp_str = f"pi: {inv_mat[2,0]:.3f} p:{inv_mat[2,1]:.3f} k:{inv_mat[2,2]:.3f}"
+#                 
+#                 comp_str = pion_comp_str if species=="pion" else proton_comp_str if species=="proton" else kaon_comp_str
+#                 
+# 
+#                 #ax[0][(ev_i+1)%4].text( 0.9, 0.85, f"Composition: {comp_str}", transform = ax[0][(ev_i+1)%4].transAxes, ha='right')
+#         else:
+#             fit_params = self.PionTPCNSigmaFitObjs[i,j].popt
+#             mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk = fit_params
+# 
+#             protonEnhNorm = -(np.pi/2)**.5*(
+#                 akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
+#                 app*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                 apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
+#                 )
+#             pionEnhNorm = -(np.pi/2)**.5*(
+#                 akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)) + 
+#                 appi*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                 apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi))
+#                 )
+#             kaonEnhNorm = -(np.pi/2)**.5*(
+#                 apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)) + 
+#                 apk*sigp*( erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)) +
+#                 akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk))
+#                 )
+#             
+#             fpp = -(np.pi/2)**.5*(app*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/protonEnhNorm
+#             fpip = -(np.pi/2)**.5*(apip*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/protonEnhNorm
+#             fkp = -(np.pi/2)**.5*(akp*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/protonEnhNorm
+#             fppi = -(np.pi/2)**.5*(appi*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/pionEnhNorm
+#             fpipi = -(np.pi/2)**.5*(apipi*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/pionEnhNorm
+#             fkpi = -(np.pi/2)**.5*(akpi*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/pionEnhNorm
+#             fpk = -(np.pi/2)**.5*(apk*sigp*(erf(0.707107*(-10+mup)/sigp) - erf(0.707107*(10+mup)/sigp)))/kaonEnhNorm
+#             fpik = -(np.pi/2)**.5*(apik*sigpi*(erf(0.707107*(-10+mupi)/sigpi) - erf(0.707107*(10+mupi)/sigpi)))/kaonEnhNorm
+#             fkk = -(np.pi/2)**.5*(akk*sigk*(erf(0.707107*(-10+muk)/sigk) - erf(0.707107*(10+muk)/sigk)))/kaonEnhNorm
+# 
+#             
+#             determinant_factor = -(fkk*fppi*fpip-fkk*fpipi*fpp+fkp*fpik*fppi-fkp*fpipi*fpk-fkpi*fpik*fpp+fkpi*fppi*fpk)
+#             inv_mat = unp.ulinalg.inv(np.array([[fpipi, fppi, fkpi], [fpip, fpp, fkp], [fpik, fpk, fkk]]))
+# 
+#             row_sums = np.array([fsum(unp.fabs(inv_mat[0])), fsum(unp.fabs(inv_mat[1])), fsum(unp.fabs(inv_mat[2]))])
+#             inv_mat = inv_mat/row_sums[:,np.newaxis]
+#                     
+#                     
+#             pion_comp_str = f"pi: {inv_mat[0,0]:.3f} p:{inv_mat[0,1]:.3f} k:{inv_mat[0,2]:.3f}"
+#             proton_comp_str = f"pi: {inv_mat[1,0]:.3f} p:{inv_mat[1,1]:.3f} k:{inv_mat[1,2]:.3f}"
+#             kaon_comp_str = f"pi: {inv_mat[2,0]:.3f} p:{inv_mat[2,1]:.3f} k:{inv_mat[2,2]:.3f}"
+#             
+#             comp_str = pion_comp_str if species=="pion" else proton_comp_str if species=="proton" else kaon_comp_str
+
+            #ax[0][0].text( 0.9, 0.85, f"Composition: {comp_str}", transform = ax[0][0].transAxes, ha='right')
+        # add text to the axes that says "inclusive = (in+mid+out)/3"
+        #ax[0][3].text( 0.1, 0.1, "Inclusive = (In+Mid+Out)", transform = ax[0][3].transAxes,)
+        fig.suptitle(
+            f"RPF fit for {species}s for pTtrig {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, pTassoc {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, Chi2/NDF = {self.RPFObjs[i,j].chi2OverNDF}"
+        )  # type:ignore
+        fig.tight_layout()
+        fig.savefig(
+            f"{self.base_save_path}RPF{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}{'withSig' if withSignal else ''}{species}ZV.png"
+        )  # type:ignore
+
 
     @print_function_name_with_description_on_call(description="")
     def plot_optimal_parameters(self, i, withALICEData=True):
@@ -3628,7 +4353,7 @@ class PlotMixin:
         fig.savefig(f"{self.base_save_path}va4_vs_pTassoc_{'20-40GeV' if i==0 else '40-60GeV'}ZV.png")  # type:ignore
 
     @print_function_name_with_description_on_call(description="")
-    def plot_optimal_parameters_for_species(self, i, species, withALICEData=True):
+    def plot_optimal_parameters_for_true_species(self, i, species, withALICEData=True):
         # retrieve optimal parameters and put in numpy array
         optimal_params = np.zeros(
             (len(self.pTassocBinEdges) - 1, 6)
@@ -3638,9 +4363,9 @@ class PlotMixin:
         )  # type:ignore
         #for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
         for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
-            optimal_params[j] = self.RPFObjsForSpecies[species][i, j].popt  # type:ignore
+            optimal_params[j] = self.RPFObjsForTrueSpecies[species][i, j].popt  # type:ignore
             optimal_param_errors[j] = np.sqrt(
-                    np.diag(self.RPFObjsForSpecies[species][i, j].pcov)
+                    np.diag(self.RPFObjsForTrueSpecies[species][i, j].pcov)
                 )  # type:ignore
         # plot optimal parameters as a function of pTassoc for each pTtrig bin
         fig, ax = plt.subplots(1, 1, figsize=(10, 10))
@@ -3873,7 +4598,7 @@ class PlotMixin:
         fig.savefig(f"{self.base_save_path}va4_vs_pTassoc_{'20-40GeV' if i==0 else '40-60GeV'}_{species}.png")  # type:ignore
     
     @print_function_name_with_description_on_call(description="")
-    def plot_optimal_parameters_for_species_in_z_vertex_bins(self, i, species, withALICEData=True):
+    def plot_optimal_parameters_for_true_species_in_z_vertex_bins(self, i, species, withALICEData=True):
         # retrieve optimal parameters and put in numpy array
         optimal_params = np.zeros(
             (len(self.pTassocBinEdges) - 1, 6)
@@ -3883,9 +4608,499 @@ class PlotMixin:
         )  # type:ignore
         #for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
         for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
-            optimal_params[j] = self.RPFObjsForSpeciesZV[species][i, j].popt  # type:ignore
+            optimal_params[j] = self.RPFObjsForTrueSpeciesZV[species][i, j].popt  # type:ignore
             optimal_param_errors[j] = np.sqrt(
-                    np.diag(self.RPFObjsForSpeciesZV[species][i, j].pcov)
+                    np.diag(self.RPFObjsForTrueSpeciesZV[species][i, j].pcov)
+                )  # type:ignore
+        # plot optimal parameters as a function of pTassoc for each pTtrig bin
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+        fig.subplots_adjust(wspace=0)
+        # first plot B vs ptassoc
+        B = optimal_params[:, 0]
+        Berr = optimal_param_errors[:, 0]
+        ax.errorbar(
+            self.pTassocBinCenters,
+            B,
+            yerr=Berr,
+            xerr=np.array(self.pTassocBinWidths)/2, 
+            fmt="o",
+            ms=2,
+        )  # type:ignore
+        ax.set_xlabel(r"$p_{T,assoc}$ (GeV/c)")
+        ax.set_ylabel(r"$B$")
+        ax.set_title(
+            f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
+        )  # type:ignore
+        fig.tight_layout()
+        fig.suptitle(r"$B$ vs $p_{T,assoc}$")
+        fig.savefig(f"{self.base_save_path}B_vs_pTassoc_{'20-40GeV' if i==0 else '40-60GeV'}_{species}ZV.png")  # type:ignore
+        plt.close(fig)
+        
+        # now plot v2 vs ptassoc
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10), )
+        fig.subplots_adjust(wspace=0)
+        v2 = optimal_params[:, 1]
+        v2err = optimal_param_errors[:, 1]
+        ax.errorbar(
+            self.pTassocBinCenters,
+            v2,
+            yerr=v2err,
+            xerr=np.array(self.pTassocBinWidths)/2, 
+            fmt="o",
+            ms=2,
+        )  # type:ignore
+        ax.set_xlabel(r"$p_{T,assoc}$ (GeV/c)")
+        ax.set_ylabel(r"$v_2$")
+        ax.set_title(
+            f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
+        )  # type:ignore
+        ax.set_ylim(-0.01, 0.12)
+        fig.suptitle(r"$v_2$ vs $p_{T,assoc}$")
+        fig.tight_layout()
+        fig.savefig(f"{self.base_save_path}v2_vs_pTassoc_{'20-40GeV' if i==0 else '40-60GeV'}_{species}ZV.png")  # type:ignore
+        plt.close(fig)
+        # now plot v3 vs ptassoc
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10), )
+        fig.subplots_adjust(wspace=0)
+        v3 = optimal_params[:, 2]
+        v3err = optimal_param_errors[:, 2]
+        ax.errorbar(
+                self.pTassocBinCenters,
+                v3,
+                yerr=v3err,
+                xerr=np.array(self.pTassocBinWidths)/2, 
+                fmt="o",
+                ms=2,
+            )  # type:ignore
+        ax.set_xlabel(r"$p_{T,assoc}$ (GeV/c)")
+        ax.set_ylabel(r"$v_3$")
+        ax.set_title(
+                f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
+            )  # type:ignore
+        ax.set_ylim(-0.2, 0.1)
+        fig.suptitle(r"$v_3$ vs $p_{T,assoc}$")
+        fig.tight_layout()
+        fig.savefig(f"{self.base_save_path}v3_vs_pTassoc_{'20-40GeV' if i==0 else '40-60GeV'}_{species}ZV.png")  # type:ignore
+        plt.close(fig)
+        # now plot v4 vs ptassoc
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10), )
+        fig.subplots_adjust(wspace=0)
+        v4 = optimal_params[:, 3]
+        v4err = optimal_param_errors[:, 3]
+        ax.errorbar(
+            self.pTassocBinCenters,
+            v4,
+            yerr=v4err,\
+            xerr=np.array(self.pTassocBinWidths)/2, 
+            fmt="o",
+            ms=2,
+        )  # type:ignore
+        ax.set_xlabel(r"$p_{T,assoc}$ (GeV/c)")
+        ax.set_ylabel(r"$v_4$")
+        ax.set_title(
+            f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
+        )  # type:ignore
+        ax.set_ylim(-0.2, 0.2)
+        fig.suptitle(r"$v_4$ vs $p_{T,assoc}$")
+        fig.tight_layout()
+        fig.savefig(f"{self.base_save_path}v4_vs_pTassoc_{'20-40GeV' if i==0 else '40-60GeV'}_{species}ZV.png")  # type:ignore
+        plt.close(fig)
+        # now plot va2 vs ptassoc
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10), )
+        fig.subplots_adjust(wspace=0)
+        va2 = optimal_params[:, 4]
+        va2err = optimal_param_errors[:, 4]
+        ax.errorbar(
+            self.pTassocBinCenters,
+            va2,
+            yerr=va2err,
+            xerr=np.array(self.pTassocBinWidths)/2, 
+            fmt="o",
+            ms=2,
+            label="This Analysis"
+        )  # type:ignore
+        # load the va2 measurement from ALICE at ./Centralvn.csv and SemiCentralvn.csv
+        if withALICEData:
+            alice_vn = np.loadtxt("./Centralvn.csv", delimiter=",", skiprows=1) if self.analysisType=='central' else [np.loadtxt("./30-40.csv", delimiter=",", skiprows=1), np.loadtxt("./40-50.csv", delimiter=",", skiprows=1)]
+            if self.analysisType=='central': 
+                x_vals = alice_vn[:, 0]
+                delta_x = x_vals-alice_vn[:,1]
+                alice_va2 = alice_vn[:,3]
+                alice_va2_error = np.sqrt(alice_vn[:,4]**2+alice_vn[:,5]**2)
+                ax.errorbar(
+                    x_vals,
+                    alice_va2,
+                    yerr=alice_va2_error,
+                    xerr=delta_x,
+                    fmt="o",
+                    ms=2,
+                    label="ALICE"
+                )  # type:ignore
+            if self.analysisType == 'semicentral':
+                x_vals_3040 = alice_vn[0][:, 0]
+                x_vals_4050 = alice_vn[1][:, 0]
+                
+                delta_x_3040 = x_vals_3040-alice_vn[0][:,1]
+                delta_x_4050 = x_vals_4050-alice_vn[1][:,1]
+                alice_va2_3040 = alice_vn[0][:,3]
+                alice_va2_4050 = alice_vn[1][:,3]
+                alice_va2_error_3040 = np.sqrt(alice_vn[0][:,4]**2+alice_vn[0][:,5]**2)
+                alice_va2_error_4050 = np.sqrt(alice_vn[1][:,4]**2+alice_vn[1][:,5]**2)
+
+                
+                ax.errorbar(
+                    x_vals_3040,
+                    alice_va2_3040,
+                    yerr=alice_va2_error_3040,
+                    xerr=delta_x_3040,
+                    fmt="o",
+                    ms=2,
+                    label="ALICE 30-40%"
+                )
+                ax.errorbar(
+                    x_vals_4050,
+                    alice_va2_4050,
+                    yerr=alice_va2_error_4050,
+                    xerr=delta_x_4050,
+                    fmt="o",
+                    ms=2,
+                    label="ALICE 40-50%"
+                )
+                # make a list of tuples which are the x_vals in the 40-50% bin that correspond to the x_vals in the 30-40% bin
+                x_vals_4050_3040 = []
+                for ind,x in enumerate(x_vals_3040):
+                    x_vals_4050_3040.append(np.argwhere(np.abs(x_vals_4050-x)<delta_x_3040[ind]))
+                # average the va2 values and errors for each tuple in the list
+                alice_va2_4050_3040 = []
+                alice_va2_error_4050_3040 = []
+                for inds in x_vals_4050_3040:
+                    alice_va2_4050_3040.append(np.mean(alice_va2_4050[inds]))
+                    alice_va2_error_4050_3040.append(np.mean(alice_va2_error_4050[inds]))
+                alice_va2_4050_3040 = np.array(alice_va2_4050_3040)
+                alice_va2_error_4050_3040 = np.array(alice_va2_error_4050_3040)
+
+
+                ax.errorbar(
+                    x_vals_3040,
+                    (alice_va2_3040+alice_va2_4050_3040)/2,
+                    yerr=np.sqrt(alice_va2_error_3040**2+alice_va2_error_4050_3040**2)/2,
+                    xerr=delta_x_3040,
+                    fmt="o",
+                    ms=2,
+                    label="ALICE 30-50%"
+                )
+
+
+
+        ax.set_xlabel(r"$p_{T,assoc}$ (GeV/c)")
+        ax.set_ylabel(r"$v_{a2}$")
+        ax.legend()
+        ax.set_title(
+            f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
+        )  # type:ignore
+        ax.set_ylim(-0.01, 0.3)
+        ax.set_xlim(0,10)
+        fig.suptitle(r"$v_{a2}$ vs $p_{T,assoc}$")
+        fig.tight_layout()
+        fig.savefig(f"{self.base_save_path}va2_vs_pTassoc_{'20-40GeV' if i==0 else '40-60GeV'}_{species}ZV.png")  # type:ignore
+        plt.close(fig)
+        # now plot va4 vs ptassoc
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10), )
+        fig.subplots_adjust(wspace=0)
+        va4 = optimal_params[ :, 5]
+        va4err = optimal_param_errors[ :, 5]
+        ax.errorbar(
+            self.pTassocBinCenters,
+            va4,
+            yerr=va4err,
+            xerr=np.array(self.pTassocBinWidths)/2, 
+            fmt="o",
+            ms=2,
+        )  # type:ignore
+        if withALICEData:
+            alice_vn = np.loadtxt("./Centralvn.csv", delimiter=",", skiprows=1) if self.analysisType=='central' else np.loadtxt("./SemiCentralvn.csv", delimiter=",", skiprows=1)
+            x_vals = alice_vn[:, 0]
+            delta_x = x_vals-alice_vn[:,1]
+            alice_va4 = alice_vn[:,9]
+            alice_va4_error = np.sqrt(alice_vn[:,10]**2+alice_vn[:,11]**2)
+            ax.errorbar(
+                x_vals,
+                alice_va4,
+                yerr=alice_va4_error,
+                xerr=delta_x,
+                fmt="o",
+                ms=2,
+                label="ALICE"
+            )  # type:ignore
+        ax.set_xlabel(r"$p_{T,assoc}$ (GeV/c)")
+        ax.set_ylabel(r"$v_{a4}$")
+        ax.set_title(
+            f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
+        )  # type:ignore
+        ax.set_ylim(-0.01, 0.2)
+        fig.suptitle(r"$v_{a4}$ vs $p_{T,assoc}$")
+        fig.tight_layout()
+        fig.savefig(f"{self.base_save_path}va4_vs_pTassoc_{'20-40GeV' if i==0 else '40-60GeV'}_{species}ZV.png")  # type:ignore
+    
+    @print_function_name_with_description_on_call(description="")
+    def plot_optimal_parameters_for_enhanced_species(self, i, species, withALICEData=True):
+        # retrieve optimal parameters and put in numpy array
+        optimal_params = np.zeros(
+            (len(self.pTassocBinEdges) - 1, 6)
+        )  # type:ignore
+        optimal_param_errors = np.zeros(
+            (len(self.pTassocBinEdges) - 1, 6)
+        )  # type:ignore
+        #for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
+        for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
+            optimal_params[j] = self.RPFObjsForEnhancedSpecies[species][i, j].popt  # type:ignore
+            optimal_param_errors[j] = np.sqrt(
+                    np.diag(self.RPFObjsForEnhancedSpecies[species][i, j].pcov)
+                )  # type:ignore
+        # plot optimal parameters as a function of pTassoc for each pTtrig bin
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+        fig.subplots_adjust(wspace=0)
+        # first plot B vs ptassoc
+        B = optimal_params[:, 0]
+        Berr = optimal_param_errors[:, 0]
+        ax.errorbar(
+            self.pTassocBinCenters,
+            B,
+            yerr=Berr,
+            xerr=np.array(self.pTassocBinWidths)/2, 
+            fmt="o",
+            ms=2,
+        )  # type:ignore
+        ax.set_xlabel(r"$p_{T,assoc}$ (GeV/c)")
+        ax.set_ylabel(r"$B$")
+        ax.set_title(
+            f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
+        )  # type:ignore
+        fig.tight_layout()
+        fig.suptitle(r"$B$ vs $p_{T,assoc}$")
+        fig.savefig(f"{self.base_save_path}B_vs_pTassoc_{'20-40GeV' if i==0 else '40-60GeV'}_{species}.png")  # type:ignore
+        plt.close(fig)
+        
+        # now plot v2 vs ptassoc
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10), )
+        fig.subplots_adjust(wspace=0)
+        v2 = optimal_params[:, 1]
+        v2err = optimal_param_errors[:, 1]
+        ax.errorbar(
+            self.pTassocBinCenters,
+            v2,
+            yerr=v2err,
+            xerr=np.array(self.pTassocBinWidths)/2, 
+            fmt="o",
+            ms=2,
+        )  # type:ignore
+        ax.set_xlabel(r"$p_{T,assoc}$ (GeV/c)")
+        ax.set_ylabel(r"$v_2$")
+        ax.set_title(
+            f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
+        )  # type:ignore
+        ax.set_ylim(-0.01, 0.12)
+        fig.suptitle(r"$v_2$ vs $p_{T,assoc}$")
+        fig.tight_layout()
+        fig.savefig(f"{self.base_save_path}v2_vs_pTassoc_{'20-40GeV' if i==0 else '40-60GeV'}_{species}.png")  # type:ignore
+        plt.close(fig)
+        # now plot v3 vs ptassoc
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10), )
+        fig.subplots_adjust(wspace=0)
+        v3 = optimal_params[:, 2]
+        v3err = optimal_param_errors[:, 2]
+        ax.errorbar(
+                self.pTassocBinCenters,
+                v3,
+                yerr=v3err,
+                xerr=np.array(self.pTassocBinWidths)/2, 
+                fmt="o",
+                ms=2,
+            )  # type:ignore
+        ax.set_xlabel(r"$p_{T,assoc}$ (GeV/c)")
+        ax.set_ylabel(r"$v_3$")
+        ax.set_title(
+                f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
+            )  # type:ignore
+        ax.set_ylim(-0.2, 0.1)
+        fig.suptitle(r"$v_3$ vs $p_{T,assoc}$")
+        fig.tight_layout()
+        fig.savefig(f"{self.base_save_path}v3_vs_pTassoc_{'20-40GeV' if i==0 else '40-60GeV'}_{species}.png")  # type:ignore
+        plt.close(fig)
+        # now plot v4 vs ptassoc
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10), )
+        fig.subplots_adjust(wspace=0)
+        v4 = optimal_params[:, 3]
+        v4err = optimal_param_errors[:, 3]
+        ax.errorbar(
+            self.pTassocBinCenters,
+            v4,
+            yerr=v4err,\
+            xerr=np.array(self.pTassocBinWidths)/2, 
+            fmt="o",
+            ms=2,
+        )  # type:ignore
+        ax.set_xlabel(r"$p_{T,assoc}$ (GeV/c)")
+        ax.set_ylabel(r"$v_4$")
+        ax.set_title(
+            f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
+        )  # type:ignore
+        ax.set_ylim(-0.2, 0.2)
+        fig.suptitle(r"$v_4$ vs $p_{T,assoc}$")
+        fig.tight_layout()
+        fig.savefig(f"{self.base_save_path}v4_vs_pTassoc_{'20-40GeV' if i==0 else '40-60GeV'}_{species}.png")  # type:ignore
+        plt.close(fig)
+        # now plot va2 vs ptassoc
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10), )
+        fig.subplots_adjust(wspace=0)
+        va2 = optimal_params[:, 4]
+        va2err = optimal_param_errors[:, 4]
+        ax.errorbar(
+            self.pTassocBinCenters,
+            va2,
+            yerr=va2err,
+            xerr=np.array(self.pTassocBinWidths)/2, 
+            fmt="o",
+            ms=2,
+            label="This Analysis"
+        )  # type:ignore
+        # load the va2 measurement from ALICE at ./Centralvn.csv and SemiCentralvn.csv
+        if withALICEData:
+            alice_vn = np.loadtxt("./Centralvn.csv", delimiter=",", skiprows=1) if self.analysisType=='central' else [np.loadtxt("./30-40.csv", delimiter=",", skiprows=1), np.loadtxt("./40-50.csv", delimiter=",", skiprows=1)]
+            if self.analysisType=='central': 
+                x_vals = alice_vn[:, 0]
+                delta_x = x_vals-alice_vn[:,1]
+                alice_va2 = alice_vn[:,3]
+                alice_va2_error = np.sqrt(alice_vn[:,4]**2+alice_vn[:,5]**2)
+                ax.errorbar(
+                    x_vals,
+                    alice_va2,
+                    yerr=alice_va2_error,
+                    xerr=delta_x,
+                    fmt="o",
+                    ms=2,
+                    label="ALICE"
+                )  # type:ignore
+            if self.analysisType == 'semicentral':
+                x_vals_3040 = alice_vn[0][:, 0]
+                x_vals_4050 = alice_vn[1][:, 0]
+                
+                delta_x_3040 = x_vals_3040-alice_vn[0][:,1]
+                delta_x_4050 = x_vals_4050-alice_vn[1][:,1]
+                alice_va2_3040 = alice_vn[0][:,3]
+                alice_va2_4050 = alice_vn[1][:,3]
+                alice_va2_error_3040 = np.sqrt(alice_vn[0][:,4]**2+alice_vn[0][:,5]**2)
+                alice_va2_error_4050 = np.sqrt(alice_vn[1][:,4]**2+alice_vn[1][:,5]**2)
+
+                
+                ax.errorbar(
+                    x_vals_3040,
+                    alice_va2_3040,
+                    yerr=alice_va2_error_3040,
+                    xerr=delta_x_3040,
+                    fmt="o",
+                    ms=2,
+                    label="ALICE 30-40%"
+                )
+                ax.errorbar(
+                    x_vals_4050,
+                    alice_va2_4050,
+                    yerr=alice_va2_error_4050,
+                    xerr=delta_x_4050,
+                    fmt="o",
+                    ms=2,
+                    label="ALICE 40-50%"
+                )
+                # make a list of tuples which are the x_vals in the 40-50% bin that correspond to the x_vals in the 30-40% bin
+                x_vals_4050_3040 = []
+                for ind,x in enumerate(x_vals_3040):
+                    x_vals_4050_3040.append(np.argwhere(np.abs(x_vals_4050-x)<delta_x_3040[ind]))
+                # average the va2 values and errors for each tuple in the list
+                alice_va2_4050_3040 = []
+                alice_va2_error_4050_3040 = []
+                for inds in x_vals_4050_3040:
+                    alice_va2_4050_3040.append(np.mean(alice_va2_4050[inds]))
+                    alice_va2_error_4050_3040.append(np.mean(alice_va2_error_4050[inds]))
+                alice_va2_4050_3040 = np.array(alice_va2_4050_3040)
+                alice_va2_error_4050_3040 = np.array(alice_va2_error_4050_3040)
+
+
+                ax.errorbar(
+                    x_vals_3040,
+                    (alice_va2_3040+alice_va2_4050_3040)/2,
+                    yerr=np.sqrt(alice_va2_error_3040**2+alice_va2_error_4050_3040**2)/2,
+                    xerr=delta_x_3040,
+                    fmt="o",
+                    ms=2,
+                    label="ALICE 30-50%"
+                )
+
+
+
+        ax.set_xlabel(r"$p_{T,assoc}$ (GeV/c)")
+        ax.set_ylabel(r"$v_{a2}$")
+        ax.legend()
+        ax.set_title(
+            f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
+        )  # type:ignore
+        ax.set_ylim(-0.01, 0.3)
+        ax.set_xlim(0,10)
+        fig.suptitle(r"$v_{a2}$ vs $p_{T,assoc}$")
+        fig.tight_layout()
+        fig.savefig(f"{self.base_save_path}va2_vs_pTassoc_{'20-40GeV' if i==0 else '40-60GeV'}_{species}.png")  # type:ignore
+        plt.close(fig)
+        # now plot va4 vs ptassoc
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10), )
+        fig.subplots_adjust(wspace=0)
+        va4 = optimal_params[ :, 5]
+        va4err = optimal_param_errors[ :, 5]
+        ax.errorbar(
+            self.pTassocBinCenters,
+            va4,
+            yerr=va4err,
+            xerr=np.array(self.pTassocBinWidths)/2, 
+            fmt="o",
+            ms=2,
+        )  # type:ignore
+        if withALICEData:
+            alice_vn = np.loadtxt("./Centralvn.csv", delimiter=",", skiprows=1) if self.analysisType=='central' else np.loadtxt("./SemiCentralvn.csv", delimiter=",", skiprows=1)
+            x_vals = alice_vn[:, 0]
+            delta_x = x_vals-alice_vn[:,1]
+            alice_va4 = alice_vn[:,9]
+            alice_va4_error = np.sqrt(alice_vn[:,10]**2+alice_vn[:,11]**2)
+            ax.errorbar(
+                x_vals,
+                alice_va4,
+                yerr=alice_va4_error,
+                xerr=delta_x,
+                fmt="o",
+                ms=2,
+                label="ALICE"
+            )  # type:ignore
+        ax.set_xlabel(r"$p_{T,assoc}$ (GeV/c)")
+        ax.set_ylabel(r"$v_{a4}$")
+        ax.set_title(
+            f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c"
+        )  # type:ignore
+        ax.set_ylim(-0.01, 0.2)
+        fig.suptitle(r"$v_{a4}$ vs $p_{T,assoc}$")
+        fig.tight_layout()
+        fig.savefig(f"{self.base_save_path}va4_vs_pTassoc_{'20-40GeV' if i==0 else '40-60GeV'}_{species}.png")  # type:ignore
+    
+    @print_function_name_with_description_on_call(description="")
+    def plot_optimal_parameters_for_enhanced_species_in_z_vertex_bins(self, i, species, withALICEData=True):
+        # retrieve optimal parameters and put in numpy array
+        optimal_params = np.zeros(
+            (len(self.pTassocBinEdges) - 1, 6)
+        )  # type:ignore
+        optimal_param_errors = np.zeros(
+            (len(self.pTassocBinEdges) - 1, 6)
+        )  # type:ignore
+        #for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
+        for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
+            optimal_params[j] = self.RPFObjsForEnhancedSpeciesZV[species][i, j].popt  # type:ignore
+            optimal_param_errors[j] = np.sqrt(
+                    np.diag(self.RPFObjsForEnhancedSpeciesZV[species][i, j].pcov)
                 )  # type:ignore
         # plot optimal parameters as a function of pTassoc for each pTtrig bin
         fig, ax = plt.subplots(1, 1, figsize=(10, 10))
@@ -4125,9 +5340,14 @@ class PlotMixin:
             if k == 2
             else ("mid-plane" if k == 1 else ("in-plane" if k == 0 else "inclusive"))
         )
+        debug_logger.info(
+            f"Plotting bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}"
+        )  # type:ignore
+        
         print(
             f"Plotting bin {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}"
         )  # type:ignore
+
         correlation_func = plot_TH2(
             self.SEcorrs[i, j, k],
             f"Correlation Function {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}",
@@ -4211,10 +5431,10 @@ class PlotMixin:
         plt.close(dPhiSig)
 
     @print_function_name_with_description_on_call(description="")
-    def plot_pion_tpc_signal(self, i, j):
+    def plot_pion_tpc_signal(self, i, j,):
         pionTPCsignal, pionTPCsignalax = plt.subplots(1, 1, figsize=(5, 5))
         pionTPCsignalax = plot_TH1(
-            self.pionTPCsignals[i, j],
+            self.pionTPCnSigmaInc[i, j],
             f"Pion TPC signal {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c",
             "$(\\frac{dE}{dx})_{meas}-(\\frac{dE}{dx})_{calc}$",
             "Counts",
@@ -4342,7 +5562,7 @@ class PlotMixin:
             #SEcorr.Rebin2D(2, 4)
             #SEcorr.Scale(1/8)
             if normalize:
-                print(N_trig)
+                debug_logger.debug(N_trig)
                 SEcorr.Scale(1/N_trig)
             correlation_func = plot_TH2(
                 SEcorr,
@@ -5923,20 +7143,18 @@ class PlotMixin:
                     bin_contentNS[l] if l < n_binsNS else bin_contentAS[l - n_binsNS]
                     for l in range(n_binsINC)
                 ]
-            ) / (1 if k != 3 else 3)
+            )
             bin_errorsINC = np.array(
                 [
                     bin_errorsNS[l] if l < n_binsNS else bin_errorsAS[l - n_binsNS]
                     for l in range(n_binsINC)
                 ]
-            ) / (1 if k != 3 else 3)
+            ) 
             RPFErrorINC = np.array(
                 [
                     BGErrorNS[l] if l < n_binsNS else BGErrorAS[l - n_binsNS]
                     for l in range(n_binsINC)
                 ]
-            ) / (
-                1 if k != 3 else 3
             )  # type:ignore
             dPhiSigminusBGINCax.errorbar(
                 x_binsINC, bin_contentINC, yerr=bin_errorsINC, fmt="o", color="black"
@@ -5984,10 +7202,10 @@ class PlotMixin:
                 x_binsINC,
                 bin_contentINC - RPFErrorINC[:, k]
                 if k != 3
-                else bin_contentINC - np.sqrt(np.sum(RPFErrorINC**2, axis=1) / 9),
+                else bin_contentINC - np.sqrt(np.sum(RPFErrorINC**2, axis=1) ),
                 bin_contentINC + RPFErrorINC[:, k]
                 if k != 3
-                else bin_contentINC + np.sqrt(np.sum(RPFErrorINC**2, axis=1) / 9),
+                else bin_contentINC + np.sqrt(np.sum(RPFErrorINC**2, axis=1) ),
                 alpha=0.3,
                 color="green",
                 label="RPF fit",
@@ -6118,21 +7336,19 @@ class PlotMixin:
                     bin_contentNS[l] if l < n_binsNS else bin_contentAS[l - n_binsNS]
                     for l in range(n_binsINC)
                 ]
-            ) / (1 if k != 3 else 3)
+            ) 
             bin_errorsINC = np.array(
                 [
                     bin_errorsNS[l] if l < n_binsNS else bin_errorsAS[l - n_binsNS]
                     for l in range(n_binsINC)
                 ]
-            ) / (1 if k != 3 else 3)
+            ) 
             RPFErrorINC = np.array(
                 [
                     BGErrorNS[l] if l < n_binsNS else BGErrorAS[l - n_binsNS]
                     for l in range(n_binsINC)
                 ]
-            ) / (
-                1 if k != 3 else 3
-            )  # type:ignore
+            )   # type:ignore
             dPhiSigminusBGINCax.errorbar(
                 x_binsINC, bin_contentINC, yerr=bin_errorsINC, fmt="o", color="black"
             )
@@ -6179,10 +7395,10 @@ class PlotMixin:
                 x_binsINC,
                 bin_contentINC - RPFErrorINC[:, k]
                 if k != 3
-                else bin_contentINC - np.sqrt(np.sum(RPFErrorINC**2, axis=1) / 9),
+                else bin_contentINC - np.sqrt(np.sum(RPFErrorINC**2, axis=1)),
                 bin_contentINC + RPFErrorINC[:, k]
                 if k != 3
-                else bin_contentINC + np.sqrt(np.sum(RPFErrorINC**2, axis=1) / 9),
+                else bin_contentINC + np.sqrt(np.sum(RPFErrorINC**2, axis=1) ),
                 alpha=0.3,
                 color="green",
                 label="RPF fit",
@@ -6287,6 +7503,7 @@ class PlotMixin:
     ):
         if self.analysisType in ["central", "semicentral"]:
            N_trig = self.N_trigs[i,k]
+           print(f"N_trig = {N_trig}, for k={k}")
         elif self.analysisType == "pp":
             N_trig = self.N_trigs[i]
 
@@ -6302,7 +7519,6 @@ class PlotMixin:
             x_binsNormINC = np.zeros(n_binsNormINC)  # type:ignore
             bin_contentNormINC = np.zeros(n_binsNormINC)  # type:ignore
             bin_errorsNormINC = np.zeros(n_binsNormINC)  # type:ignore
-
             for l in range(n_binsNormINC):
                 x_binsNormINC[l] = (
                     self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs[i, j, k]
@@ -6335,11 +7551,11 @@ class PlotMixin:
                 x_binsNormINC,
                 bin_contentNormINC - BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 - np.sqrt(np.sum((BGErrorINC) ** 2, axis=1) ) / N_trig,
                 bin_contentNormINC + BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / N_trig,
                 alpha=0.3,
                 color="green",
@@ -6356,9 +7572,9 @@ class PlotMixin:
                     label="ME normalization",
                 )
             dPhiSigminusBGNormINC.legend()
-            dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$")
+            dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$ (rad)")
             dPhiSigminusBGNormINCax.set_ylabel(
-                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$"
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ (rad)$^{-1}$"
                 if k == 0
                 else ""
             )
@@ -6381,11 +7597,11 @@ class PlotMixin:
                 x_binsNormINC,
                 bin_contentNormINC - BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 - np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / N_trig,
                 bin_contentNormINC + BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / N_trig,
                 alpha=0.3,
                 color="green",
@@ -6402,9 +7618,9 @@ class PlotMixin:
                     label="ME normalization",
                 )
 
-            axSigminusBGNormINC[(k+1)%4].set_xlabel("$\\Delta \\phi$")
+            axSigminusBGNormINC[(k+1)%4].set_xlabel("$\\Delta \\phi$ (rad)")
             axSigminusBGNormINC[k].set_ylabel(
-                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$"
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ (rad)$^{-1}$"
                 if k == 0
                 else ""
             )
@@ -6568,11 +7784,11 @@ class PlotMixin:
                 x_binsNormINC,
                 bin_contentNormINC - BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 - np.sqrt(np.sum((BGErrorINC) ** 2, axis=1) ) / N_trig,
                 bin_contentNormINC + BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / N_trig,
                 alpha=0.3,
                 color="green",
@@ -6614,11 +7830,11 @@ class PlotMixin:
                 x_binsNormINC,
                 bin_contentNormINC - BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 - np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / N_trig,
                 bin_contentNormINC + BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / N_trig,
                 alpha=0.3,
                 color="green",
@@ -6748,19 +7964,21 @@ class PlotMixin:
             # axSigminusBGNormINC.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
 
     @print_function_name_with_description_on_call(description="")
-    def plot_normalized_background_subtracted_dPhi_for_species(
-        self, i, j, k, species, axSigminusBGNormINCSpecies, BGErrorINC, plot_ME_systematic=False
+    def plot_normalized_background_subtracted_dPhi_for_true_species(
+        self, i, j, k, species, axSigminusBGNormINCSpecies, BGErrorINC, plot_ME_systematic=True, plot_PID_systematic=True
     ):
+        
         if self.analysisType in ["central", "semicentral"]:
             N_trig = self.N_trigs[i,k]
         elif self.analysisType=='pp':
             N_trig = self.N_trigs[i]
+            plot_ME_systematic=False
         if self.analysisType in ["central", "semicentral"]:
             dPhiSigminusBGNormINC, dPhiSigminusBGNormINCax = plt.subplots(
                 1, 1, figsize=(10, 6)
             )  # type:ignore
             n_binsNormINC = (
-                self.NormalizedBGSubtracteddPhiForSpecies[species][i, j, k]
+                self.NormalizedBGSubtracteddPhiForTrueSpecies[species][i, j, k]
                 .GetXaxis()
                 .GetNbins()
             )  # type:ignore
@@ -6770,16 +7988,16 @@ class PlotMixin:
 
             for l in range(n_binsNormINC):
                 x_binsNormINC[l] = (
-                    self.NormalizedBGSubtracteddPhiForSpecies[species][i, j, k]
+                    self.NormalizedBGSubtracteddPhiForTrueSpecies[species][i, j, k]
                     .GetXaxis()
                     .GetBinCenter(l + 1)
                 )  # type:ignore
-                bin_contentNormINC[l] = self.NormalizedBGSubtracteddPhiForSpecies[species][
+                bin_contentNormINC[l] = self.NormalizedBGSubtracteddPhiForTrueSpecies[species][
                     i, j, k
                 ].GetBinContent(
                     l + 1
                 )  # type:ignore
-                bin_errorsNormINC[l] = self.NormalizedBGSubtracteddPhiForSpecies[species][
+                bin_errorsNormINC[l] = self.NormalizedBGSubtracteddPhiForTrueSpecies[species][
                     i, j, k
                 ].GetBinError(
                     l + 1
@@ -6787,8 +8005,8 @@ class PlotMixin:
 
             dPhiSigminusBGNormINCax.errorbar(
                 x_binsNormINC,
-                bin_contentNormINC if k!=3 else bin_contentNormINC,
-                yerr=bin_errorsNormINC if k!=3 else bin_errorsNormINC,
+                bin_contentNormINC if k!=3 else bin_contentNormINC*3,
+                yerr=bin_errorsNormINC if k!=3 else bin_errorsNormINC*3,
                 fmt="o",
                 color="black",
             )
@@ -6796,11 +8014,11 @@ class PlotMixin:
                 x_binsNormINC,
                 bin_contentNormINC - BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 - np.sqrt(np.sum((BGErrorINC) ** 2, axis=1) ) / N_trig,
                 bin_contentNormINC + BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / (N_trig),
                 alpha=0.3,
                 color="green",
@@ -6808,18 +8026,46 @@ class PlotMixin:
             )
             # do fill between for me norm systematic
             if plot_ME_systematic:
+                bin_contentDiff = np.zeros(n_binsNormINC)  # type:ignore
+
+                for l in range(n_binsNormINC):
+                    bin_contentDiff[l] = self.NormalizedBGSubtracteddPhiForTrueSpeciesZV[species][
+                        i, j, k
+                    ].GetBinContent(
+                        l + 1
+                    )  # type:ignore
+                bin_contentDiff = np.abs(bin_contentDiff - bin_contentNormINC)
                 dPhiSigminusBGNormINCax.fill_between(
                     x_binsNormINC,
-                    bin_contentNormINC - self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC - self.ME_norm_systematics[i, j, k]/(N_trig),
-                    bin_contentNormINC + self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC + self.ME_norm_systematics[i, j, k]/(N_trig),
+                    bin_contentNormINC - bin_contentDiff,
+                    bin_contentNormINC +bin_contentDiff,
                     color="red",
                     alpha=0.3,
-                    label="ME normalization",
+                    label="ME systematic",
                 )
+            
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                elif self.analysisType=='pp':
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j]
+                    BGLevel = self.NormalizedBGSubtracteddPhiForTrueSpeciesminVals[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])-BGLevel
+
+                dPhiSigminusBGNormINCax.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
+            
             dPhiSigminusBGNormINC.legend()
-            dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$")
+            dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$ ($rad$)")
             dPhiSigminusBGNormINCax.set_ylabel(
-                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$"
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad^{-1}$)"
                 if k == 0
                 else ""
             )
@@ -6833,8 +8079,8 @@ class PlotMixin:
             plt.close(dPhiSigminusBGNormINC)
             axSigminusBGNormINCSpecies[(k+1)%4].errorbar(
                 x_binsNormINC,
-                bin_contentNormINC if k!=3 else bin_contentNormINC,
-                yerr=bin_errorsNormINC if k!=3 else bin_errorsNormINC,
+                bin_contentNormINC if k!=3 else bin_contentNormINC*3,
+                yerr=bin_errorsNormINC if k!=3 else bin_errorsNormINC*3,
                 fmt="o",
                 color="black",
             )
@@ -6842,11 +8088,11 @@ class PlotMixin:
                 x_binsNormINC,
                 bin_contentNormINC - BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 - np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / (N_trig),
                 bin_contentNormINC + BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / (N_trig),
                 alpha=0.3,
                 color="green",
@@ -6856,16 +8102,33 @@ class PlotMixin:
             if plot_ME_systematic:
                 axSigminusBGNormINCSpecies[(k+1)%4].fill_between(
                     x_binsNormINC,
-                    bin_contentNormINC - self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC - self.ME_norm_systematics[i, j, k]/(N_trig),
-                    bin_contentNormINC + self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC + self.ME_norm_systematics[i, j, k]/(N_trig),
+                    bin_contentNormINC - bin_contentDiff,
+                    bin_contentNormINC + bin_contentDiff,
                     color="red",
                     alpha=0.3,
-                    label="ME normalization",
+                    label="ME systematic",
                 )
 
-            axSigminusBGNormINCSpecies[(k+1)%4].set_xlabel("$\\Delta \\phi$")
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                else:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                axSigminusBGNormINCSpecies[(k+1)%4].fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
+
+            axSigminusBGNormINCSpecies[(k+1)%4].set_xlabel("$\\Delta \\phi$ ($rad$)")
             axSigminusBGNormINCSpecies[k].set_ylabel(
-                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$"
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad^{-1}$)"
                 if k == 0
                 else ""
             )
@@ -6874,12 +8137,12 @@ class PlotMixin:
             dPhiSigminusBGNormINC, dPhiSigminusBGNormINCax = plt.subplots(
                 1, 1, figsize=(10, 6)
             )  # type:ignore
-            n_binsNormINC = self.NormalizedBGSubtracteddPhiForSpecies[species][
+            n_binsNormINC = self.NormalizedBGSubtracteddPhiForTrueSpecies[species][
                 i, j
             ].GetNbinsX()  # type:ignore
             x_binsNormINC = np.array(
                 [
-                    self.NormalizedBGSubtracteddPhiForSpecies[species][
+                    self.NormalizedBGSubtracteddPhiForTrueSpecies[species][
                         i, j
                     ].GetBinCenter(b)
                     for b in range(1, n_binsNormINC + 1)
@@ -6887,7 +8150,7 @@ class PlotMixin:
             )  # type:ignore
             bin_contentNormINC = np.array(
                 [
-                    self.NormalizedBGSubtracteddPhiForSpecies[species][
+                    self.NormalizedBGSubtracteddPhiForTrueSpecies[species][
                         i, j
                     ].GetBinContent(b)
                     for b in range(1, n_binsNormINC + 1)
@@ -6895,13 +8158,13 @@ class PlotMixin:
             )  # type:ignore
             bin_errorsNormINC = np.array(
                 [
-                    self.NormalizedBGSubtracteddPhiForSpecies[species][
+                    self.NormalizedBGSubtracteddPhiForTrueSpecies[species][
                         i, j
                     ].GetBinError(b)
                     for b in range(1, n_binsNormINC + 1)
                 ]
             )  # type:ignore
-            BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForSpeciesminVals[
+            BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForTrueSpeciesminVals[
                 species
             ][
                 i, j
@@ -6922,18 +8185,45 @@ class PlotMixin:
                 label="Yield normalization",
             )
             if plot_ME_systematic:
+                bin_contentDiff = np.zeros(n_binsNormINC)  # type:ignore
+
+                for l in range(n_binsNormINC):
+                    bin_contentDiff[l] = self.NormalizedBGSubtracteddPhiForTrueSpeciesZV[species][
+                        i, j
+                    ].GetBinContent(
+                        l + 1
+                    )  # type:ignore
+                bin_contentDiff = np.abs(bin_contentDiff - bin_contentNormINC)
+
                 dPhiSigminusBGNormINCax.fill_between(
                     x_binsNormINC,
-                    bin_contentNormINC - self.ME_norm_systematics[i, j]/N_trig,
-                    bin_contentNormINC + self.ME_norm_systematics[i, j]/N_trig,
+                    bin_contentNormINC - bin_contentDiff,
+                    bin_contentNormINC + bin_contentDiff,
                     alpha=0.3,
                     color="red",
-                    label="ME normalization",
+                    label="ME Systematic",
                 )  # type:ignore
+
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                else:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                dPhiSigminusBGNormINCax.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
             dPhiSigminusBGNormINC.legend()
-            dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$")
+            dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$ ($rad$)")
             dPhiSigminusBGNormINCax.set_ylabel(
-                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$"
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad^{-1}$)"
                 if k == 0
                 else ""
             )
@@ -6963,23 +8253,41 @@ class PlotMixin:
                 label="Yield normalization",
             )
             if plot_ME_systematic:
+                
                 axSigminusBGNormINCSpecies.fill_between(
                     x_binsNormINC,
-                    bin_contentNormINC - self.ME_norm_systematics[i, j]/N_trig,
-                    bin_contentNormINC + self.ME_norm_systematics[i, j]/N_trig,
+                    bin_contentNormINC - bin_contentDiff,
+                    bin_contentNormINC + bin_contentDiff,
                     alpha=0.3,
                     color="red",
                     label="ME normalization",
                 )  # type:ignore
-            axSigminusBGNormINCSpecies.set_xlabel("$\\Delta \\phi$")
+
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                else:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                axSigminusBGNormINCSpecies.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
+            axSigminusBGNormINCSpecies.set_xlabel("$\\Delta \\phi$ ($rad$)")
             axSigminusBGNormINCSpecies.set_ylabel(
-                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$"
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad^{-1}$)"
             )
             # axSigminusBGNormINC.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
     
     @print_function_name_with_description_on_call(description="")
-    def plot_normalized_background_subtracted_dPhi_for_species_in_z_vertex_bins(
-        self, i, j, k, species, axSigminusBGNormINCSpecies, BGErrorINC, plot_ME_systematic=False
+    def plot_normalized_background_subtracted_dPhi_for_true_species_in_z_vertex_bins(
+        self, i, j, k, species, axSigminusBGNormINCSpecies, BGErrorINC, plot_ME_systematic=False, plot_PID_systematic=True
     ):
         if self.analysisType in ["central", "semicentral"]:
             N_trig = self.N_trigs[i,k]
@@ -6990,7 +8298,7 @@ class PlotMixin:
                 1, 1, figsize=(10, 6)
             )  # type:ignore
             n_binsNormINC = (
-                self.NormalizedBGSubtracteddPhiForSpeciesZV[species][i, j, k]
+                self.NormalizedBGSubtracteddPhiForTrueSpeciesZV[species][i, j, k]
                 .GetXaxis()
                 .GetNbins()
             )  # type:ignore
@@ -7000,16 +8308,16 @@ class PlotMixin:
 
             for l in range(n_binsNormINC):
                 x_binsNormINC[l] = (
-                    self.NormalizedBGSubtracteddPhiForSpeciesZV[species][i, j, k]
+                    self.NormalizedBGSubtracteddPhiForTrueSpeciesZV[species][i, j, k]
                     .GetXaxis()
                     .GetBinCenter(l + 1)
                 )  # type:ignore
-                bin_contentNormINC[l] = self.NormalizedBGSubtracteddPhiForSpeciesZV[species][
+                bin_contentNormINC[l] = self.NormalizedBGSubtracteddPhiForTrueSpeciesZV[species][
                     i, j, k
                 ].GetBinContent(
                     l + 1
                 )  # type:ignore
-                bin_errorsNormINC[l] = self.NormalizedBGSubtracteddPhiForSpeciesZV[species][
+                bin_errorsNormINC[l] = self.NormalizedBGSubtracteddPhiForTrueSpeciesZV[species][
                     i, j, k
                 ].GetBinError(
                     l + 1
@@ -7017,8 +8325,8 @@ class PlotMixin:
 
             dPhiSigminusBGNormINCax.errorbar(
                 x_binsNormINC,
-                bin_contentNormINC if k!=3 else bin_contentNormINC,
-                yerr=bin_errorsNormINC if k!=3 else bin_errorsNormINC,
+                bin_contentNormINC if k!=3 else bin_contentNormINC*3,
+                yerr=bin_errorsNormINC if k!=3 else bin_errorsNormINC*3,
                 fmt="o",
                 color="black",
             )
@@ -7026,11 +8334,11 @@ class PlotMixin:
                 x_binsNormINC,
                 bin_contentNormINC - BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 - np.sqrt(np.sum((BGErrorINC) ** 2, axis=1) ) / N_trig,
                 bin_contentNormINC + BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / (N_trig),
                 alpha=0.3,
                 color="green",
@@ -7040,16 +8348,34 @@ class PlotMixin:
             if plot_ME_systematic:
                 dPhiSigminusBGNormINCax.fill_between(
                     x_binsNormINC,
-                    bin_contentNormINC - self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC - self.ME_norm_systematics[i, j, k]/(N_trig),
-                    bin_contentNormINC + self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC + self.ME_norm_systematics[i, j, k]/(N_trig),
+                    bin_contentNormINC - self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC*3 - self.ME_norm_systematics[i, j, k]/(N_trig),
+                    bin_contentNormINC + self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC*3 + self.ME_norm_systematics[i, j, k]/(N_trig),
                     color="red",
                     alpha=0.3,
                     label="ME normalization",
                 )
+            
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                else:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                dPhiSigminusBGNormINCax.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
+
             dPhiSigminusBGNormINC.legend()
-            dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$")
+            dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$ ($rad$)")
             dPhiSigminusBGNormINCax.set_ylabel(
-                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$"
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad^{-1}$)"
                 if k == 0
                 else ""
             )
@@ -7063,8 +8389,8 @@ class PlotMixin:
             plt.close(dPhiSigminusBGNormINC)
             axSigminusBGNormINCSpecies[(k+1)%4].errorbar(
                 x_binsNormINC,
-                bin_contentNormINC if k!=3 else bin_contentNormINC,
-                yerr=bin_errorsNormINC if k!=3 else bin_errorsNormINC,
+                bin_contentNormINC if k!=3 else bin_contentNormINC*3,
+                yerr=bin_errorsNormINC if k!=3 else bin_errorsNormINC*3,
                 fmt="o",
                 color="black",
             )
@@ -7072,11 +8398,11 @@ class PlotMixin:
                 x_binsNormINC,
                 bin_contentNormINC - BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 - np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / (N_trig),
                 bin_contentNormINC + BGErrorINC[:, k] / N_trig
                 if k != 3
-                else bin_contentNormINC
+                else bin_contentNormINC*3
                 + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / (N_trig),
                 alpha=0.3,
                 color="green",
@@ -7086,16 +8412,32 @@ class PlotMixin:
             if plot_ME_systematic:
                 axSigminusBGNormINCSpecies[(k+1)%4].fill_between(
                     x_binsNormINC,
-                    bin_contentNormINC - self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC - self.ME_norm_systematics[i, j, k]/(N_trig),
-                    bin_contentNormINC + self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC + self.ME_norm_systematics[i, j, k]/(N_trig),
+                    bin_contentNormINC - self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC*3 - self.ME_norm_systematics[i, j, k]/(N_trig),
+                    bin_contentNormINC + self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC*3 + self.ME_norm_systematics[i, j, k]/(N_trig),
                     color="red",
                     alpha=0.3,
                     label="ME normalization",
                 )
 
-            axSigminusBGNormINCSpecies[(k+1)%4].set_xlabel("$\\Delta \\phi$")
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                else:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                axSigminusBGNormINCSpecies[(k+1)%4].fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
+            axSigminusBGNormINCSpecies[(k+1)%4].set_xlabel("$\\Delta \\phi$ ($rad$)")
             axSigminusBGNormINCSpecies[k].set_ylabel(
-                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$"
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad^{-1}$)"
                 if k == 0
                 else ""
             )
@@ -7104,12 +8446,12 @@ class PlotMixin:
             dPhiSigminusBGNormINC, dPhiSigminusBGNormINCax = plt.subplots(
                 1, 1, figsize=(10, 6)
             )  # type:ignore
-            n_binsNormINC = self.NormalizedBGSubtracteddPhiForSpeciesZV[species][
+            n_binsNormINC = self.NormalizedBGSubtracteddPhiForTrueSpeciesZV[species][
                 i, j
             ].GetNbinsX()  # type:ignore
             x_binsNormINC = np.array(
                 [
-                    self.NormalizedBGSubtracteddPhiForSpeciesZV[species][
+                    self.NormalizedBGSubtracteddPhiForTrueSpeciesZV[species][
                         i, j
                     ].GetBinCenter(b)
                     for b in range(1, n_binsNormINC + 1)
@@ -7117,7 +8459,7 @@ class PlotMixin:
             )  # type:ignore
             bin_contentNormINC = np.array(
                 [
-                    self.NormalizedBGSubtracteddPhiForSpeciesZV[species][
+                    self.NormalizedBGSubtracteddPhiForTrueSpeciesZV[species][
                         i, j
                     ].GetBinContent(b)
                     for b in range(1, n_binsNormINC + 1)
@@ -7125,13 +8467,13 @@ class PlotMixin:
             )  # type:ignore
             bin_errorsNormINC = np.array(
                 [
-                    self.NormalizedBGSubtracteddPhiForSpeciesZV[species][
+                    self.NormalizedBGSubtracteddPhiForTrueSpeciesZV[species][
                         i, j
                     ].GetBinError(b)
                     for b in range(1, n_binsNormINC + 1)
                 ]
             )  # type:ignore
-            BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForSpeciesminValsZV[
+            BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForTrueSpeciesminValsZV[
                 species
             ][
                 i, j
@@ -7160,10 +8502,27 @@ class PlotMixin:
                     color="red",
                     label="ME normalization",
                 )  # type:ignore
+
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                else:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                dPhiSigminusBGNormINCax.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
             dPhiSigminusBGNormINC.legend()
-            dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$")
+            dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$ ($rad{-1}$)")
             dPhiSigminusBGNormINCax.set_ylabel(
-                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$"
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad{-1}$)"
                 if k == 0
                 else ""
             )
@@ -7201,26 +8560,670 @@ class PlotMixin:
                     color="red",
                     label="ME normalization",
                 )  # type:ignore
-            axSigminusBGNormINCSpecies.set_xlabel("$\\Delta \\phi$")
+
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                else:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                axSigminusBGNormINCSpecies.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
+            axSigminusBGNormINCSpecies.set_xlabel("$\\Delta \\phi$ ($rad$)")
             axSigminusBGNormINCSpecies.set_ylabel(
-                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$"
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad^{-1}$)"
+            )
+            # axSigminusBGNormINC.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
+    
+    @print_function_name_with_description_on_call(description="")
+    def plot_normalized_background_subtracted_dPhi_for_enhanced_species(
+        self, i, j, k, species, axSigminusBGNormINCSpecies, BGErrorINC, plot_ME_systematic=True, plot_PID_systematic=False
+    ):
+        
+        if self.analysisType in ["central", "semicentral"]:
+            N_trig = self.N_trigs[i,k]
+        elif self.analysisType=='pp':
+            N_trig = self.N_trigs[i]
+            plot_ME_systematic=False
+        if self.analysisType in ["central", "semicentral"]:
+            dPhiSigminusBGNormINC, dPhiSigminusBGNormINCax = plt.subplots(
+                1, 1, figsize=(10, 6)
+            )  # type:ignore
+            n_binsNormINC = (
+                self.NormalizedBGSubtracteddPhiForEnhancedSpecies[species][i, j, k]
+                .GetXaxis()
+                .GetNbins()
+            )  # type:ignore
+            x_binsNormINC = np.zeros(n_binsNormINC)  # type:ignore
+            bin_contentNormINC = np.zeros(n_binsNormINC)  # type:ignore
+            bin_errorsNormINC = np.zeros(n_binsNormINC)  # type:ignore
+
+            for l in range(n_binsNormINC):
+                x_binsNormINC[l] = (
+                    self.NormalizedBGSubtracteddPhiForEnhancedSpecies[species][i, j, k]
+                    .GetXaxis()
+                    .GetBinCenter(l + 1)
+                )  # type:ignore
+                bin_contentNormINC[l] = self.NormalizedBGSubtracteddPhiForEnhancedSpecies[species][
+                    i, j, k
+                ].GetBinContent(
+                    l + 1
+                )  # type:ignore
+                bin_errorsNormINC[l] = self.NormalizedBGSubtracteddPhiForEnhancedSpecies[species][
+                    i, j, k
+                ].GetBinError(
+                    l + 1
+                )  # type:ignore
+
+            dPhiSigminusBGNormINCax.errorbar(
+                x_binsNormINC,
+                bin_contentNormINC if k!=3 else bin_contentNormINC*3,
+                yerr=bin_errorsNormINC if k!=3 else bin_errorsNormINC*3,
+                fmt="o",
+                color="black",
+            )
+            dPhiSigminusBGNormINCax.fill_between(
+                x_binsNormINC,
+                bin_contentNormINC - BGErrorINC[:, k] / N_trig
+                if k != 3
+                else bin_contentNormINC*3
+                - np.sqrt(np.sum((BGErrorINC) ** 2, axis=1) ) / N_trig,
+                bin_contentNormINC + BGErrorINC[:, k] / N_trig
+                if k != 3
+                else bin_contentNormINC*3
+                + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / (N_trig),
+                alpha=0.3,
+                color="green",
+                label="RPF fit",
+            )
+            # do fill between for me norm systematic
+            if plot_ME_systematic:
+                bin_contentDiff = np.zeros(n_binsNormINC)  # type:ignore
+
+                for l in range(n_binsNormINC):
+                    bin_contentDiff[l] = self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV[species][
+                        i, j, k
+                    ].GetBinContent(
+                        l + 1
+                    )  # type:ignore
+                bin_contentDiff = np.abs(bin_contentDiff - bin_contentNormINC)
+                dPhiSigminusBGNormINCax.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - bin_contentDiff,
+                    bin_contentNormINC +bin_contentDiff,
+                    color="red",
+                    alpha=0.3,
+                    label="ME systematic",
+                )
+            
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                elif self.analysisType=='pp':
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                dPhiSigminusBGNormINCax.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
+            
+            dPhiSigminusBGNormINC.legend()
+            dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$ ($rad$)")
+            dPhiSigminusBGNormINCax.set_ylabel(
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad^{-1}$)"
+                if k == 0
+                else ""
+            )
+            dPhiSigminusBGNormINCax.set_title(
+                f"Normalized Background subtracted $\\Delta \\phi${self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}, {species}"
+            )  # type:ignore
+            dPhiSigminusBGNormINC.tight_layout()
+            dPhiSigminusBGNormINC.savefig(
+                f"{self.base_save_path}{self.epString}/dPhiSig-BG-Norm-{species}{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}Enh.png"
+            )  # type:ignore
+            plt.close(dPhiSigminusBGNormINC)
+            axSigminusBGNormINCSpecies[(k+1)%4].errorbar(
+                x_binsNormINC,
+                bin_contentNormINC if k!=3 else bin_contentNormINC*3,
+                yerr=bin_errorsNormINC if k!=3 else bin_errorsNormINC*3,
+                fmt="o",
+                color="black",
+            )
+            axSigminusBGNormINCSpecies[(k+1)%4].fill_between(
+                x_binsNormINC,
+                bin_contentNormINC - BGErrorINC[:, k] / N_trig
+                if k != 3
+                else bin_contentNormINC*3
+                - np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / (N_trig),
+                bin_contentNormINC + BGErrorINC[:, k] / N_trig
+                if k != 3
+                else bin_contentNormINC*3
+                + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / (N_trig),
+                alpha=0.3,
+                color="green",
+                label="RPF fit",
+            )
+            # do fill between for me norm systematic
+            if plot_ME_systematic:
+                axSigminusBGNormINCSpecies[(k+1)%4].fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - bin_contentDiff,
+                    bin_contentNormINC + bin_contentDiff,
+                    color="red",
+                    alpha=0.3,
+                    label="ME systematic",
+                )
+
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                else:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                axSigminusBGNormINCSpecies[(k+1)%4].fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
+
+            axSigminusBGNormINCSpecies[(k+1)%4].set_xlabel("$\\Delta \\phi$ ($rad$)")
+            axSigminusBGNormINCSpecies[k].set_ylabel(
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad^{-1}$)"
+                if k == 0
+                else ""
+            )
+
+        elif self.analysisType == "pp":
+            dPhiSigminusBGNormINC, dPhiSigminusBGNormINCax = plt.subplots(
+                1, 1, figsize=(10, 6)
+            )  # type:ignore
+            n_binsNormINC = self.NormalizedBGSubtracteddPhiForEnhancedSpecies[species][
+                i, j
+            ].GetNbinsX()  # type:ignore
+            x_binsNormINC = np.array(
+                [
+                    self.NormalizedBGSubtracteddPhiForEnhancedSpecies[species][
+                        i, j
+                    ].GetBinCenter(b)
+                    for b in range(1, n_binsNormINC + 1)
+                ]
+            )  # type:ignore
+            bin_contentNormINC = np.array(
+                [
+                    self.NormalizedBGSubtracteddPhiForEnhancedSpecies[species][
+                        i, j
+                    ].GetBinContent(b)
+                    for b in range(1, n_binsNormINC + 1)
+                ]
+            )  # type:ignore
+            bin_errorsNormINC = np.array(
+                [
+                    self.NormalizedBGSubtracteddPhiForEnhancedSpecies[species][
+                        i, j
+                    ].GetBinError(b)
+                    for b in range(1, n_binsNormINC + 1)
+                ]
+            )  # type:ignore
+            BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminVals[
+                species
+            ][
+                i, j
+            ]  # type:ignore
+            dPhiSigminusBGNormINCax.errorbar(
+                x_binsNormINC,
+                bin_contentNormINC,
+                yerr=bin_errorsNormINC,
+                fmt="o",
+                color="black",
+            )
+            dPhiSigminusBGNormINCax.fill_between(
+                x_binsNormINC,
+                bin_contentNormINC - BG_errorsNormINC / N_trig,
+                bin_contentNormINC + BG_errorsNormINC / N_trig,
+                alpha=0.3,
+                color="orange",
+                label="Yield normalization",
+            )
+            if plot_ME_systematic:
+                bin_contentDiff = np.zeros(n_binsNormINC)  # type:ignore
+
+                for l in range(n_binsNormINC):
+                    bin_contentDiff[l] = self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV[species][
+                        i, j
+                    ].GetBinContent(
+                        l + 1
+                    )  # type:ignore
+                bin_contentDiff = np.abs(bin_contentDiff - bin_contentNormINC)
+
+                dPhiSigminusBGNormINCax.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - bin_contentDiff,
+                    bin_contentNormINC + bin_contentDiff,
+                    alpha=0.3,
+                    color="red",
+                    label="ME Systematic",
+                )  # type:ignore
+
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                else:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                dPhiSigminusBGNormINCax.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
+            dPhiSigminusBGNormINC.legend()
+            dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$ ($rad$)")
+            dPhiSigminusBGNormINCax.set_ylabel(
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad^{-1}$)"
+                if k == 0
+                else ""
+            )
+            # dPhiSigminusBGNormINCax.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
+
+            dPhiSigminusBGNormINCax.set_title(
+                f"Normalized background subtracted $\\Delta \\phi${self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}, {species}"
+            )  # type:ignore
+            dPhiSigminusBGNormINC.tight_layout()
+            dPhiSigminusBGNormINC.savefig(
+                f"{self.base_save_path}{self.epString}/dPhiSig-BG-Norm-{species}{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}Enh.png"
+            )  # type:ignore
+            plt.close(dPhiSigminusBGNormINC)
+            axSigminusBGNormINCSpecies.errorbar(
+                x_binsNormINC,
+                bin_contentNormINC,
+                yerr=bin_errorsNormINC,
+                fmt="o",
+                color="black",
+            )
+            axSigminusBGNormINCSpecies.fill_between(
+                x_binsNormINC,
+                bin_contentNormINC - BG_errorsNormINC / N_trig,
+                bin_contentNormINC + BG_errorsNormINC / N_trig,
+                alpha=0.3,
+                color="orange",
+                label="Yield normalization",
+            )
+            if plot_ME_systematic:
+                
+                axSigminusBGNormINCSpecies.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - bin_contentDiff,
+                    bin_contentNormINC + bin_contentDiff,
+                    alpha=0.3,
+                    color="red",
+                    label="ME normalization",
+                )  # type:ignore
+
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                else:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                axSigminusBGNormINCSpecies.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
+            axSigminusBGNormINCSpecies.set_xlabel("$\\Delta \\phi$ ($rad$)")
+            axSigminusBGNormINCSpecies.set_ylabel(
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad^{-1}$)"
+            )
+            # axSigminusBGNormINC.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
+    
+    @print_function_name_with_description_on_call(description="")
+    def plot_normalized_background_subtracted_dPhi_for_enhanced_species_in_z_vertex_bins(
+        self, i, j, k, species, axSigminusBGNormINCSpecies, BGErrorINC, plot_ME_systematic=False, plot_PID_systematic=False
+    ):
+        if self.analysisType in ["central", "semicentral"]:
+            N_trig = self.N_trigs[i,k]
+        elif self.analysisType=='pp':
+            N_trig = self.N_trigs[i]
+        if self.analysisType in ["central", "semicentral"]:
+            dPhiSigminusBGNormINC, dPhiSigminusBGNormINCax = plt.subplots(
+                1, 1, figsize=(10, 6)
+            )  # type:ignore
+            n_binsNormINC = (
+                self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV[species][i, j, k]
+                .GetXaxis()
+                .GetNbins()
+            )  # type:ignore
+            x_binsNormINC = np.zeros(n_binsNormINC)  # type:ignore
+            bin_contentNormINC = np.zeros(n_binsNormINC)  # type:ignore
+            bin_errorsNormINC = np.zeros(n_binsNormINC)  # type:ignore
+
+            for l in range(n_binsNormINC):
+                x_binsNormINC[l] = (
+                    self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV[species][i, j, k]
+                    .GetXaxis()
+                    .GetBinCenter(l + 1)
+                )  # type:ignore
+                bin_contentNormINC[l] = self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV[species][
+                    i, j, k
+                ].GetBinContent(
+                    l + 1
+                )  # type:ignore
+                bin_errorsNormINC[l] = self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV[species][
+                    i, j, k
+                ].GetBinError(
+                    l + 1
+                )  # type:ignore
+
+            dPhiSigminusBGNormINCax.errorbar(
+                x_binsNormINC,
+                bin_contentNormINC if k!=3 else bin_contentNormINC*3,
+                yerr=bin_errorsNormINC if k!=3 else bin_errorsNormINC*3,
+                fmt="o",
+                color="black",
+            )
+            dPhiSigminusBGNormINCax.fill_between(
+                x_binsNormINC,
+                bin_contentNormINC - BGErrorINC[:, k] / N_trig
+                if k != 3
+                else bin_contentNormINC*3
+                - np.sqrt(np.sum((BGErrorINC) ** 2, axis=1) ) / N_trig,
+                bin_contentNormINC + BGErrorINC[:, k] / N_trig
+                if k != 3
+                else bin_contentNormINC*3
+                + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / (N_trig),
+                alpha=0.3,
+                color="green",
+                label="RPF fit",
+            )
+            # do fill between for me norm systematic
+            if plot_ME_systematic:
+                dPhiSigminusBGNormINCax.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC*3 - self.ME_norm_systematics[i, j, k]/(N_trig),
+                    bin_contentNormINC + self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC*3 + self.ME_norm_systematics[i, j, k]/(N_trig),
+                    color="red",
+                    alpha=0.3,
+                    label="ME normalization",
+                )
+            
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                else:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                dPhiSigminusBGNormINCax.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
+
+            dPhiSigminusBGNormINC.legend()
+            dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$ ($rad$)")
+            dPhiSigminusBGNormINCax.set_ylabel(
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad^{-1}$)"
+                if k == 0
+                else ""
+            )
+            dPhiSigminusBGNormINCax.set_title(
+                f"Normalized Background subtracted $\\Delta \\phi${self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}, {species}"
+            )  # type:ignore
+            dPhiSigminusBGNormINC.tight_layout()
+            dPhiSigminusBGNormINC.savefig(
+                f"{self.base_save_path}{self.epString}/dPhiSig-BG-Norm-{species}{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}EnhZV.png"
+            )  # type:ignore
+            plt.close(dPhiSigminusBGNormINC)
+            axSigminusBGNormINCSpecies[(k+1)%4].errorbar(
+                x_binsNormINC,
+                bin_contentNormINC if k!=3 else bin_contentNormINC*3,
+                yerr=bin_errorsNormINC if k!=3 else bin_errorsNormINC*3,
+                fmt="o",
+                color="black",
+            )
+            axSigminusBGNormINCSpecies[(k+1)%4].fill_between(
+                x_binsNormINC,
+                bin_contentNormINC - BGErrorINC[:, k] / N_trig
+                if k != 3
+                else bin_contentNormINC*3
+                - np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / (N_trig),
+                bin_contentNormINC + BGErrorINC[:, k] / N_trig
+                if k != 3
+                else bin_contentNormINC*3
+                + np.sqrt(np.sum(BGErrorINC**2, axis=1) ) / (N_trig),
+                alpha=0.3,
+                color="green",
+                label="RPF fit",
+            )
+            # do fill between for me norm systematic
+            if plot_ME_systematic:
+                axSigminusBGNormINCSpecies[(k+1)%4].fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC*3 - self.ME_norm_systematics[i, j, k]/(N_trig),
+                    bin_contentNormINC + self.ME_norm_systematics[i, j, k]/N_trig if k!=3 else bin_contentNormINC*3 + self.ME_norm_systematics[i, j, k]/(N_trig),
+                    color="red",
+                    alpha=0.3,
+                    label="ME normalization",
+                )
+
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                else:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                axSigminusBGNormINCSpecies[(k+1)%4].fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig if k!=3 else bin_contentNormINC*3 + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
+            axSigminusBGNormINCSpecies[(k+1)%4].set_xlabel("$\\Delta \\phi$ ($rad$)")
+            axSigminusBGNormINCSpecies[k].set_ylabel(
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad^{-1}$)"
+                if k == 0
+                else ""
+            )
+
+        elif self.analysisType == "pp":
+            dPhiSigminusBGNormINC, dPhiSigminusBGNormINCax = plt.subplots(
+                1, 1, figsize=(10, 6)
+            )  # type:ignore
+            n_binsNormINC = self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV[species][
+                i, j
+            ].GetNbinsX()  # type:ignore
+            x_binsNormINC = np.array(
+                [
+                    self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV[species][
+                        i, j
+                    ].GetBinCenter(b)
+                    for b in range(1, n_binsNormINC + 1)
+                ]
+            )  # type:ignore
+            bin_contentNormINC = np.array(
+                [
+                    self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV[species][
+                        i, j
+                    ].GetBinContent(b)
+                    for b in range(1, n_binsNormINC + 1)
+                ]
+            )  # type:ignore
+            bin_errorsNormINC = np.array(
+                [
+                    self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV[species][
+                        i, j
+                    ].GetBinError(b)
+                    for b in range(1, n_binsNormINC + 1)
+                ]
+            )  # type:ignore
+            BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminValsZV[
+                species
+            ][
+                i, j
+            ]  # type:ignore
+            dPhiSigminusBGNormINCax.errorbar(
+                x_binsNormINC,
+                bin_contentNormINC,
+                yerr=bin_errorsNormINC,
+                fmt="o",
+                color="black",
+            )
+            dPhiSigminusBGNormINCax.fill_between(
+                x_binsNormINC,
+                bin_contentNormINC - BG_errorsNormINC / N_trig,
+                bin_contentNormINC + BG_errorsNormINC / N_trig,
+                alpha=0.3,
+                color="orange",
+                label="Yield normalization",
+            )
+            if plot_ME_systematic:
+                dPhiSigminusBGNormINCax.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - self.ME_norm_systematics[i, j]/N_trig,
+                    bin_contentNormINC + self.ME_norm_systematics[i, j]/N_trig,
+                    alpha=0.3,
+                    color="red",
+                    label="ME normalization",
+                )  # type:ignore
+
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                else:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                dPhiSigminusBGNormINCax.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
+            dPhiSigminusBGNormINC.legend()
+            dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$ ($rad{-1}$)")
+            dPhiSigminusBGNormINCax.set_ylabel(
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad{-1}$)"
+                if k == 0
+                else ""
+            )
+            # dPhiSigminusBGNormINCax.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
+
+            dPhiSigminusBGNormINCax.set_title(
+                f"Normalized background subtracted $\\Delta \\phi${self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]} GeV/c, {self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]} GeV/c, {self.epString}, {species}"
+            )  # type:ignore
+            dPhiSigminusBGNormINC.tight_layout()
+            dPhiSigminusBGNormINC.savefig(
+                f"{self.base_save_path}{self.epString}/dPhiSig-BG-Norm-{species}{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}_{self.pTassocBinEdges[j]}-{self.pTassocBinEdges[j+1]}EnhZV.png"
+            )  # type:ignore
+            plt.close(dPhiSigminusBGNormINC)
+            axSigminusBGNormINCSpecies.errorbar(
+                x_binsNormINC,
+                bin_contentNormINC,
+                yerr=bin_errorsNormINC,
+                fmt="o",
+                color="black",
+            )
+            axSigminusBGNormINCSpecies.fill_between(
+                x_binsNormINC,
+                bin_contentNormINC - BG_errorsNormINC / N_trig,
+                bin_contentNormINC + BG_errorsNormINC / N_trig,
+                alpha=0.3,
+                color="orange",
+                label="Yield normalization",
+            )
+            if plot_ME_systematic:
+                axSigminusBGNormINCSpecies.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - self.ME_norm_systematics[i, j]/N_trig,
+                    bin_contentNormINC + self.ME_norm_systematics[i, j]/N_trig,
+                    alpha=0.3,
+                    color="red",
+                    label="ME normalization",
+                )  # type:ignore
+
+            if plot_PID_systematic:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                else:
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+                axSigminusBGNormINCSpecies.fill_between(
+                    x_binsNormINC,
+                    bin_contentNormINC - dPhiErr/N_trig,
+                    bin_contentNormINC + dPhiErr/N_trig,
+                    color="blue",
+                    alpha=0.3,
+                    label="PID Error"
+                )
+            axSigminusBGNormINCSpecies.set_xlabel("$\\Delta \\phi$ ($rad$)")
+            axSigminusBGNormINCSpecies.set_ylabel(
+                "$\\frac{1}{N_{trig}\\epsilon a(\\Delta \\eta \\Delta\\phi)}\\frac{d(N_{meas}-N_{BG})}{d\\Delta\\phi}$ ($rad^{-1}$)"
             )
             # axSigminusBGNormINC.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
 
     @print_function_name_with_description_on_call(description="")
-    def plot_yield_for_species(self, species, plot_ME_systematic=False):
+    def plot_inclusive_yield(self, plot_ME_systematic=True,):
+
+        panel_text1 = "ALICE Work In Progress" + "\n" + f"{'pp' if self.analysisType=='pp' else 'Pb-Pb'}" + r"$\sqrt{s_{NN}}$=5.02TeV"+ f", {'30-50%' if self.analysisType=='semicentral' else '0-10%' if self.analysisType=='central' else ''}"+ "\n"  + "anti-$k_T$ R=0.2"
+        panel_text2 =  f"\n" + r"$p_T^{ch}$ c, $E_T^{clus}>$3.0 GeV" + "\n" + r"$p_T^{lead, ch} >$ 5.0 GeV/c"
+        x_locs = [0.25, 0.4]
+        y_locs = [0.75, 0.75]
+        font_size = 16
 
         yieldFig, axYield = plt.subplots(1, 1, figsize=(10, 6))
-        axYield.set_title(f"Yield for {species}")
+        axYield.set_title(f"{'Inclusive'} Yield")
         axYield.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
-        axYield.set_ylabel("Yield")
+        axYield.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)$^{-1}$"%('Inclusive', 'Inclusive'))
         # set log y
         axYield.set_yscale("log")
+        if self.analysisType=='pp':
+            plot_ME_systematic=False
         for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
             axYield.errorbar(
                 self.pTassocBinCenters,
-                self.Yields[species][i, :],
-                self.YieldErrs[species][i, :],
+                self.YieldsTrue['inclusive'][i, :],
+                self.YieldErrsTrue['inclusive'][i, :],
                 np.array(self.pTassocBinWidths) / 2,
                 label=f"Jet p_T {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
                 fmt="o",
@@ -7231,7 +9234,7 @@ class PlotMixin:
                 self.set_pT_epAngle_bin(i, j, 3)  # type:ignore
                 N_trigs.append(self.get_N_trig())  # type:ignore
             N_trigs = np.array(N_trigs)
-            N_trigs = N_trigs + 1e-4
+            N_trigs = N_trigs
             if self.analysisType in ["central", "semicentral"]:  # type:ignore
                 
                 n_bins = (
@@ -7262,83 +9265,91 @@ class PlotMixin:
                         / N_trigs[j]
                         for j in range(len(self.pTassocBinCenters))
                     ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
-                per_bin_sig_to_inc_ratio = [
-                    np.sum([self.get_bin_contents_as_array(self.dPhiSigcorrsForSpecies[species][i,j,k], forFitting=False) / self.get_bin_contents_as_array(self.dPhiSigcorrs[i,j,k], forFitting=False) for k in range(4)]) for j in range(len(self.pTassocBinCenters)) # type:ignore 
-                ] # type:ignore
+                
                 RPFError = [
-                    np.sum(per_bin_RPF_error[j]*per_bin_sig_to_inc_ratio[j])
+                    np.sum(per_bin_RPF_error[j])
                     for j in range(len(self.pTassocBinCenters))
                 ]  # type:ignore
 
 
                 axYield.fill_between(
                     self.pTassocBinCenters,
-                    np.array(self.Yields[species][i, :], dtype=float) - RPFError,
-                    np.array(self.Yields[species][i, :], dtype=float) + RPFError,
+                    np.array(self.YieldsTrue['inclusive'][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsTrue['inclusive'][i, :], dtype=float) + RPFError,
                     alpha=0.3,
                     color="green",
-                    label="RPF systematics" if i == 2 else "",
+                    label="RPF systematics" if i == 1 else "",
                 )  # type:ignore
                 # now ME_norm_systematics
                 if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrue['inclusive'][i, :]-self.YieldsTrueZV['inclusive'][i,:]) # type:ignore
                     axYield.fill_between(
                         self.pTassocBinCenters,
-                        np.array(self.Yields[species][i, :], dtype=float)
-                        - np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
-                        / N_trigs,
-                        np.array(self.Yields[species][i, :], dtype=float)
-                        + np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
-                        / N_trigs,
+                        np.array(self.YieldsTrue['inclusive'][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrue['inclusive'][i, :], dtype=float)
+                        + bin_contentDiff,
                         alpha=0.3,
                         color="red",
                         label="ME normalization" if i == 2 else "",
                     )  # type:ignore
+                
+               
             if self.analysisType == "pp":
-                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForSpeciesminVals[
-                    species
-                ][
+                BG_errorsNormINC = self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminVals[
                     i, :
                 ]  # type:ignore
                 BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
                 axYield.fill_between(
                     self.pTassocBinCenters,
-                    np.array(self.Yields[species][i, :], dtype=float)
+                    np.array(self.YieldsTrue['inclusive'][i, :], dtype=float)
                     - BG_errorsNormINC,
-                    np.array(self.Yields[species][i, :], dtype=float)
+                    np.array(self.YieldsTrue['inclusive'][i, :], dtype=float)
                     + BG_errorsNormINC,
                     alpha=0.3,
                     color="orange",
-                    label="Yield normalization" if i == 2 else "",
+                    label="Yield normalization" if i == 1 else "",
                 )  # type:ignore
                 # now ME_norm_systematics
                 if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrue['inclusive'][i, :]-self.YieldsTrueZV['inclusive'][i,:]) # type:ignore
                     axYield.fill_between(
                         self.pTassocBinCenters,
-                        np.array(self.Yields[species][i, :], dtype=float)
-                        - np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
-                        np.array(self.Yields[species][i, :], dtype=float)
-                        + np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        np.array(self.YieldsTrue['inclusive'][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrue['inclusive'][i, :], dtype=float)
+                        + bin_contentDiff,
                         alpha=0.3,
                         color="red",
-                        label="ME normalization" if i == 2 else "",
+                        label="ME normalization" if i == 1 else "",
                     )  # type:ignore
+
+                
+        axYield.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYield.transAxes)
+        axYield.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYield.transAxes)
 
         axYield.legend()
         yieldFig.tight_layout()
-        yieldFig.savefig(f"{self.base_save_path}Yield_{species}.png")  # type:ignore
+        yieldFig.savefig(f"{self.base_save_path}Yield_{'inclusive'}.png")  # type:ignore
         plt.close(yieldFig)
 
         yieldFigNS, axYieldNS = plt.subplots(1, 1, figsize=(10, 6))
-        axYieldNS.set_title(f"Yield for {species} on the near side")
+        axYieldNS.set_title(f"Near side {'Inclusive'} Yield")
         axYieldNS.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
-        axYieldNS.set_ylabel("Yield")
+        axYieldNS.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)$^{-1}$"%('Inclusive', 'Inclusive'))
         # set log y
         axYieldNS.set_yscale("log")
         for i in range(len(self.pTtrigBinEdges) - 1):
             axYieldNS.errorbar(
                 self.pTassocBinCenters,
-                self.YieldsNS[species][i, :],
-                self.YieldErrsNS[species][i, :],
+                self.YieldsTrueNS['inclusive'][i, :],
+                self.YieldErrsTrueNS['inclusive'][i, :],
                 np.array(self.pTassocBinWidths) / 2,
                 label=f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
                 fmt="o",
@@ -7384,8 +9395,8 @@ class PlotMixin:
                 ]  # type:ignore
                 axYieldNS.fill_between(
                     self.pTassocBinCenters,
-                    np.array(self.YieldsNS[species][i, :], dtype=float) - RPFError,
-                    np.array(self.YieldsNS[species][i, :], dtype=float) + RPFError,
+                    np.array(self.YieldsTrueNS['inclusive'][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsTrueNS['inclusive'][i, :], dtype=float) + RPFError,
                     alpha=0.3,
                     color="orange",
                     label="RPF systematics" if i == 2 else "",
@@ -7393,63 +9404,73 @@ class PlotMixin:
 
                 # now ME_norm_systematics
                 if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrueNS['inclusive'][i, :]-self.YieldsTrueNSZV['inclusive'][i,:]) # type:ignore
                     axYieldNS.fill_between(
                         self.pTassocBinCenters,
-                        np.array(self.YieldsNS[species][i, :], dtype=float)
-                        - np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
-                        / N_trigs,
-                        np.array(self.YieldsNS[species][i, :], dtype=float)
-                        + np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
-                        / N_trigs,
+                        np.array(self.YieldsTrueNS['inclusive'][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrueNS['inclusive'][i, :], dtype=float)
+                        + bin_contentDiff,
                         alpha=0.3,
                         color="red",
                         label="ME normalization" if i == 2 else "",
                     )  # type:ignore
+                
+               
             if self.analysisType == "pp":
-                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForSpeciesminVals[
-                    species
-                ][
+                BG_errorsNormINC = self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminVals[
                     i, :
                 ]  # type:ignore
                 BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
                 axYieldNS.fill_between(
                     self.pTassocBinCenters,
-                    np.array(self.YieldsNS[species][i, :], dtype=float)
+                    np.array(self.YieldsTrueNS['inclusive'][i, :], dtype=float)
                     - BG_errorsNormINC,
-                    np.array(self.YieldsNS[species][i, :], dtype=float)
+                    np.array(self.YieldsTrueNS['inclusive'][i, :], dtype=float)
                     + BG_errorsNormINC,
                     alpha=0.3,
                     color="orange",
-                    label="Yield normalization" if i == 2 else "",
+                    label="Yield normalization" if i == 1 else "",
                 )  # type:ignore
                 # now ME_norm_systematics
                 if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrueNS['inclusive'][i, :]-self.YieldsTrueNSZV['inclusive'][i,:]) # type:ignore
                     axYieldNS.fill_between(
                         self.pTassocBinCenters,
-                        np.array(self.YieldsNS[species][i, :], dtype=float)
-                        - np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
-                        np.array(self.YieldsNS[species][i, :], dtype=float)
-                        + np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        np.array(self.YieldsTrueNS['inclusive'][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrueNS['inclusive'][i, :], dtype=float)
+                        + bin_contentDiff,
                         alpha=0.3,
                         color="red",
                         label="ME normalization" if i == 2 else "",
                     )  # type:ignore
+
+        axYieldNS.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYieldNS.transAxes)
+        axYieldNS.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYieldNS.transAxes)
+        
         axYieldNS.legend()
         yieldFigNS.tight_layout()
-        yieldFigNS.savefig(f"{self.base_save_path}YieldNS_{species}.png")  # type:ignore
+        yieldFigNS.savefig(f"{self.base_save_path}YieldNS_{'inclusive'}.png")  # type:ignore
         plt.close(yieldFigNS)
 
         yieldFigAS, axYieldAS = plt.subplots(1, 1, figsize=(10, 6))
-        axYieldAS.set_title(f"Yield for {species} on the away side")
+        axYieldAS.set_title(f"Away Side {'inclusive'} Yield")
         axYieldAS.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
-        axYieldAS.set_ylabel("Yield")
+        axYieldAS.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)${-1}$"%('inclusive', 'inclusive'))
         # set log y
         axYieldAS.set_yscale("log")
         for i in range(len(self.pTtrigBinEdges) - 1):
             axYieldAS.errorbar(
                 self.pTassocBinCenters,
-                self.YieldsAS[species][i, :],
-                self.YieldErrsAS[species][i, :],
+                self.YieldsTrueAS['inclusive'][i, :],
+                self.YieldErrsTrueAS['inclusive'][i, :],
                 np.array(self.pTassocBinWidths) / 2,
                 label=f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
                 fmt="o",
@@ -7496,74 +9517,93 @@ class PlotMixin:
 
                 axYieldAS.fill_between(
                     self.pTassocBinCenters,
-                    np.array(self.YieldsAS[species][i, :], dtype=float) - RPFError,
-                    np.array(self.YieldsAS[species][i, :], dtype=float) + RPFError,
+                    np.array(self.YieldsTrueAS['inclusive'][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsTrueAS['inclusive'][i, :], dtype=float) + RPFError,
                     alpha=0.3,
                     color="orange",
                     label="RPF systematics" if i == 2 else "",
                 )  # type:ignore
                 # now ME_norm_systematics
                 if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrueAS['inclusive'][i, :]-self.YieldsTrueASZV['inclusive'][i,:]) # type:ignore
                     axYieldAS.fill_between(
                         self.pTassocBinCenters,
-                        np.array(self.YieldsAS[species][i, :], dtype=float)
-                        - np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
-                        / N_trigs,
-                        np.array(self.YieldsAS[species][i, :], dtype=float)
-                        + np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
-                        / N_trigs,
+                        np.array(self.YieldsTrueAS['inclusive'][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrueAS['inclusive'][i, :], dtype=float)
+                        + bin_contentDiff,
                         alpha=0.3,
                         color="red",
                         label="ME normalization" if i == 2 else "",
                     )  # type:ignore
+
+                   
             if self.analysisType == "pp":
-                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForSpeciesminVals[
-                    species
-                ][
+                BG_errorsNormINC = self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminVals[
                     i, :
                 ]  # type:ignore
                 BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
                 axYieldAS.fill_between(
                     self.pTassocBinCenters,
-                    np.array(self.YieldsAS[species][i, :], dtype=float)
+                    np.array(self.YieldsTrueAS['inclusive'][i, :], dtype=float)
                     - BG_errorsNormINC,
-                    np.array(self.YieldsAS[species][i, :], dtype=float)
+                    np.array(self.YieldsTrueAS['inclusive'][i, :], dtype=float)
                     + BG_errorsNormINC,
                     alpha=0.3,
                     color="orange",
-                    label="Yield normalization" if i == 2 else "",
+                    label="Yield normalization" if i == 1 else "",
                 )  # type:ignore
                 # now ME_norm_systematics
                 if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrueAS['inclusive'][i, :]-self.YieldsTrueASZV['inclusive'][i,:]) # type:ignore
                     axYieldAS.fill_between(
                         self.pTassocBinCenters,
-                        np.array(self.YieldsAS[species][i, :], dtype=float)
-                        - np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
-                        np.array(self.YieldsAS[species][i, :], dtype=float)
-                        + np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        np.array(self.YieldsTrueAS['inclusive'][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrueAS['inclusive'][i, :], dtype=float)
+                        + bin_contentDiff,
                         alpha=0.3,
                         color="red",
                         label="ME normalization" if i == 2 else "",
                     )  # type:ignore
+
+               
+        axYieldAS.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYieldAS.transAxes)
+        axYieldAS.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYieldAS.transAxes)
+
         axYieldAS.legend()
         yieldFigAS.tight_layout()
-        yieldFigAS.savefig(f"{self.base_save_path}YieldAS_{species}.png")  # type:ignore
+        yieldFigAS.savefig(f"{self.base_save_path}YieldAS_{'inclusive'}.png")  # type:ignore
         plt.close(yieldFigAS)
     
     @print_function_name_with_description_on_call(description="")
-    def plot_yield_for_species_in_z_vertex_bins(self, species, plot_ME_systematic=False):
+    def plot_inclusive_yield_in_z_vertex_bins(self, plot_ME_systematic=False,):
+
+        panel_text1 = "ALICE Work In Progress" + "\n" + f"{'pp' if self.analysisType=='pp' else 'Pb-Pb'}" + r"$\sqrt{s_{NN}}$=5.02TeV"+ f", {'30-50%' if self.analysisType=='semicentral' else '0-10%' if self.analysisType=='central' else ''}"+ "\n"  + "anti-$k_T$ R=0.2"
+        panel_text2 =  f"\n" + r"$p_T^{ch}$ c, $E_T^{clus}>$3.0 GeV" + "\n" + r"$p_T^{lead, ch} >$ 5.0 GeV/c"
+        x_locs = [0.25, 0.4]
+        y_locs = [0.75, 0.75]
+        font_size = 16
 
         yieldFig, axYield = plt.subplots(1, 1, figsize=(10, 6))
-        axYield.set_title(f"Yield for {species}")
+        axYield.set_title(f"{'Inclusive'} Yield")
         axYield.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
-        axYield.set_ylabel("Yield")
+        axYield.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)$^{-1}$"%('Inclusive', 'Inclusive'))
         # set log y
         axYield.set_yscale("log")
+        if self.analysisType=='pp':
+            plot_ME_systematic=False
         for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
             axYield.errorbar(
                 self.pTassocBinCenters,
-                self.YieldsZV[species][i, :],
-                self.YieldErrsZV[species][i, :],
+                self.YieldsTrueZV['inclusive'][i, :],
+                self.YieldErrsTrueZV['inclusive'][i, :],
                 np.array(self.pTassocBinWidths) / 2,
                 label=f"Jet p_T {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
                 fmt="o",
@@ -7574,7 +9614,7 @@ class PlotMixin:
                 self.set_pT_epAngle_bin(i, j, 3)  # type:ignore
                 N_trigs.append(self.get_N_trig())  # type:ignore
             N_trigs = np.array(N_trigs)
-            N_trigs = N_trigs + 1e-4
+            N_trigs = N_trigs
             if self.analysisType in ["central", "semicentral"]:  # type:ignore
                 
                 n_bins = (
@@ -7605,83 +9645,91 @@ class PlotMixin:
                         / N_trigs[j]
                         for j in range(len(self.pTassocBinCenters))
                     ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
-                per_bin_sig_to_inc_ratio = [
-                    np.sum([self.get_bin_contents_as_array(self.dPhiSigcorrsForSpeciesZV[species][i,j,k], forFitting=False) / self.get_bin_contents_as_array(self.dPhiSigcorrsZV[i,j,k], forFitting=False) for k in range(4)]) for j in range(len(self.pTassocBinCenters)) # type:ignore 
-                ] # type:ignore
+                
                 RPFError = [
-                    np.sum(per_bin_RPF_error[j]*per_bin_sig_to_inc_ratio[j])
+                    np.sum(per_bin_RPF_error[j])
                     for j in range(len(self.pTassocBinCenters))
                 ]  # type:ignore
 
 
                 axYield.fill_between(
                     self.pTassocBinCenters,
-                    np.array(self.YieldsZV[species][i, :], dtype=float) - RPFError,
-                    np.array(self.YieldsZV[species][i, :], dtype=float) + RPFError,
+                    np.array(self.YieldsTrueZV['inclusive'][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsTrueZV['inclusive'][i, :], dtype=float) + RPFError,
                     alpha=0.3,
                     color="green",
-                    label="RPF systematics" if i == 2 else "",
+                    label="RPF systematics" if i == 1 else "",
                 )  # type:ignore
                 # now ME_norm_systematics
                 if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrue['inclusive'][i, :]-self.YieldsTrueZV['inclusive'][i,:]) # type:ignore
                     axYield.fill_between(
                         self.pTassocBinCenters,
-                        np.array(self.YieldsZV[species][i, :], dtype=float)
-                        - np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
-                        / N_trigs,
-                        np.array(self.YieldsZV[species][i, :], dtype=float)
-                        + np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
-                        / N_trigs,
+                        np.array(self.YieldsTrue['inclusive'][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrue['inclusive'][i, :], dtype=float)
+                        + bin_contentDiff,
                         alpha=0.3,
                         color="red",
                         label="ME normalization" if i == 2 else "",
                     )  # type:ignore
+                
+               
             if self.analysisType == "pp":
-                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForSpeciesminValsZV[
-                    species
-                ][
+                BG_errorsNormINC = self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminValsZV[
                     i, :
                 ]  # type:ignore
                 BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
                 axYield.fill_between(
                     self.pTassocBinCenters,
-                    np.array(self.YieldsZV[species][i, :], dtype=float)
+                    np.array(self.YieldsTrueZV['inclusive'][i, :], dtype=float)
                     - BG_errorsNormINC,
-                    np.array(self.YieldsZV[species][i, :], dtype=float)
+                    np.array(self.YieldsTrueZV['inclusive'][i, :], dtype=float)
                     + BG_errorsNormINC,
                     alpha=0.3,
                     color="orange",
-                    label="Yield normalization" if i == 2 else "",
+                    label="Yield normalization" if i == 1 else "",
                 )  # type:ignore
                 # now ME_norm_systematics
                 if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrue['inclusive'][i, :]-self.YieldsTrueZV['inclusive'][i,:]) # type:ignore
                     axYield.fill_between(
                         self.pTassocBinCenters,
-                        np.array(self.YieldsZV[species][i, :], dtype=float)
-                        - np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
-                        np.array(self.YieldsZV[species][i, :], dtype=float)
-                        + np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        np.array(self.YieldsTrueZV['inclusive'][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrueZV['inclusive'][i, :], dtype=float)
+                        + bin_contentDiff,
                         alpha=0.3,
                         color="red",
-                        label="ME normalization" if i == 2 else "",
+                        label="ME normalization" if i == 1 else "",
                     )  # type:ignore
+
+                
+        axYield.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYield.transAxes)
+        axYield.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYield.transAxes)
 
         axYield.legend()
         yieldFig.tight_layout()
-        yieldFig.savefig(f"{self.base_save_path}Yield_{species}ZV.png")  # type:ignore
+        yieldFig.savefig(f"{self.base_save_path}Yield_{'inclusive'}ZV.png")  # type:ignore
         plt.close(yieldFig)
 
         yieldFigNS, axYieldNS = plt.subplots(1, 1, figsize=(10, 6))
-        axYieldNS.set_title(f"Yield for {species} on the near side")
+        axYieldNS.set_title(f"Near side {'Inclusive'} Yield")
         axYieldNS.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
-        axYieldNS.set_ylabel("Yield")
+        axYieldNS.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)$^{-1}$"%('Inclusive', 'Inclusive'))
         # set log y
         axYieldNS.set_yscale("log")
         for i in range(len(self.pTtrigBinEdges) - 1):
             axYieldNS.errorbar(
                 self.pTassocBinCenters,
-                self.YieldsNSZV[species][i, :],
-                self.YieldErrsNSZV[species][i, :],
+                self.YieldsTrueNSZV['inclusive'][i, :],
+                self.YieldErrsTrueNSZV['inclusive'][i, :],
                 np.array(self.pTassocBinWidths) / 2,
                 label=f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
                 fmt="o",
@@ -7727,8 +9775,8 @@ class PlotMixin:
                 ]  # type:ignore
                 axYieldNS.fill_between(
                     self.pTassocBinCenters,
-                    np.array(self.YieldsNSZV[species][i, :], dtype=float) - RPFError,
-                    np.array(self.YieldsNSZV[species][i, :], dtype=float) + RPFError,
+                    np.array(self.YieldsTrueNSZV['inclusive'][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsTrueNSZV['inclusive'][i, :], dtype=float) + RPFError,
                     alpha=0.3,
                     color="orange",
                     label="RPF systematics" if i == 2 else "",
@@ -7736,63 +9784,73 @@ class PlotMixin:
 
                 # now ME_norm_systematics
                 if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrueNS['inclusive'][i, :]-self.YieldsTrueNSZV['inclusive'][i,:]) # type:ignore
                     axYieldNS.fill_between(
                         self.pTassocBinCenters,
-                        np.array(self.YieldsNSZV[species][i, :], dtype=float)
-                        - np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
-                        / N_trigs,
-                        np.array(self.YieldsNSZV[species][i, :], dtype=float)
-                        + np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
-                        / N_trigs,
+                        np.array(self.YieldsTrueNS['inclusive'][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrueNS['inclusive'][i, :], dtype=float)
+                        + bin_contentDiff,
                         alpha=0.3,
                         color="red",
                         label="ME normalization" if i == 2 else "",
                     )  # type:ignore
+                
+               
             if self.analysisType == "pp":
-                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForSpeciesminValsZV[
-                    species
-                ][
+                BG_errorsNormINC = self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminValsZV[
                     i, :
                 ]  # type:ignore
                 BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
                 axYieldNS.fill_between(
                     self.pTassocBinCenters,
-                    np.array(self.YieldsNSZV[species][i, :], dtype=float)
+                    np.array(self.YieldsTrueNSZV['inclusive'][i, :], dtype=float)
                     - BG_errorsNormINC,
-                    np.array(self.YieldsNSZV[species][i, :], dtype=float)
+                    np.array(self.YieldsTrueNSZV['inclusive'][i, :], dtype=float)
                     + BG_errorsNormINC,
                     alpha=0.3,
                     color="orange",
-                    label="Yield normalization" if i == 2 else "",
+                    label="Yield normalization" if i == 1 else "",
                 )  # type:ignore
                 # now ME_norm_systematics
                 if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrueNS['inclusive'][i, :]-self.YieldsTrueNSZV['inclusive'][i,:]) # type:ignore
                     axYieldNS.fill_between(
                         self.pTassocBinCenters,
-                        np.array(self.YieldsNSZV[species][i, :], dtype=float)
-                        - np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
-                        np.array(self.YieldsNSZV[species][i, :], dtype=float)
-                        + np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        np.array(self.YieldsTrueNS['inclusive'][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrueNS['inclusive'][i, :], dtype=float)
+                        + bin_contentDiff,
                         alpha=0.3,
                         color="red",
                         label="ME normalization" if i == 2 else "",
                     )  # type:ignore
+
+        axYieldNS.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYieldNS.transAxes)
+        axYieldNS.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYieldNS.transAxes)
+        
         axYieldNS.legend()
         yieldFigNS.tight_layout()
-        yieldFigNS.savefig(f"{self.base_save_path}YieldNS_{species}ZV.png")  # type:ignore
+        yieldFigNS.savefig(f"{self.base_save_path}YieldNS_{'inclusive'}ZV.png")  # type:ignore
         plt.close(yieldFigNS)
 
         yieldFigAS, axYieldAS = plt.subplots(1, 1, figsize=(10, 6))
-        axYieldAS.set_title(f"Yield for {species} on the away side")
+        axYieldAS.set_title(f"Away Side {'inclusive'} Yield")
         axYieldAS.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
-        axYieldAS.set_ylabel("Yield")
+        axYieldAS.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)${-1}$"%('inclusive', 'inclusive'))
         # set log y
         axYieldAS.set_yscale("log")
         for i in range(len(self.pTtrigBinEdges) - 1):
             axYieldAS.errorbar(
                 self.pTassocBinCenters,
-                self.YieldsASZV[species][i, :],
-                self.YieldErrsASZV[species][i, :],
+                self.YieldsTrueASZV['inclusive'][i, :],
+                self.YieldErrsTrueASZV['inclusive'][i, :],
                 np.array(self.pTassocBinWidths) / 2,
                 label=f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
                 fmt="o",
@@ -7839,8 +9897,1059 @@ class PlotMixin:
 
                 axYieldAS.fill_between(
                     self.pTassocBinCenters,
-                    np.array(self.YieldsASZV[species][i, :], dtype=float) - RPFError,
-                    np.array(self.YieldsASZV[species][i, :], dtype=float) + RPFError,
+                    np.array(self.YieldsTrueASZV['inclusive'][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsTrueASZV['inclusive'][i, :], dtype=float) + RPFError,
+                    alpha=0.3,
+                    color="orange",
+                    label="RPF systematics" if i == 2 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrueAS['inclusive'][i, :]-self.YieldsTrueASZV['inclusive'][i,:]) # type:ignore
+                    axYieldAS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueAS['inclusive'][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrueAS['inclusive'][i, :], dtype=float)
+                        + bin_contentDiff,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                   
+            if self.analysisType == "pp":
+                BG_errorsNormINC = self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminValsZV[
+                    i, :
+                ]  # type:ignore
+                BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
+                axYieldAS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsTrueASZV['inclusive'][i, :], dtype=float)
+                    - BG_errorsNormINC,
+                    np.array(self.YieldsTrueASZV['inclusive'][i, :], dtype=float)
+                    + BG_errorsNormINC,
+                    alpha=0.3,
+                    color="orange",
+                    label="Yield normalization" if i == 1 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrueAS['inclusive'][i, :]-self.YieldsTrueASZV['inclusive'][i,:]) # type:ignore
+                    axYieldAS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueAS['inclusive'][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrueAS['inclusive'][i, :], dtype=float)
+                        + bin_contentDiff,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+               
+        axYieldAS.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYieldAS.transAxes)
+        axYieldAS.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYieldAS.transAxes)
+
+        axYieldAS.legend()
+        yieldFigAS.tight_layout()
+        yieldFigAS.savefig(f"{self.base_save_path}YieldAS_{'inclusive'}ZV.png")  # type:ignore
+        plt.close(yieldFigAS)
+
+    @print_function_name_with_description_on_call(description="")
+    def plot_yield_for_true_species(self, species, plot_ME_systematic=True, plot_PID_systematic=True):
+
+        panel_text1 = "ALICE Work In Progress" + "\n" + f"{'pp' if self.analysisType=='pp' else 'Pb-Pb'}" + r"$\sqrt{s_{NN}}$=5.02TeV"+ f", {'30-50%' if self.analysisType=='semicentral' else '0-10%' if self.analysisType=='central' else ''}"+ "\n"  + "anti-$k_T$ R=0.2"
+        panel_text2 =  f"\n" + r"$p_T^{ch}$ c, $E_T^{clus}>$3.0 GeV" + "\n" + r"$p_T^{lead, ch} >$ 5.0 GeV/c"
+        x_locs = [0.25, 0.4]
+        y_locs = [0.75, 0.75]
+        font_size = 16
+
+        yieldFig, axYield = plt.subplots(1, 1, figsize=(10, 6))
+        axYield.set_title(f"{species} Yield")
+        axYield.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
+        axYield.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)$^{-1}$"%(species, species))
+        # set log y
+        axYield.set_yscale("log")
+        if self.analysisType=='pp':
+            plot_ME_systematic=False
+        for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
+            axYield.errorbar(
+                self.pTassocBinCenters,
+                self.YieldsTrue[species][i, :],
+                self.YieldErrsTrue[species][i, :],
+                np.array(self.pTassocBinWidths) / 2,
+                label=f"Jet p_T {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
+                fmt="o",
+            )  # type:ignore
+            # now add the systematics
+            N_trigs = []
+            for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
+                self.set_pT_epAngle_bin(i, j, 3)  # type:ignore
+                N_trigs.append(self.get_N_trig())  # type:ignore
+            N_trigs = np.array(N_trigs)
+            N_trigs = N_trigs + 1e-4
+            if self.analysisType in ["central", "semicentral"]:  # type:ignore
+                
+                n_bins = (
+                    self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs[i, j, 3]
+                    .GetXaxis()
+                    .GetNbins()
+                )  # type:ignore
+                x_bins = np.zeros(n_bins)
+                per_bin_RPF_error = np.zeros((n_bins, len(self.pTassocBinCenters)))
+                for l in range(n_bins):
+                    x_bins[l] = (
+                        self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs[i, j, 3]
+                        .GetXaxis()
+                        .GetBinCenter(l + 1)
+                    )  # type:ignore
+                for l in range(n_bins):
+                    per_bin_RPF_error[l] = [
+                        np.sqrt(
+                            np.sum(
+                                self.RPFObjsForTrueSpecies[species][i, j].simultaneous_fit_err(
+                                    x_bins[l],
+                                    x_bins[1] - x_bins[0],
+                                    *self.RPFObjsForTrueSpecies[species][i, j].popt,
+                                )
+                                ** 2
+                            )
+                        )
+                        / N_trigs[j]
+                        for j in range(len(self.pTassocBinCenters))
+                    ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
+                RPFError = [
+                    np.sum(per_bin_RPF_error[j])
+                    for j in range(len(self.pTassocBinCenters))
+                ]  # type:ignore Here we sum over the range in dphi...should I be normalizing by the range??? 2pi?
+
+
+                axYield.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsTrue[species][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsTrue[species][i, :], dtype=float) + RPFError,
+                    alpha=0.3,
+                    color="green",
+                    label="RPF systematics" if i == 2 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrue[species][i, :]-self.YieldsTrueZV[species][i,:]) # type:ignore
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrue[species][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrue[species][i, :], dtype=float)
+                        + bin_contentDiff,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+                
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpecies[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpecies[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrue[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsTrue[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+
+            if self.analysisType == "pp":
+                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForTrueSpeciesminVals[
+                    species
+                ][
+                    i, :
+                ]  # type:ignore
+                BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
+                axYield.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsTrue[species][i, :], dtype=float)
+                    - BG_errorsNormINC,
+                    np.array(self.YieldsTrue[species][i, :], dtype=float)
+                    + BG_errorsNormINC,
+                    alpha=0.3,
+                    color="orange",
+                    label="Yield normalization" if i == 1 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrue[species][i, :]-self.YieldsTrueZV[species][i,:]) # type:ignore
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrue[species][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrue[species][i, :], dtype=float)
+                        + bin_contentDiff,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpecies[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpecies[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrue[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsTrue[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+
+        axYield.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYield.transAxes)
+        axYield.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYield.transAxes)
+
+        axYield.legend()
+        yieldFig.tight_layout()
+        yieldFig.savefig(f"{self.base_save_path}Yield_{species}.png")  # type:ignore
+        plt.close(yieldFig)
+
+        yieldFigNS, axYieldNS = plt.subplots(1, 1, figsize=(10, 6))
+        axYieldNS.set_title(f"Near side {species} Yield")
+        axYieldNS.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
+        axYieldNS.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)$^{-1}$"%(species, species))
+        # set log y
+        axYieldNS.set_yscale("log")
+        for i in range(len(self.pTtrigBinEdges) - 1):
+            axYieldNS.errorbar(
+                self.pTassocBinCenters,
+                self.YieldsTrueNS[species][i, :],
+                self.YieldErrsTrueNS[species][i, :],
+                np.array(self.pTassocBinWidths) / 2,
+                label=f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
+                fmt="o",
+            )  # type:ignore
+            # now add the systematics
+            N_trigs = []
+            for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
+                self.set_pT_epAngle_bin(i, j, 3)  # type:ignore
+                N_trigs.append(self.get_N_trig())  # type:ignore
+            N_trigs = np.array(N_trigs)
+            if self.analysisType in ["central", "semicentral"]:  # type:ignore
+                n_bins = (
+                    self.BGSubtractedAccCorrectedSEdPhiSigNScorrs[i, j, 3]
+                    .GetXaxis()
+                    .GetNbins()
+                )  # type:ignore
+                x_bins = np.zeros(n_bins)
+                for l in range(n_bins):
+                    x_bins[l] = (
+                        self.BGSubtractedAccCorrectedSEdPhiSigNScorrs[i, j, 3]
+                        .GetXaxis()
+                        .GetBinCenter(l + 1)
+                    )  # type:ignore
+                for l in range(n_bins):
+                    per_bin_RPF_error = [
+                        np.sqrt(
+                            np.sum(
+                                self.RPFObjs[i, j].simultaneous_fit_err(
+                                    x_bins[l],
+                                    x_bins[1] - x_bins[0],
+                                    *self.RPFObjs[i, j].popt,
+                                )
+                                ** 2
+                            )
+                            
+                        )
+                        / N_trigs[j]
+                        for j in range(len(self.pTassocBinCenters))
+                    ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
+                RPFError = [
+                    np.sum(per_bin_RPF_error[j])
+                    for j in range(len(self.pTassocBinCenters))
+                ]  # type:ignore
+                axYieldNS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsTrueNS[species][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsTrueNS[species][i, :], dtype=float) + RPFError,
+                    alpha=0.3,
+                    color="orange",
+                    label="RPF systematics" if i == 2 else "",
+                )  # type:ignore
+
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrueNS[species][i, :]-self.YieldsTrueNSZV[species][i,:]) # type:ignore
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueNS[species][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrueNS[species][i, :], dtype=float)
+                        + bin_contentDiff,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+                
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForTrueSpecies[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForTrueSpecies[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpecies[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForTrueSpecies[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForTrueSpecies[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpecies[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueNS[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsTrueNS[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+
+            if self.analysisType == "pp":
+                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForTrueSpeciesminVals[
+                    species
+                ][
+                    i, :
+                ]  # type:ignore
+                BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
+                axYieldNS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsTrueNS[species][i, :], dtype=float)
+                    - BG_errorsNormINC,
+                    np.array(self.YieldsTrueNS[species][i, :], dtype=float)
+                    + BG_errorsNormINC,
+                    alpha=0.3,
+                    color="orange",
+                    label="Yield normalization" if i == 1 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrueNS[species][i, :]-self.YieldsTrueNSZV[species][i,:]) # type:ignore
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueNS[species][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrueNS[species][i, :], dtype=float)
+                        + bin_contentDiff,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForTrueSpecies[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForTrueSpecies[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpecies[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForTrueSpecies[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForTrueSpecies[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpecies[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueNS[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsTrueNS[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+
+        axYieldNS.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYieldNS.transAxes)
+        axYieldNS.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYieldNS.transAxes)
+        
+        axYieldNS.legend()
+        yieldFigNS.tight_layout()
+        yieldFigNS.savefig(f"{self.base_save_path}YieldNS_{species}.png")  # type:ignore
+        plt.close(yieldFigNS)
+
+        yieldFigAS, axYieldAS = plt.subplots(1, 1, figsize=(10, 6))
+        axYieldAS.set_title(f"Away Side {species} Yield")
+        axYieldAS.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
+        axYieldAS.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)${-1}$"%(species, species))
+        # set log y
+        axYieldAS.set_yscale("log")
+        for i in range(len(self.pTtrigBinEdges) - 1):
+            axYieldAS.errorbar(
+                self.pTassocBinCenters,
+                self.YieldsTrueAS[species][i, :],
+                self.YieldErrsTrueAS[species][i, :],
+                np.array(self.pTassocBinWidths) / 2,
+                label=f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
+                fmt="o",
+            )  # type:ignore
+            # now add the systematics
+            N_trigs = []
+            for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
+                self.set_pT_epAngle_bin(i, j, 3)  # type:ignore
+                N_trigs.append(self.get_N_trig())  # type:ignore
+            N_trigs = np.array(N_trigs)
+            if self.analysisType in ["central", "semicentral"]:  # type:ignore
+                n_bins = (
+                    self.BGSubtractedAccCorrectedSEdPhiSigAScorrs[i, j, 3]
+                    .GetXaxis()
+                    .GetNbins()
+                )  # type:ignore
+                x_bins = np.zeros(n_bins)
+                for l in range(n_bins):
+                    x_bins[l] = (
+                        self.BGSubtractedAccCorrectedSEdPhiSigAScorrs[i, j, 3]
+                        .GetXaxis()
+                        .GetBinCenter(l + 1)
+                    )  # type:ignore
+                for l in range(n_bins):
+                    per_bin_RPF_error = [
+                        np.sqrt(
+                            np.sum(
+                                self.RPFObjs[i, j].simultaneous_fit_err(
+                                    x_bins[l],
+                                    x_bins[1] - x_bins[0],
+                                    *self.RPFObjs[i, j].popt,
+                                )
+                                ** 2
+                            )
+                            
+                        )
+                        / N_trigs[j]
+                        for j in range(len(self.pTassocBinCenters))
+                    ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
+                RPFError = [
+                    np.sum(per_bin_RPF_error[j])
+                    for j in range(len(self.pTassocBinCenters))
+                ]  # type:ignore
+
+                axYieldAS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsTrueAS[species][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsTrueAS[species][i, :], dtype=float) + RPFError,
+                    alpha=0.3,
+                    color="orange",
+                    label="RPF systematics" if i == 2 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrueAS[species][i, :]-self.YieldsTrueASZV[species][i,:]) # type:ignore
+                    axYieldAS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueAS[species][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrueAS[species][i, :], dtype=float)
+                        + bin_contentDiff,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForTrueSpecies[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigAS[0]
+                        ), self.dPhiSigPIDErrForTrueSpecies[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigAS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpecies[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForTrueSpecies[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigAS[0]
+                        ), self.dPhiSigPIDErrForTrueSpecies[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigAS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpecies[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYieldAS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueAS[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsTrueAS[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+            if self.analysisType == "pp":
+                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForTrueSpeciesminVals[
+                    species
+                ][
+                    i, :
+                ]  # type:ignore
+                BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
+                axYieldAS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsTrueAS[species][i, :], dtype=float)
+                    - BG_errorsNormINC,
+                    np.array(self.YieldsTrueAS[species][i, :], dtype=float)
+                    + BG_errorsNormINC,
+                    alpha=0.3,
+                    color="orange",
+                    label="Yield normalization" if i == 1 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsTrueAS[species][i, :]-self.YieldsTrueASZV[species][i,:]) # type:ignore
+                    axYieldAS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueAS[species][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsTrueAS[species][i, :], dtype=float)
+                        + bin_contentDiff,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                        if self.analysisType in ["central", "semicentral"]:
+                            (
+                                low_bin,
+                                high_bin,
+                            ) = self.dPhiSigPIDErrForTrueSpecies[species][i,0,3].GetXaxis().FindBin(
+                                self.dPhiSigAS[0]
+                            ), self.dPhiSigPIDErrForTrueSpecies[species][i,0,3].GetXaxis().FindBin(
+                                self.dPhiSigAS[1]
+                            )
+                            dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpecies[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                            dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                            dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                        else:
+                            (
+                                low_bin,
+                                high_bin,
+                            ) = self.dPhiSigPIDErrForTrueSpecies[species][i,0].GetXaxis().FindBin(
+                                self.dPhiSigAS[0]
+                            ), self.dPhiSigPIDErrForTrueSpecies[species][i,0].GetXaxis().FindBin(
+                                self.dPhiSigAS[1]
+                            )
+                            dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpecies[species][i,:] # a list of histograms; one for each pTassoc bin
+                            dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                            dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                        axYieldAS.fill_between(
+                            self.pTassocBinCenters,
+                            np.array(self.YieldsTrueAS[species][i, :], dtype=float)
+                            - dPhiPIDErrs,
+                            np.array(self.YieldsTrueAS[species][i, :], dtype=float)
+                            + dPhiPIDErrs,
+                            alpha=0.3,
+                            color="blue",
+                            label="PID Error" if i==1 else "",
+                        )
+        
+        axYieldAS.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYieldAS.transAxes)
+        axYieldAS.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYieldAS.transAxes)
+
+        axYieldAS.legend()
+        yieldFigAS.tight_layout()
+        yieldFigAS.savefig(f"{self.base_save_path}YieldAS_{species}.png")  # type:ignore
+        plt.close(yieldFigAS)
+    
+    @print_function_name_with_description_on_call(description="")
+    def plot_yield_for_true_species_in_z_vertex_bins(self, species, plot_ME_systematic=False, plot_PID_systematic=True):
+
+
+        panel_text1 = "ALICE Work In Progress" + "\n" + f"{'pp' if self.analysisType=='pp' else 'Pb-Pb'}" + r"$\sqrt{s_{NN}}$=5.02TeV"+ f", {'30-50%' if self.analysisType=='semicentral' else '0-10%' if self.analysisType=='central' else ''}"+ "\n"  + "anti-$k_T$ R=0.2"
+        panel_text2 =  f"\n" + r"$p_T^{ch}$ c, $E_T^{clus}>$3.0 GeV" + "\n" + r"$p_T^{lead, ch} >$ 5.0 GeV/c"
+        x_locs = [0.25, 0.4]
+        y_locs = [0.75, 0.75]
+        font_size = 16
+
+        yieldFig, axYield = plt.subplots(1, 1, figsize=(10, 6))
+        axYield.set_title(f"{species} Yield")
+        axYield.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
+        axYield.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)$^{-1}$"%(species, species))
+        # set log y
+        axYield.set_yscale("log")
+        for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
+            axYield.errorbar(
+                self.pTassocBinCenters,
+                self.YieldsTrueZV[species][i, :],
+                self.YieldErrsTrueZV[species][i, :],
+                np.array(self.pTassocBinWidths) / 2,
+                label=f"Jet p_T {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
+                fmt="o",
+            )  # type:ignore
+            # now add the systematics
+            N_trigs = []
+            for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
+                self.set_pT_epAngle_bin(i, j, 3)  # type:ignore
+                N_trigs.append(self.get_N_trig())  # type:ignore
+            N_trigs = np.array(N_trigs)
+            N_trigs = N_trigs + 1e-4
+            if self.analysisType in ["central", "semicentral"]:  # type:ignore
+                
+                n_bins = (
+                    self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsZV[i, j, 3]
+                    .GetXaxis()
+                    .GetNbins()
+                )  # type:ignore
+                x_bins = np.zeros(n_bins)
+                per_bin_RPF_error = np.zeros((n_bins, len(self.pTassocBinCenters)))
+                for l in range(n_bins):
+                    x_bins[l] = (
+                        self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsZV[i, j, 3]
+                        .GetXaxis()
+                        .GetBinCenter(l + 1)
+                    )  # type:ignore
+                for l in range(n_bins):
+                    per_bin_RPF_error[l] = [
+                        np.sqrt(
+                            np.sum(
+                                self.RPFObjsForTrueSpeciesZV[species][i, j].simultaneous_fit_err(
+                                    x_bins[l],
+                                    x_bins[1] - x_bins[0],
+                                    *self.RPFObjsForTrueSpeciesZV[species][i, j].popt,
+                                )
+                                ** 2
+                            )
+                        )
+                        / N_trigs[j]
+                        for j in range(len(self.pTassocBinCenters))
+                    ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
+                
+                RPFError = [
+                    np.sum(per_bin_RPF_error[j])
+                    for j in range(len(self.pTassocBinCenters))
+                ]  # type:ignore
+
+
+                axYield.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsTrueZV[species][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsTrueZV[species][i, :], dtype=float) + RPFError,
+                    alpha=0.3,
+                    color="green",
+                    label="RPF systematics" if i == 1 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueZV[species][i, :], dtype=float)
+                        - np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
+                        / N_trigs,
+                        np.array(self.YieldsTrueZV[species][i, :], dtype=float)
+                        + np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
+                        / N_trigs,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueZV[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsTrueZV[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+            if self.analysisType == "pp":
+                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForTrueSpeciesminValsZV[
+                    species
+                ][
+                    i, :
+                ]  # type:ignore
+                BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
+                axYield.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsTrueZV[species][i, :], dtype=float)
+                    - BG_errorsNormINC,
+                    np.array(self.YieldsTrueZV[species][i, :], dtype=float)
+                    + BG_errorsNormINC,
+                    alpha=0.3,
+                    color="orange",
+                    label="Yield normalization" if i == 1 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueZV[species][i, :], dtype=float)
+                        - np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        np.array(self.YieldsTrueZV[species][i, :], dtype=float)
+                        + np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueZV[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsTrueZV[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+
+        axYield.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYield.transAxes)
+        axYield.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYield.transAxes)
+
+        axYield.legend()
+        yieldFig.tight_layout()
+        yieldFig.savefig(f"{self.base_save_path}Yield_{species}ZV.png")  # type:ignore
+        plt.close(yieldFig)
+
+        yieldFigNS, axYieldNS = plt.subplots(1, 1, figsize=(10, 6))
+        axYieldNS.set_title(f"Near Side {species} Yield")
+        axYieldNS.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
+        axYieldNS.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)$^{-1}$"%(species, species))
+        # set log y
+        axYieldNS.set_yscale("log")
+        for i in range(len(self.pTtrigBinEdges) - 1):
+            axYieldNS.errorbar(
+                self.pTassocBinCenters,
+                self.YieldsTrueNSZV[species][i, :],
+                self.YieldErrsTrueNSZV[species][i, :],
+                np.array(self.pTassocBinWidths) / 2,
+                label=f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
+                fmt="o",
+            )  # type:ignore
+            # now add the systematics
+            N_trigs = []
+            for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
+                self.set_pT_epAngle_bin(i, j, 3)  # type:ignore
+                N_trigs.append(self.get_N_trig())  # type:ignore
+            N_trigs = np.array(N_trigs)
+            if self.analysisType in ["central", "semicentral"]:  # type:ignore
+                n_bins = (
+                    self.BGSubtractedAccCorrectedSEdPhiSigNScorrsZV[i, j, 3]
+                    .GetXaxis()
+                    .GetNbins()
+                )  # type:ignore
+                x_bins = np.zeros(n_bins)
+                for l in range(n_bins):
+                    x_bins[l] = (
+                        self.BGSubtractedAccCorrectedSEdPhiSigNScorrsZV[i, j, 3]
+                        .GetXaxis()
+                        .GetBinCenter(l + 1)
+                    )  # type:ignore
+                for l in range(n_bins):
+                    per_bin_RPF_error = [
+                        np.sqrt(
+                            np.sum(
+                                self.RPFObjsZV[i, j].simultaneous_fit_err(
+                                    x_bins[l],
+                                    x_bins[1] - x_bins[0],
+                                    *self.RPFObjsZV[i, j].popt,
+                                )
+                                ** 2
+                            )
+                            
+                        )
+                        / N_trigs[j]
+                        for j in range(len(self.pTassocBinCenters))
+                    ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
+                RPFError = [
+                    np.sum(per_bin_RPF_error[j])
+                    for j in range(len(self.pTassocBinCenters))
+                ]  # type:ignore
+                axYieldNS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsTrueNSZV[species][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsTrueNSZV[species][i, :], dtype=float) + RPFError,
+                    alpha=0.3,
+                    color="orange",
+                    label="RPF systematics" if i == 2 else "",
+                )  # type:ignore
+
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueNSZV[species][i, :], dtype=float)
+                        - np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
+                        / N_trigs,
+                        np.array(self.YieldsTrueNSZV[species][i, :], dtype=float)
+                        + np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
+                        / N_trigs,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueNSZV[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsTrueNSZV[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+            if self.analysisType == "pp":
+                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForTrueSpeciesminValsZV[
+                    species
+                ][
+                    i, :
+                ]  # type:ignore
+                BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
+                axYieldNS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsTrueNSZV[species][i, :], dtype=float)
+                    - BG_errorsNormINC,
+                    np.array(self.YieldsTrueNSZV[species][i, :], dtype=float)
+                    + BG_errorsNormINC,
+                    alpha=0.3,
+                    color="orange",
+                    label="Yield normalization" if i == 1 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueNSZV[species][i, :], dtype=float)
+                        - np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        np.array(self.YieldsTrueNSZV[species][i, :], dtype=float)
+                        + np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsTrueNSZV[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsTrueNSZV[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+        
+        axYieldNS.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYieldNS.transAxes)
+        axYieldNS.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYieldNS.transAxes)
+        
+        axYieldNS.legend()
+        yieldFigNS.tight_layout()
+        yieldFigNS.savefig(f"{self.base_save_path}YieldNS_{species}ZV.png")  # type:ignore
+        plt.close(yieldFigNS)
+
+        yieldFigAS, axYieldAS = plt.subplots(1, 1, figsize=(10, 6))
+        axYieldAS.set_title(f"Away Side{species} Yield")
+        axYieldAS.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
+        axYieldAS.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)$^{-1}$"%(species, species))
+        # set log y
+        axYieldAS.set_yscale("log")
+        for i in range(len(self.pTtrigBinEdges) - 1):
+            axYieldAS.errorbar(
+                self.pTassocBinCenters,
+                self.YieldsTrueASZV[species][i, :],
+                self.YieldErrsTrueASZV[species][i, :],
+                np.array(self.pTassocBinWidths) / 2,
+                label=f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
+                fmt="o",
+            )  # type:ignore
+            # now add the systematics
+            N_trigs = []
+            for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
+                self.set_pT_epAngle_bin(i, j, 3)  # type:ignore
+                N_trigs.append(self.get_N_trig())  # type:ignore
+            N_trigs = np.array(N_trigs)
+            if self.analysisType in ["central", "semicentral"]:  # type:ignore
+                n_bins = (
+                    self.BGSubtractedAccCorrectedSEdPhiSigAScorrsZV[i, j, 3]
+                    .GetXaxis()
+                    .GetNbins()
+                )  # type:ignore
+                x_bins = np.zeros(n_bins)
+                for l in range(n_bins):
+                    x_bins[l] = (
+                        self.BGSubtractedAccCorrectedSEdPhiSigAScorrsZV[i, j, 3]
+                        .GetXaxis()
+                        .GetBinCenter(l + 1)
+                    )  # type:ignore
+                for l in range(n_bins):
+                    per_bin_RPF_error = [
+                        np.sqrt(
+                            np.sum(
+                                self.RPFObjsZV[i, j].simultaneous_fit_err(
+                                    x_bins[l],
+                                    x_bins[1] - x_bins[0],
+                                    *self.RPFObjsZV[i, j].popt,
+                                )
+                                ** 2
+                            )
+                            
+                        )
+                        / N_trigs[j]
+                        for j in range(len(self.pTassocBinCenters))
+                    ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
+                RPFError = [
+                    np.sum(per_bin_RPF_error[j])
+                    for j in range(len(self.pTassocBinCenters))
+                ]  # type:ignore
+
+                axYieldAS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsTrueASZV[species][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsTrueASZV[species][i, :], dtype=float) + RPFError,
                     alpha=0.3,
                     color="orange",
                     label="RPF systematics" if i == 2 else "",
@@ -7849,18 +10958,55 @@ class PlotMixin:
                 if plot_ME_systematic:
                     axYieldAS.fill_between(
                         self.pTassocBinCenters,
-                        np.array(self.YieldsASZV[species][i, :], dtype=float)
+                        np.array(self.YieldsTrueASZV[species][i, :], dtype=float)
                         - np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
                         / N_trigs,
-                        np.array(self.YieldsASZV[species][i, :], dtype=float)
+                        np.array(self.YieldsTrueASZV[species][i, :], dtype=float)
                         + np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
                         / N_trigs,
                         alpha=0.3,
                         color="red",
                         label="ME normalization" if i == 2 else "",
                     )  # type:ignore
+
+                    if plot_PID_systematic:
+                        if self.analysisType in ["central", "semicentral"]:
+                            (
+                                low_bin,
+                                high_bin,
+                            ) = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                                self.dPhiSigAS[0]
+                            ), self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                                self.dPhiSigAS[1]
+                            )
+                            dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                            dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                            dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                        else:
+                            (
+                                low_bin,
+                                high_bin,
+                            ) = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0].GetXaxis().FindBin(
+                                self.dPhiSigAS[0]
+                            ), self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0].GetXaxis().FindBin(
+                                self.dPhiSigAS[1]
+                            )
+                            dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,:] # a list of histograms; one for each pTassoc bin
+                            dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                            dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                        axYieldAS.fill_between(
+                            self.pTassocBinCenters,
+                            np.array(self.YieldsTrueASZV[species][i, :], dtype=float)
+                            - dPhiPIDErrs,
+                            np.array(self.YieldsTrueASZV[species][i, :], dtype=float)
+                            + dPhiPIDErrs,
+                            alpha=0.3,
+                            color="blue",
+                            label="PID Error" if i==1 else "",
+                        )
             if self.analysisType == "pp":
-                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForSpeciesminValsZV[
+                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForTrueSpeciesminValsZV[
                     species
                 ][
                     i, :
@@ -7868,29 +11014,1188 @@ class PlotMixin:
                 BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
                 axYieldAS.fill_between(
                     self.pTassocBinCenters,
-                    np.array(self.YieldsASZV[species][i, :], dtype=float)
+                    np.array(self.YieldsTrueASZV[species][i, :], dtype=float)
                     - BG_errorsNormINC,
-                    np.array(self.YieldsASZV[species][i, :], dtype=float)
+                    np.array(self.YieldsTrueASZV[species][i, :], dtype=float)
                     + BG_errorsNormINC,
                     alpha=0.3,
                     color="orange",
-                    label="Yield normalization" if i == 2 else "",
+                    label="Yield normalization" if i == 1 else "",
                 )  # type:ignore
                 # now ME_norm_systematics
                 if plot_ME_systematic:
                     axYieldAS.fill_between(
                         self.pTassocBinCenters,
-                        np.array(self.YieldsASZV[species][i, :], dtype=float)
+                        np.array(self.YieldsTrueASZV[species][i, :], dtype=float)
                         - np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
-                        np.array(self.YieldsASZV[species][i, :], dtype=float)
+                        np.array(self.YieldsTrueASZV[species][i, :], dtype=float)
                         + np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
                         alpha=0.3,
                         color="red",
                         label="ME normalization" if i == 2 else "",
                     )  # type:ignore
+
+                if plot_PID_systematic:
+                        if self.analysisType in ["central", "semicentral"]:
+                            (
+                                low_bin,
+                                high_bin,
+                            ) = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                                self.dPhiSigAS[0]
+                            ), self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                                self.dPhiSigAS[1]
+                            )
+                            dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                            dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                            dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                        else:
+                            (
+                                low_bin,
+                                high_bin,
+                            ) = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0].GetXaxis().FindBin(
+                                self.dPhiSigAS[0]
+                            ), self.dPhiSigPIDErrForTrueSpeciesZV[species][i,0].GetXaxis().FindBin(
+                                self.dPhiSigAS[1]
+                            )
+                            dPhiPIDErrs = self.dPhiSigPIDErrForTrueSpeciesZV[species][i,:] # a list of histograms; one for each pTassoc bin
+                            dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                            dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                        axYieldAS.fill_between(
+                            self.pTassocBinCenters,
+                            np.array(self.YieldsTrueASZV[species][i, :], dtype=float)
+                            - dPhiPIDErrs,
+                            np.array(self.YieldsTrueASZV[species][i, :], dtype=float)
+                            + dPhiPIDErrs,
+                            alpha=0.3,
+                            color="blue",
+                            label="PID Error" if i==1 else "",
+                        )
+        
+        axYieldAS.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYieldAS.transAxes)
+        axYieldAS.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYieldAS.transAxes)
+        
         axYieldAS.legend()
         yieldFigAS.tight_layout()
         yieldFigAS.savefig(f"{self.base_save_path}YieldAS_{species}ZV.png")  # type:ignore
+        plt.close(yieldFigAS)
+    
+    @print_function_name_with_description_on_call(description="")
+    def plot_yield_for_enhanced_species(self, species, plot_ME_systematic=True, plot_PID_systematic=True):
+
+        panel_text1 = "ALICE Work In Progress" + "\n" + f"{'pp' if self.analysisType=='pp' else 'Pb-Pb'}" + r"$\sqrt{s_{NN}}$=5.02TeV"+ f", {'30-50%' if self.analysisType=='semicentral' else '0-10%' if self.analysisType=='central' else ''}"+ "\n"  + "anti-$k_T$ R=0.2"
+        panel_text2 =  f"\n" + r"$p_T^{ch}$ c, $E_T^{clus}>$3.0 GeV" + "\n" + r"$p_T^{lead, ch} >$ 5.0 GeV/c"
+        x_locs = [0.25, 0.4]
+        y_locs = [0.75, 0.75]
+        font_size = 16
+
+        yieldFig, axYield = plt.subplots(1, 1, figsize=(10, 6))
+        axYield.set_title(f"{species} Yield")
+        axYield.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
+        axYield.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)$^{-1}$"%(species, species))
+        # set log y
+        axYield.set_yscale("log")
+        if self.analysisType=='pp':
+            plot_ME_systematic=False
+        for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
+            axYield.errorbar(
+                self.pTassocBinCenters,
+                self.YieldsEnhanced[species][i, :],
+                self.YieldErrsEnhanced[species][i, :],
+                np.array(self.pTassocBinWidths) / 2,
+                label=f"Jet p_T {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
+                fmt="o",
+            )  # type:ignore
+            # now add the systematics
+            N_trigs = []
+            for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
+                self.set_pT_epAngle_bin(i, j, 3)  # type:ignore
+                N_trigs.append(self.get_N_trig())  # type:ignore
+            N_trigs = np.array(N_trigs)
+            N_trigs = N_trigs + 1e-4
+            if self.analysisType in ["central", "semicentral"]:  # type:ignore
+                
+                n_bins = (
+                    self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs[i, j, 3]
+                    .GetXaxis()
+                    .GetNbins()
+                )  # type:ignore
+                x_bins = np.zeros(n_bins)
+                per_bin_RPF_error = np.zeros((n_bins, len(self.pTassocBinCenters)))
+                for l in range(n_bins):
+                    x_bins[l] = (
+                        self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrs[i, j, 3]
+                        .GetXaxis()
+                        .GetBinCenter(l + 1)
+                    )  # type:ignore
+                for l in range(n_bins):
+                    per_bin_RPF_error[l] = [
+                        np.sqrt(
+                            np.sum(
+                                self.RPFObjsForEnhancedSpecies[species][i, j].simultaneous_fit_err(
+                                    x_bins[l],
+                                    x_bins[1] - x_bins[0],
+                                    *self.RPFObjsForEnhancedSpecies[species][i, j].popt,
+                                )
+                                ** 2
+                            )
+                        )
+                        / N_trigs[j]
+                        for j in range(len(self.pTassocBinCenters))
+                    ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
+                RPFError = [
+                    np.sum(per_bin_RPF_error[j])
+                    for j in range(len(self.pTassocBinCenters))
+                ]  # type:ignore Here we sum over the range in dphi...should I be normalizing by the range??? 2pi?
+
+
+                axYield.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsEnhanced[species][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsEnhanced[species][i, :], dtype=float) + RPFError,
+                    alpha=0.3,
+                    color="green",
+                    label="RPF systematics" if i == 2 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsEnhanced[species][i, :]-self.YieldsEnhancedZV[species][i,:]) # type:ignore
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhanced[species][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsEnhanced[species][i, :], dtype=float)
+                        + bin_contentDiff,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+                
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpecies[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpecies[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhanced[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsEnhanced[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+
+            if self.analysisType == "pp":
+                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminVals[
+                    species
+                ][
+                    i, :
+                ]  # type:ignore
+                BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
+                axYield.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsEnhanced[species][i, :], dtype=float)
+                    - BG_errorsNormINC,
+                    np.array(self.YieldsEnhanced[species][i, :], dtype=float)
+                    + BG_errorsNormINC,
+                    alpha=0.3,
+                    color="orange",
+                    label="Yield normalization" if i == 1 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsEnhanced[species][i, :]-self.YieldsEnhancedZV[species][i,:]) # type:ignore
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhanced[species][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsEnhanced[species][i, :], dtype=float)
+                        + bin_contentDiff,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpecies[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpecies[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhanced[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsEnhanced[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+
+        axYield.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYield.transAxes)
+        axYield.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYield.transAxes)
+
+        axYield.legend()
+        yieldFig.tight_layout()
+        yieldFig.savefig(f"{self.base_save_path}Yield_{species}Enh.png")  # type:ignore
+        plt.close(yieldFig)
+
+        yieldFigNS, axYieldNS = plt.subplots(1, 1, figsize=(10, 6))
+        axYieldNS.set_title(f"Near side {species} Yield")
+        axYieldNS.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
+        axYieldNS.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)$^{-1}$"%(species, species))
+        # set log y
+        axYieldNS.set_yscale("log")
+        for i in range(len(self.pTtrigBinEdges) - 1):
+            axYieldNS.errorbar(
+                self.pTassocBinCenters,
+                self.YieldsEnhancedNS[species][i, :],
+                self.YieldErrsEnhancedNS[species][i, :],
+                np.array(self.pTassocBinWidths) / 2,
+                label=f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
+                fmt="o",
+            )  # type:ignore
+            # now add the systematics
+            N_trigs = []
+            for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
+                self.set_pT_epAngle_bin(i, j, 3)  # type:ignore
+                N_trigs.append(self.get_N_trig())  # type:ignore
+            N_trigs = np.array(N_trigs)
+            if self.analysisType in ["central", "semicentral"]:  # type:ignore
+                n_bins = (
+                    self.BGSubtractedAccCorrectedSEdPhiSigNScorrs[i, j, 3]
+                    .GetXaxis()
+                    .GetNbins()
+                )  # type:ignore
+                x_bins = np.zeros(n_bins)
+                for l in range(n_bins):
+                    x_bins[l] = (
+                        self.BGSubtractedAccCorrectedSEdPhiSigNScorrs[i, j, 3]
+                        .GetXaxis()
+                        .GetBinCenter(l + 1)
+                    )  # type:ignore
+                for l in range(n_bins):
+                    per_bin_RPF_error = [
+                        np.sqrt(
+                            np.sum(
+                                self.RPFObjs[i, j].simultaneous_fit_err(
+                                    x_bins[l],
+                                    x_bins[1] - x_bins[0],
+                                    *self.RPFObjs[i, j].popt,
+                                )
+                                ** 2
+                            )
+                            
+                        )
+                        / N_trigs[j]
+                        for j in range(len(self.pTassocBinCenters))
+                    ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
+                RPFError = [
+                    np.sum(per_bin_RPF_error[j])
+                    for j in range(len(self.pTassocBinCenters))
+                ]  # type:ignore
+                axYieldNS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsEnhancedNS[species][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsEnhancedNS[species][i, :], dtype=float) + RPFError,
+                    alpha=0.3,
+                    color="orange",
+                    label="RPF systematics" if i == 2 else "",
+                )  # type:ignore
+
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsEnhancedNS[species][i, :]-self.YieldsEnhancedNSZV[species][i,:]) # type:ignore
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedNS[species][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsEnhancedNS[species][i, :], dtype=float)
+                        + bin_contentDiff,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+                
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForEnhancedSpecies[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForEnhancedSpecies[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpecies[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForEnhancedSpecies[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForEnhancedSpecies[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpecies[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedNS[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsEnhancedNS[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+
+            if self.analysisType == "pp":
+                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminVals[
+                    species
+                ][
+                    i, :
+                ]  # type:ignore
+                BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
+                axYieldNS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsEnhancedNS[species][i, :], dtype=float)
+                    - BG_errorsNormINC,
+                    np.array(self.YieldsEnhancedNS[species][i, :], dtype=float)
+                    + BG_errorsNormINC,
+                    alpha=0.3,
+                    color="orange",
+                    label="Yield normalization" if i == 1 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsEnhancedNS[species][i, :]-self.YieldsEnhancedNSZV[species][i,:]) # type:ignore
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedNS[species][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsEnhancedNS[species][i, :], dtype=float)
+                        + bin_contentDiff,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForEnhancedSpecies[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForEnhancedSpecies[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpecies[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForEnhancedSpecies[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForEnhancedSpecies[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpecies[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedNS[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsEnhancedNS[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+
+        axYieldNS.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYieldNS.transAxes)
+        axYieldNS.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYieldNS.transAxes)
+        
+        axYieldNS.legend()
+        yieldFigNS.tight_layout()
+        yieldFigNS.savefig(f"{self.base_save_path}YieldNS_{species}Enh.png")  # type:ignore
+        plt.close(yieldFigNS)
+
+        yieldFigAS, axYieldAS = plt.subplots(1, 1, figsize=(10, 6))
+        axYieldAS.set_title(f"Away Side {species} Yield")
+        axYieldAS.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
+        axYieldAS.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)${-1}$"%(species, species))
+        # set log y
+        axYieldAS.set_yscale("log")
+        for i in range(len(self.pTtrigBinEdges) - 1):
+            axYieldAS.errorbar(
+                self.pTassocBinCenters,
+                self.YieldsEnhancedAS[species][i, :],
+                self.YieldErrsEnhancedAS[species][i, :],
+                np.array(self.pTassocBinWidths) / 2,
+                label=f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
+                fmt="o",
+            )  # type:ignore
+            # now add the systematics
+            N_trigs = []
+            for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
+                self.set_pT_epAngle_bin(i, j, 3)  # type:ignore
+                N_trigs.append(self.get_N_trig())  # type:ignore
+            N_trigs = np.array(N_trigs)
+            if self.analysisType in ["central", "semicentral"]:  # type:ignore
+                n_bins = (
+                    self.BGSubtractedAccCorrectedSEdPhiSigAScorrs[i, j, 3]
+                    .GetXaxis()
+                    .GetNbins()
+                )  # type:ignore
+                x_bins = np.zeros(n_bins)
+                for l in range(n_bins):
+                    x_bins[l] = (
+                        self.BGSubtractedAccCorrectedSEdPhiSigAScorrs[i, j, 3]
+                        .GetXaxis()
+                        .GetBinCenter(l + 1)
+                    )  # type:ignore
+                for l in range(n_bins):
+                    per_bin_RPF_error = [
+                        np.sqrt(
+                            np.sum(
+                                self.RPFObjs[i, j].simultaneous_fit_err(
+                                    x_bins[l],
+                                    x_bins[1] - x_bins[0],
+                                    *self.RPFObjs[i, j].popt,
+                                )
+                                ** 2
+                            )
+                            
+                        )
+                        / N_trigs[j]
+                        for j in range(len(self.pTassocBinCenters))
+                    ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
+                RPFError = [
+                    np.sum(per_bin_RPF_error[j])
+                    for j in range(len(self.pTassocBinCenters))
+                ]  # type:ignore
+
+                axYieldAS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsEnhancedAS[species][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsEnhancedAS[species][i, :], dtype=float) + RPFError,
+                    alpha=0.3,
+                    color="orange",
+                    label="RPF systematics" if i == 2 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsEnhancedAS[species][i, :]-self.YieldsEnhancedASZV[species][i,:]) # type:ignore
+                    axYieldAS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedAS[species][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsEnhancedAS[species][i, :], dtype=float)
+                        + bin_contentDiff,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForEnhancedSpecies[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigAS[0]
+                        ), self.dPhiSigPIDErrForEnhancedSpecies[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigAS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpecies[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForEnhancedSpecies[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigAS[0]
+                        ), self.dPhiSigPIDErrForEnhancedSpecies[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigAS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpecies[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYieldAS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedAS[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsEnhancedAS[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+            if self.analysisType == "pp":
+                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminVals[
+                    species
+                ][
+                    i, :
+                ]  # type:ignore
+                BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
+                axYieldAS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsEnhancedAS[species][i, :], dtype=float)
+                    - BG_errorsNormINC,
+                    np.array(self.YieldsEnhancedAS[species][i, :], dtype=float)
+                    + BG_errorsNormINC,
+                    alpha=0.3,
+                    color="orange",
+                    label="Yield normalization" if i == 1 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    bin_contentDiff = np.zeros(len(self.pTassocBinCenters))  # type:ignore
+
+                    
+                    bin_contentDiff = np.abs(self.YieldsEnhancedAS[species][i, :]-self.YieldsEnhancedASZV[species][i,:]) # type:ignore
+                    axYieldAS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedAS[species][i, :], dtype=float)
+                        - bin_contentDiff,
+                        np.array(self.YieldsEnhancedAS[species][i, :], dtype=float)
+                        + bin_contentDiff,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                        if self.analysisType in ["central", "semicentral"]:
+                            (
+                                low_bin,
+                                high_bin,
+                            ) = self.dPhiSigPIDErrForEnhancedSpecies[species][i,0,3].GetXaxis().FindBin(
+                                self.dPhiSigAS[0]
+                            ), self.dPhiSigPIDErrForEnhancedSpecies[species][i,0,3].GetXaxis().FindBin(
+                                self.dPhiSigAS[1]
+                            )
+                            dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpecies[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                            dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                            dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                        else:
+                            (
+                                low_bin,
+                                high_bin,
+                            ) = self.dPhiSigPIDErrForEnhancedSpecies[species][i,0].GetXaxis().FindBin(
+                                self.dPhiSigAS[0]
+                            ), self.dPhiSigPIDErrForEnhancedSpecies[species][i,0].GetXaxis().FindBin(
+                                self.dPhiSigAS[1]
+                            )
+                            dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpecies[species][i,:] # a list of histograms; one for each pTassoc bin
+                            dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                            dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                        axYieldAS.fill_between(
+                            self.pTassocBinCenters,
+                            np.array(self.YieldsEnhancedAS[species][i, :], dtype=float)
+                            - dPhiPIDErrs,
+                            np.array(self.YieldsEnhancedAS[species][i, :], dtype=float)
+                            + dPhiPIDErrs,
+                            alpha=0.3,
+                            color="blue",
+                            label="PID Error" if i==1 else "",
+                        )
+        
+        axYieldAS.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYieldAS.transAxes)
+        axYieldAS.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYieldAS.transAxes)
+
+        axYieldAS.legend()
+        yieldFigAS.tight_layout()
+        yieldFigAS.savefig(f"{self.base_save_path}YieldAS_{species}Enh.png")  # type:ignore
+        plt.close(yieldFigAS)
+    
+    @print_function_name_with_description_on_call(description="")
+    def plot_yield_for_enhanced_species_in_z_vertex_bins(self, species, plot_ME_systematic=False, plot_PID_systematic=True):
+
+
+        panel_text1 = "ALICE Work In Progress" + "\n" + f"{'pp' if self.analysisType=='pp' else 'Pb-Pb'}" + r"$\sqrt{s_{NN}}$=5.02TeV"+ f", {'30-50%' if self.analysisType=='semicentral' else '0-10%' if self.analysisType=='central' else ''}"+ "\n"  + "anti-$k_T$ R=0.2"
+        panel_text2 =  f"\n" + r"$p_T^{ch}$ c, $E_T^{clus}>$3.0 GeV" + "\n" + r"$p_T^{lead, ch} >$ 5.0 GeV/c"
+        x_locs = [0.25, 0.4]
+        y_locs = [0.75, 0.75]
+        font_size = 16
+
+        yieldFig, axYield = plt.subplots(1, 1, figsize=(10, 6))
+        axYield.set_title(f"{species} Yield")
+        axYield.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
+        axYield.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)$^{-1}$"%(species, species))
+        # set log y
+        axYield.set_yscale("log")
+        for i in range(len(self.pTtrigBinEdges) - 1):  # type:ignore
+            axYield.errorbar(
+                self.pTassocBinCenters,
+                self.YieldsEnhancedZV[species][i, :],
+                self.YieldErrsEnhancedZV[species][i, :],
+                np.array(self.pTassocBinWidths) / 2,
+                label=f"Jet p_T {self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
+                fmt="o",
+            )  # type:ignore
+            # now add the systematics
+            N_trigs = []
+            for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
+                self.set_pT_epAngle_bin(i, j, 3)  # type:ignore
+                N_trigs.append(self.get_N_trig())  # type:ignore
+            N_trigs = np.array(N_trigs)
+            N_trigs = N_trigs + 1e-4
+            if self.analysisType in ["central", "semicentral"]:  # type:ignore
+                
+                n_bins = (
+                    self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsZV[i, j, 3]
+                    .GetXaxis()
+                    .GetNbins()
+                )  # type:ignore
+                x_bins = np.zeros(n_bins)
+                per_bin_RPF_error = np.zeros((n_bins, len(self.pTassocBinCenters)))
+                for l in range(n_bins):
+                    x_bins[l] = (
+                        self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsZV[i, j, 3]
+                        .GetXaxis()
+                        .GetBinCenter(l + 1)
+                    )  # type:ignore
+                for l in range(n_bins):
+                    per_bin_RPF_error[l] = [
+                        np.sqrt(
+                            np.sum(
+                                self.RPFObjsForEnhancedSpeciesZV[species][i, j].simultaneous_fit_err(
+                                    x_bins[l],
+                                    x_bins[1] - x_bins[0],
+                                    *self.RPFObjsForEnhancedSpeciesZV[species][i, j].popt,
+                                )
+                                ** 2
+                            )
+                        )
+                        / N_trigs[j]
+                        for j in range(len(self.pTassocBinCenters))
+                    ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
+                
+                RPFError = [
+                    np.sum(per_bin_RPF_error[j])
+                    for j in range(len(self.pTassocBinCenters))
+                ]  # type:ignore
+
+
+                axYield.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsEnhancedZV[species][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsEnhancedZV[species][i, :], dtype=float) + RPFError,
+                    alpha=0.3,
+                    color="green",
+                    label="RPF systematics" if i == 1 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedZV[species][i, :], dtype=float)
+                        - np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
+                        / N_trigs,
+                        np.array(self.YieldsEnhancedZV[species][i, :], dtype=float)
+                        + np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
+                        / N_trigs,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedZV[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsEnhancedZV[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+            if self.analysisType == "pp":
+                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminValsZV[
+                    species
+                ][
+                    i, :
+                ]  # type:ignore
+                BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
+                axYield.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsEnhancedZV[species][i, :], dtype=float)
+                    - BG_errorsNormINC,
+                    np.array(self.YieldsEnhancedZV[species][i, :], dtype=float)
+                    + BG_errorsNormINC,
+                    alpha=0.3,
+                    color="orange",
+                    label="Yield normalization" if i == 1 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedZV[species][i, :], dtype=float)
+                        - np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        np.array(self.YieldsEnhancedZV[species][i, :], dtype=float)
+                        + np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(dPhiPIDErrs[j].GetNbinsX())])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYield.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedZV[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsEnhancedZV[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+
+        axYield.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYield.transAxes)
+        axYield.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYield.transAxes)
+
+        axYield.legend()
+        yieldFig.tight_layout()
+        yieldFig.savefig(f"{self.base_save_path}Yield_{species}EnhZV.png")  # type:ignore
+        plt.close(yieldFig)
+
+        yieldFigNS, axYieldNS = plt.subplots(1, 1, figsize=(10, 6))
+        axYieldNS.set_title(f"Near Side {species} Yield")
+        axYieldNS.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
+        axYieldNS.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)$^{-1}$"%(species, species))
+        # set log y
+        axYieldNS.set_yscale("log")
+        for i in range(len(self.pTtrigBinEdges) - 1):
+            axYieldNS.errorbar(
+                self.pTassocBinCenters,
+                self.YieldsEnhancedNSZV[species][i, :],
+                self.YieldErrsEnhancedNSZV[species][i, :],
+                np.array(self.pTassocBinWidths) / 2,
+                label=f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
+                fmt="o",
+            )  # type:ignore
+            # now add the systematics
+            N_trigs = []
+            for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
+                self.set_pT_epAngle_bin(i, j, 3)  # type:ignore
+                N_trigs.append(self.get_N_trig())  # type:ignore
+            N_trigs = np.array(N_trigs)
+            if self.analysisType in ["central", "semicentral"]:  # type:ignore
+                n_bins = (
+                    self.BGSubtractedAccCorrectedSEdPhiSigNScorrsZV[i, j, 3]
+                    .GetXaxis()
+                    .GetNbins()
+                )  # type:ignore
+                x_bins = np.zeros(n_bins)
+                for l in range(n_bins):
+                    x_bins[l] = (
+                        self.BGSubtractedAccCorrectedSEdPhiSigNScorrsZV[i, j, 3]
+                        .GetXaxis()
+                        .GetBinCenter(l + 1)
+                    )  # type:ignore
+                for l in range(n_bins):
+                    per_bin_RPF_error = [
+                        np.sqrt(
+                            np.sum(
+                                self.RPFObjsZV[i, j].simultaneous_fit_err(
+                                    x_bins[l],
+                                    x_bins[1] - x_bins[0],
+                                    *self.RPFObjsZV[i, j].popt,
+                                )
+                                ** 2
+                            )
+                            
+                        )
+                        / N_trigs[j]
+                        for j in range(len(self.pTassocBinCenters))
+                    ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
+                RPFError = [
+                    np.sum(per_bin_RPF_error[j])
+                    for j in range(len(self.pTassocBinCenters))
+                ]  # type:ignore
+                axYieldNS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsEnhancedNSZV[species][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsEnhancedNSZV[species][i, :], dtype=float) + RPFError,
+                    alpha=0.3,
+                    color="orange",
+                    label="RPF systematics" if i == 2 else "",
+                )  # type:ignore
+
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedNSZV[species][i, :], dtype=float)
+                        - np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
+                        / N_trigs,
+                        np.array(self.YieldsEnhancedNSZV[species][i, :], dtype=float)
+                        + np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
+                        / N_trigs,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedNSZV[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsEnhancedNSZV[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+            if self.analysisType == "pp":
+                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminValsZV[
+                    species
+                ][
+                    i, :
+                ]  # type:ignore
+                BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
+                axYieldNS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsEnhancedNSZV[species][i, :], dtype=float)
+                    - BG_errorsNormINC,
+                    np.array(self.YieldsEnhancedNSZV[species][i, :], dtype=float)
+                    + BG_errorsNormINC,
+                    alpha=0.3,
+                    color="orange",
+                    label="Yield normalization" if i == 1 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedNSZV[species][i, :], dtype=float)
+                        - np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        np.array(self.YieldsEnhancedNSZV[species][i, :], dtype=float)
+                        + np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                    if self.analysisType in ["central", "semicentral"]:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                    else:
+                        (
+                            low_bin,
+                            high_bin,
+                        ) = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[0]
+                        ), self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0].GetXaxis().FindBin(
+                            self.dPhiSigNS[1]
+                        )
+                        dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,:] # a list of histograms; one for each pTassoc bin
+                        dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                        dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                    axYieldNS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedNSZV[species][i, :], dtype=float)
+                        - dPhiPIDErrs,
+                        np.array(self.YieldsEnhancedNSZV[species][i, :], dtype=float)
+                        + dPhiPIDErrs,
+                        alpha=0.3,
+                        color="blue",
+                        label="PID Error" if i==1 else "",
+                    )
+        
+        axYieldNS.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYieldNS.transAxes)
+        axYieldNS.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYieldNS.transAxes)
+        
+        axYieldNS.legend()
+        yieldFigNS.tight_layout()
+        yieldFigNS.savefig(f"{self.base_save_path}YieldNS_{species}EnhZV.png")  # type:ignore
+        plt.close(yieldFigNS)
+
+        yieldFigAS, axYieldAS = plt.subplots(1, 1, figsize=(10, 6))
+        axYieldAS.set_title(f"Away Side{species} Yield")
+        axYieldAS.set_xlabel("$p_{T}^{assoc.}$ (GeV/c)")
+        axYieldAS.set_ylabel("$\\frac{1}{N_{trig.}}\\frac{d(N_{meas.}^{%s}-N_{BG}^{%s})}{dp_T^{assoc.}}$ (GeV/c)$^{-1}$"%(species, species))
+        # set log y
+        axYieldAS.set_yscale("log")
+        for i in range(len(self.pTtrigBinEdges) - 1):
+            axYieldAS.errorbar(
+                self.pTassocBinCenters,
+                self.YieldsEnhancedASZV[species][i, :],
+                self.YieldErrsEnhancedASZV[species][i, :],
+                np.array(self.pTassocBinWidths) / 2,
+                label=f"{self.pTtrigBinEdges[i]}-{self.pTtrigBinEdges[i+1]}GeV/c",
+                fmt="o",
+            )  # type:ignore
+            # now add the systematics
+            N_trigs = []
+            for j in range(len(self.pTassocBinEdges) - 1):  # type:ignore
+                self.set_pT_epAngle_bin(i, j, 3)  # type:ignore
+                N_trigs.append(self.get_N_trig())  # type:ignore
+            N_trigs = np.array(N_trigs)
+            if self.analysisType in ["central", "semicentral"]:  # type:ignore
+                n_bins = (
+                    self.BGSubtractedAccCorrectedSEdPhiSigAScorrsZV[i, j, 3]
+                    .GetXaxis()
+                    .GetNbins()
+                )  # type:ignore
+                x_bins = np.zeros(n_bins)
+                for l in range(n_bins):
+                    x_bins[l] = (
+                        self.BGSubtractedAccCorrectedSEdPhiSigAScorrsZV[i, j, 3]
+                        .GetXaxis()
+                        .GetBinCenter(l + 1)
+                    )  # type:ignore
+                for l in range(n_bins):
+                    per_bin_RPF_error = [
+                        np.sqrt(
+                            np.sum(
+                                self.RPFObjsZV[i, j].simultaneous_fit_err(
+                                    x_bins[l],
+                                    x_bins[1] - x_bins[0],
+                                    *self.RPFObjsZV[i, j].popt,
+                                )
+                                ** 2
+                            )
+                            
+                        )
+                        / N_trigs[j]
+                        for j in range(len(self.pTassocBinCenters))
+                    ]  # type:ignore indexed by j, shape (n_pt_bins, n_bins)
+                RPFError = [
+                    np.sum(per_bin_RPF_error[j])
+                    for j in range(len(self.pTassocBinCenters))
+                ]  # type:ignore
+
+                axYieldAS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsEnhancedASZV[species][i, :], dtype=float) - RPFError,
+                    np.array(self.YieldsEnhancedASZV[species][i, :], dtype=float) + RPFError,
+                    alpha=0.3,
+                    color="orange",
+                    label="RPF systematics" if i == 2 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    axYieldAS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedASZV[species][i, :], dtype=float)
+                        - np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
+                        / N_trigs,
+                        np.array(self.YieldsEnhancedASZV[species][i, :], dtype=float)
+                        + np.array(self.ME_norm_systematics[i, :, 3], dtype=float)
+                        / N_trigs,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                    if plot_PID_systematic:
+                        if self.analysisType in ["central", "semicentral"]:
+                            (
+                                low_bin,
+                                high_bin,
+                            ) = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                                self.dPhiSigAS[0]
+                            ), self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                                self.dPhiSigAS[1]
+                            )
+                            dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                            dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                            dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                        else:
+                            (
+                                low_bin,
+                                high_bin,
+                            ) = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0].GetXaxis().FindBin(
+                                self.dPhiSigAS[0]
+                            ), self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0].GetXaxis().FindBin(
+                                self.dPhiSigAS[1]
+                            )
+                            dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,:] # a list of histograms; one for each pTassoc bin
+                            dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                            dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                        axYieldAS.fill_between(
+                            self.pTassocBinCenters,
+                            np.array(self.YieldsEnhancedASZV[species][i, :], dtype=float)
+                            - dPhiPIDErrs,
+                            np.array(self.YieldsEnhancedASZV[species][i, :], dtype=float)
+                            + dPhiPIDErrs,
+                            alpha=0.3,
+                            color="blue",
+                            label="PID Error" if i==1 else "",
+                        )
+            if self.analysisType == "pp":
+                BG_errorsNormINC = self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminValsZV[
+                    species
+                ][
+                    i, :
+                ]  # type:ignore
+                BG_errorsNormINC = np.array(BG_errorsNormINC, dtype=float) / N_trigs
+                axYieldAS.fill_between(
+                    self.pTassocBinCenters,
+                    np.array(self.YieldsEnhancedASZV[species][i, :], dtype=float)
+                    - BG_errorsNormINC,
+                    np.array(self.YieldsEnhancedASZV[species][i, :], dtype=float)
+                    + BG_errorsNormINC,
+                    alpha=0.3,
+                    color="orange",
+                    label="Yield normalization" if i == 1 else "",
+                )  # type:ignore
+                # now ME_norm_systematics
+                if plot_ME_systematic:
+                    axYieldAS.fill_between(
+                        self.pTassocBinCenters,
+                        np.array(self.YieldsEnhancedASZV[species][i, :], dtype=float)
+                        - np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        np.array(self.YieldsEnhancedASZV[species][i, :], dtype=float)
+                        + np.array(self.ME_norm_systematics[i, :], dtype=float) / N_trigs,
+                        alpha=0.3,
+                        color="red",
+                        label="ME normalization" if i == 2 else "",
+                    )  # type:ignore
+
+                if plot_PID_systematic:
+                        if self.analysisType in ["central", "semicentral"]:
+                            (
+                                low_bin,
+                                high_bin,
+                            ) = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                                self.dPhiSigAS[0]
+                            ), self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0,3].GetXaxis().FindBin(
+                                self.dPhiSigAS[1]
+                            )
+                            dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,:,3] # a list of histograms; one for each pTassoc bin
+                            dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                            dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+                        else:
+                            (
+                                low_bin,
+                                high_bin,
+                            ) = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0].GetXaxis().FindBin(
+                                self.dPhiSigAS[0]
+                            ), self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,0].GetXaxis().FindBin(
+                                self.dPhiSigAS[1]
+                            )
+                            dPhiPIDErrs = self.dPhiSigPIDErrForEnhancedSpeciesZV[species][i,:] # a list of histograms; one for each pTassoc bin
+                            dPhiPIDErrs = [np.sum([dPhiPIDErrs[j].GetBinContent(k+1) for k in range(low_bin-1, high_bin)])/dPhiPIDErrs[j].GetNbinsX() for j in range(len(dPhiPIDErrs))] # type:ignore
+                            dPhiPIDErrs = np.array(dPhiPIDErrs)/N_trigs # now a list of floats for each pTassoc bin
+
+                        axYieldAS.fill_between(
+                            self.pTassocBinCenters,
+                            np.array(self.YieldsEnhancedASZV[species][i, :], dtype=float)
+                            - dPhiPIDErrs,
+                            np.array(self.YieldsEnhancedASZV[species][i, :], dtype=float)
+                            + dPhiPIDErrs,
+                            alpha=0.3,
+                            color="blue",
+                            label="PID Error" if i==1 else "",
+                        )
+        
+        axYieldAS.text(x_locs[0], y_locs[0], panel_text1, fontsize=font_size, transform=axYieldAS.transAxes)
+        axYieldAS.text(x_locs[1], y_locs[1], panel_text2, fontsize=font_size, transform=axYieldAS.transAxes)
+        
+        axYieldAS.legend()
+        yieldFigAS.tight_layout()
+        yieldFigAS.savefig(f"{self.base_save_path}YieldAS_{species}EnhZV.png")  # type:ignore
         plt.close(yieldFigAS)
 
     def get_bin_contents_as_array(self, th1, forFitting=True, forAS=False):

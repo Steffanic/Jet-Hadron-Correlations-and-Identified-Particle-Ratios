@@ -1,6 +1,7 @@
 *.root
 *.png
 *.pickle
+*.log
 HEPData-ins1419244-v2-Table_7.csv
 HEPData-ins1419244-v2-Table_7.csv:Zone.Identifier
 HEPData-ins1419244-v2-Table_7.root:Zone.Identifier
@@ -16,3 +17,4 @@ __pycache__/JetHadron.cpython-39.pyc
 __pycache__/PionTPCNSigmaFitter.cpython-39.pyc
 __pycache__/RPF.cpython-39.pyc
 tests/__pycache__/JetHadron_test.cpython-39-pytest-7.3.0.pyc
+jet_hadron.log

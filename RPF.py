@@ -1,10 +1,13 @@
-
 from functools import partial
 import numpy as np
 import matplotlib.pyplot as plt
+import logging 
+
+debug_logger = logging.getLogger("debugLogger")
+
 class RPF:
     def __init__(self, p0=[1, 0.02, 0.005, 0.02, 0.05, 0.03,], analysisType=None):
-        print(f"Intializing RPF method with parameters: {list(zip(['B', 'v2', 'v3', 'v4', 'va2', 'va4'], p0))}")
+        debug_logger.debug(f"Intializing RPF method with parameters: {list(zip(['B', 'v2', 'v3', 'v4', 'va2', 'va4'], p0))}")
         self.in_plane_func = self.background(0, np.pi/6)
         self.mid_plane_func = self.background(np.pi/4, np.pi/6)
         self.out_of_plane_func = self.background(np.pi/2, np.pi/6)
@@ -149,8 +152,8 @@ class RPF:
     def fit(self, x, y, yerr):
         from scipy.optimize import curve_fit
 
-        popt, pcov, infodict, mesg, ierr = curve_fit(self.simultaneous_fit, x, y, sigma=[yerr_i or 1 for yerr_i in yerr], p0=self.p0, bounds=self.bounds,absolute_sigma=True, maxfev=1000000,  verbose=2, full_output=True, xtol=1e-12, ftol=1e-12, gtol=1e-12, method='trf')
-        print(f"{popt=}, {pcov=}, {infodict=}, {mesg=}, {ierr=}")
+        popt, pcov = curve_fit(self.simultaneous_fit, x, y, sigma=[yerr_i or 1 for yerr_i in yerr], p0=self.p0, bounds=self.bounds,absolute_sigma=True, maxfev=1000000,  verbose=2,  xtol=1e-12, ftol=1e-12, gtol=1e-12, method='trf')
+        debug_logger.debug(f"{popt=}, {pcov=}")
         '''
         # generate len(x)-1 x, y, yerr and redo fits for bootstrap estimate of error by removing one point at a time
         bootstrap_x = []
@@ -178,7 +181,7 @@ class RPF:
         self.chi2OverNDF = chi2/NDF
         self.popt = popt
         self.pcov = pcov
-        print(f"{chi2=}, {NDF=}")
+        debug_logger.debug(f"{chi2=}, {NDF=}")
         plt.plot(x, [np.sqrt(np.sum((y[i]-self.simultaneous_fit(x[i], *popt))**2))/(yerr[i] or 1) for i in range(len(x))])
         plt.savefig("residuals.png")
         return popt, pcov, chi2/NDF

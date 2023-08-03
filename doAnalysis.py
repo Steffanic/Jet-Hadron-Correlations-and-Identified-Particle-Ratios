@@ -126,33 +126,34 @@ train_output_r_filenames = [
 if __name__ == "__main__":
     # turn off ROOT's automatic garbage collection
     ROOT.TH1.AddDirectory(False)
-    flist = ["/mnt/d/18r/297118.root",
-"/mnt/d/18r/297129.root",
-"/mnt/d/18r/297415.root",
-"/mnt/d/18r/297441.root",
-"/mnt/d/18r/297446.root",
-"/mnt/d/18r/297479.root",
-"/mnt/d/18r/297544.root",
-"/mnt/d/18r/297372.root",
-"/mnt/d/18r/297085.root",
-"/mnt/d/18r/296690.root",
-"/mnt/d/18r/296794.root",
-"/mnt/d/18r/296894.root",
-"/mnt/d/18r/296941.root",
-"/mnt/d/18r/297031.root",
-"/mnt/d/18q/295754.root",
-"/mnt/d/18q/296065.root",
-"/mnt/d/18q/296068.root",
-"/mnt/d/18q/296133.root",
-"/mnt/d/18q/296191.root",
-"/mnt/d/18q/296377.root",
-"/mnt/d/18q/296379.root",
-"/mnt/d/18q/296423.root",
-"/mnt/d/18q/296433.root",
-"/mnt/d/18q/296472.root",
-"/mnt/d/18q/296510.root",
-"/mnt/d/18q/296550.root",
-"/mnt/d/18q/296551.root",
+    flist = [
+#         "/mnt/d/18r/297118.root",
+# "/mnt/d/18r/297129.root",
+# "/mnt/d/18r/297415.root",
+# "/mnt/d/18r/297441.root",
+# "/mnt/d/18r/297446.root",
+# "/mnt/d/18r/297479.root",
+# "/mnt/d/18r/297544.root",
+# "/mnt/d/18r/297372.root",
+# "/mnt/d/18r/297085.root",
+# "/mnt/d/18r/296690.root",
+# "/mnt/d/18r/296794.root",
+# "/mnt/d/18r/296894.root",
+# "/mnt/d/18r/296941.root",
+# "/mnt/d/18r/297031.root",
+ # "/mnt/d/18q/295754.root",
+ # "/mnt/d/18q/296065.root",
+ # "/mnt/d/18q/296068.root",
+ # "/mnt/d/18q/296133.root",
+ # "/mnt/d/18q/296191.root",
+ # "/mnt/d/18q/296377.root",
+ # "/mnt/d/18q/296379.root",
+ # "/mnt/d/18q/296423.root",
+ # "/mnt/d/18q/296433.root",
+ # "/mnt/d/18q/296472.root",
+ "/mnt/d/18q/296510.root",
+ "/mnt/d/18q/296550.root",
+ "/mnt/d/18q/296551.root",
 "/mnt/d/18q/295673.root",]#[
         #f"/home/steffanic/Projects/Thesis/TrainOutputq/AnalysisResults_alihaddcomp0{i}.root"
         #for i in range(1, 8)
@@ -160,7 +161,7 @@ if __name__ == "__main__":
     fpplist = ["/mnt/d/pp/17p.root"]
     DO_PP = True
     DO_CENTRAL = False
-    DO_SEMI_CENTRAL = False
+    DO_SEMI_CENTRAL = True
     DO_PLOTTING = True
     DO_FITTING = True
     DO_PICKLING = False
@@ -191,6 +192,10 @@ if __name__ == "__main__":
                     )
 
         if DO_FITTING:
+            for i in range(len(jhAnaSemiCentral.pTtrigBinEdges) - 1):
+                for j in range(len(jhAnaSemiCentral.pTassocBinEdges) - 1):
+                    for k in range(4):
+                        jhAnaSemiCentral.fit_PionTPCNSigma(i,j,k)
             jhAnaSemiCentral.fit_RPFs()
 
         if DO_PLOTTING:

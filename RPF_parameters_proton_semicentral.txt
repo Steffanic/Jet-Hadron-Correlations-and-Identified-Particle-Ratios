@@ -695,3 +695,1635 @@ va4 & -0.019999999999999997 \\
 \end{tabular}
 \end{table}
 
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 172.65535347859185 \\ 
+v2 & -0.04254703158705902 \\ 
+v3 & 0.10179799527728002 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & -0.004999999999999999 \\ 
+va4 & 0.14929936057737767 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 345.3107041064007 \\ 
+v2 & -0.042547022903963186 \\ 
+v3 & 0.10179800119078188 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & -0.004999999999999999 \\ 
+va4 & 0.1492994443133644 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 172.65535347859185 \\ 
+v2 & -0.04254703158705902 \\ 
+v3 & 0.10179799527728002 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & -0.004999999999999999 \\ 
+va4 & 0.14929936057737767 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 345.3107041064007 \\ 
+v2 & -0.042547022903963186 \\ 
+v3 & 0.10179800119078188 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & -0.004999999999999999 \\ 
+va4 & 0.1492994443133644 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 172.65535347859185 \\ 
+v2 & -0.04254703158705902 \\ 
+v3 & 0.10179799527728002 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & -0.004999999999999999 \\ 
+va4 & 0.14929936057737767 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 345.3107041064007 \\ 
+v2 & -0.042547022903963186 \\ 
+v3 & 0.10179800119078188 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & -0.004999999999999999 \\ 
+va4 & 0.1492994443133644 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.5-2.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 864.8198646668845 \\ 
+v2 & -0.013309474179719293 \\ 
+v3 & 0.02301621530202998 \\ 
+v4 & 0.030184889452684046 \\ 
+va2 & -0.0005386676062660321 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.5-2.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 1729.6397285974163 \\ 
+v2 & -0.013309472992455718 \\ 
+v3 & 0.023016215568454054 \\ 
+v4 & 0.030184892264731995 \\ 
+va2 & -0.0005386653769935024 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 2.0-3.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 462.297968349849 \\ 
+v2 & 0.03564230889259856 \\ 
+v3 & 0.03652589674419781 \\ 
+v4 & 0.07230645640842522 \\ 
+va2 & 0.00046722028325230856 \\ 
+va4 & 0.034424947088691586 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 2.0-3.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 924.5959363414742 \\ 
+v2 & 0.035642308451318556 \\ 
+v3 & 0.03652589601598073 \\ 
+v4 & 0.07230645969290446 \\ 
+va2 & 0.00046721982582958435 \\ 
+va4 & 0.03442496490613113 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 3.0-4.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 2.675404129453553e-15 \\ 
+v2 & -0.15851472722666782 \\ 
+v3 & 0.057556798483279825 \\ 
+v4 & -0.040095361452754934 \\ 
+va2 & 0.6766024073064454 \\ 
+va4 & 0.013464294961248766 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 3.0-4.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 7.078148958699312e-20 \\ 
+v2 & 0.19999999999999038 \\ 
+v3 & -0.19999999992196296 \\ 
+v4 & -0.09999999999983174 \\ 
+va2 & 0.7999999999995516 \\ 
+va4 & -0.019999999999359842 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 4.0-5.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 5.05023490766887e-21 \\ 
+v2 & -0.19999999999999998 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & 0.09999999999999999 \\ 
+va2 & -0.004997566312806789 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 4.0-5.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 7.783494914311229e-24 \\ 
+v2 & 0.1999999559321086 \\ 
+v3 & 0.29999999166562363 \\ 
+v4 & 0.09999999999999999 \\ 
+va2 & 0.7999999999999999 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 5.0-6.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.02022027168336535 \\ 
+v2 & -0.01056854897109168 \\ 
+v3 & -0.16743359017313564 \\ 
+v4 & -0.09999999999999928 \\ 
+va2 & 0.007007833732979145 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 5.0-6.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.09084913577373818 \\ 
+v2 & -0.010526064473856124 \\ 
+v3 & -0.16733166779038774 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & 0.006964408814695671 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 6.0-10.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.028797347685825116 \\ 
+v2 & -0.008385816455643008 \\ 
+v3 & -0.1327220250788182 \\ 
+v4 & 0.07065410506161829 \\ 
+va2 & 0.004270346300905045 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 6.0-10.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.12854159044248592 \\ 
+v2 & -0.008171880748299668 \\ 
+v3 & -0.1317218170634254 \\ 
+v4 & 0.06347234828147727 \\ 
+va2 & 0.004079934888930016 \\ 
+va4 & 0.1499999999999909 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 8.658030078418337e-14 \\ 
+v2 & -0.19999999999966592 \\ 
+v3 & 0.299999999999998 \\ 
+v4 & 0.09999999999995254 \\ 
+va2 & -0.004999739865298669 \\ 
+va4 & 0.14999999999998911 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 4.456934267246912e-15 \\ 
+v2 & 0.19999999608226054 \\ 
+v3 & -0.19999996604663828 \\ 
+v4 & -0.09999999532099395 \\ 
+va2 & -0.004999985165949017 \\ 
+va4 & -0.019999999119224954 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 1.5-2.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 3.6370209838519 \\ 
+v2 & -0.06366743072500884 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & 0.09999999999999999 \\ 
+va2 & 0.018345267589514956 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 1.5-2.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 7.2740413475432195 \\ 
+v2 & -0.06366760056773317 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & 0.09999999999999999 \\ 
+va2 & 0.01834547084771719 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 2.0-3.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 1.1266958616536096 \\ 
+v2 & 0.045403604032410866 \\ 
+v3 & 0.1300365652812447 \\ 
+v4 & 0.05480521400851011 \\ 
+va2 & -0.004999999999999999 \\ 
+va4 & 0.10685070305900743 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 2.0-3.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 2.2533914814827627 \\ 
+v2 & 0.045403600671670916 \\ 
+v3 & 0.13003680360811964 \\ 
+v4 & 0.054803877862764104 \\ 
+va2 & -0.004999999999999999 \\ 
+va4 & 0.10684893789536094 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 3.0-4.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 4.3213439021554853e-19 \\ 
+v2 & 0.19999999970130905 \\ 
+v3 & -0.1999999991365784 \\ 
+v4 & 0.09999999961696068 \\ 
+va2 & 0.7999999862973736 \\ 
+va4 & 0.14999999999113411 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 3.0-4.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 4.418409930142887e-26 \\ 
+v2 & 0.19597910951821623 \\ 
+v3 & -0.19999999999992452 \\ 
+v4 & 0.09954673802025212 \\ 
+va2 & 0.7977872807921378 \\ 
+va4 & 0.09898732724717482 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 4.0-5.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 1.2759099389917063e-24 \\ 
+v2 & -0.19999999481180297 \\ 
+v3 & -0.19999999999999687 \\ 
+v4 & 0.09999999364491126 \\ 
+va2 & 0.7999999893050841 \\ 
+va4 & 0.14999999999849561 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 4.0-5.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 2.0633010806197654e-17 \\ 
+v2 & 0.19999932390429856 \\ 
+v3 & -0.19999828281822482 \\ 
+v4 & 0.09999999999999999 \\ 
+va2 & -0.004999721021863262 \\ 
+va4 & 0.1499999999999391 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 5.0-6.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.0005411313151382301 \\ 
+v2 & 0.0802242056059229 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & 0.09999999999999885 \\ 
+va2 & -0.004999999999999999 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 5.0-6.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.0024348325210208624 \\ 
+v2 & 0.0802136579010852 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & 0.09999999999999916 \\ 
+va2 & -0.004999999999988757 \\ 
+va4 & -0.019999999999999896 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 6.0-10.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.006202056090455735 \\ 
+v2 & -0.19999999999988768 \\ 
+v3 & -0.18197382265092632 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & 0.43088767604414285 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 6.0-10.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.02919982430191658 \\ 
+v2 & -0.19999999999999998 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & 0.09999999999999999 \\ 
+va2 & 0.25924438384460097 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 1662.076377322929 \\ 
+v2 & -0.003991335226911759 \\ 
+v3 & 0.045472065664145835 \\ 
+v4 & -0.007130373105579987 \\ 
+va2 & -0.0001585030447752895 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 3324.1527532993205 \\ 
+v2 & -0.003991333589974592 \\ 
+v3 & 0.0454720661683378 \\ 
+v4 & -0.007130372358053185 \\ 
+va2 & -0.0001585006910295645 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 1662.076377322929 \\ 
+v2 & -0.003991335226911759 \\ 
+v3 & 0.045472065664145835 \\ 
+v4 & -0.007130373105579987 \\ 
+va2 & -0.0001585030447752895 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 3324.1527532993205 \\ 
+v2 & -0.003991333589974592 \\ 
+v3 & 0.0454720661683378 \\ 
+v4 & -0.007130372358053185 \\ 
+va2 & -0.0001585006910295645 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 168.58180115310574 \\ 
+v2 & -0.032962657579215925 \\ 
+v3 & 0.29999999999999993 \\ 
+v4 & 0.09999999999999999 \\ 
+va2 & -0.0049999999999007835 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 337.1636085367606 \\ 
+v2 & -0.032962719071950995 \\ 
+v3 & 0.29999999999999993 \\ 
+v4 & 0.09999999999999999 \\ 
+va2 & -0.004999999999999992 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 2984.842019702467 \\ 
+v2 & -0.004281992284368759 \\ 
+v3 & -0.03143693304922148 \\ 
+v4 & 0.05277484515901237 \\ 
+va2 & 8.689899721103806e-05 \\ 
+va4 & 0.09695676402225276 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 5969.68403812477 \\ 
+v2 & -0.0042819921911555195 \\ 
+v3 & -0.03143693332593008 \\ 
+v4 & 0.05277484819602986 \\ 
+va2 & 8.689880679516654e-05 \\ 
+va4 & 0.0969567691063771 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 1595.0241275583062 \\ 
+v2 & -0.0066836248819683855 \\ 
+v3 & -0.06403016701997272 \\ 
+v4 & 0.08985412567657101 \\ 
+va2 & -0.0003186500146807002 \\ 
+va4 & 0.14443264170965148 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 3190.048254323704 \\ 
+v2 & -0.006683624844623594 \\ 
+v3 & -0.06403016723231704 \\ 
+v4 & 0.08985412732251896 \\ 
+va2 & -0.0003186499160243301 \\ 
+va4 & 0.14443264599922032 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.5-2.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 1275.3890689448651 \\ 
+v2 & 0.012620768292359206 \\ 
+v3 & -0.08624563620129946 \\ 
+v4 & 0.00867676724455459 \\ 
+va2 & 5.852556387143684e-05 \\ 
+va4 & -0.0011978482856084053 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.5-2.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 2550.7781365849637 \\ 
+v2 & 0.012620770579434 \\ 
+v3 & -0.0862456362039162 \\ 
+v4 & 0.008676769823619772 \\ 
+va2 & 5.8527251884429564e-05 \\ 
+va4 & -0.0011978491605960865 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 2.0-3.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 670.4952311250745 \\ 
+v2 & 0.012969943539494926 \\ 
+v3 & 0.08374977858524446 \\ 
+v4 & -0.03451471954150775 \\ 
+va2 & -0.002141846004954659 \\ 
+va4 & -0.0031378437127698327 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 2.0-3.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 1340.9904615768269 \\ 
+v2 & 0.012969943294896485 \\ 
+v3 & 0.08374977867864737 \\ 
+v4 & -0.03451471670315531 \\ 
+va2 & -0.002141846122480128 \\ 
+va4 & -0.0031378448367587273 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 3.0-4.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 21.274151617115862 \\ 
+v2 & 0.034056073645057854 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & 0.09999999999999999 \\ 
+va2 & -0.00487390977604034 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 3.0-4.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 42.54830350835646 \\ 
+v2 & 0.03405597044227112 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & 0.09999999999999999 \\ 
+va2 & -0.0048738231778393225 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 4.0-5.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 2.911798784003242e-12 \\ 
+v2 & 0.19999999999999998 \\ 
+v3 & 0.29999999999999993 \\ 
+v4 & -0.09999999999999984 \\ 
+va2 & 0.7999999999999999 \\ 
+va4 & -0.01999590023135278 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 4.0-5.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 1.7455964790566736e-13 \\ 
+v2 & 0.19999999999999998 \\ 
+v3 & 0.29999999999999993 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & 0.7999999999999999 \\ 
+va4 & -0.01999994566332866 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 5.0-6.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.005795786800274248 \\ 
+v2 & -0.19999999999997936 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & 0.5920150213088144 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 5.0-6.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.026039752580490214 \\ 
+v2 & -0.19999999999999998 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & 0.5915044132739367 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 6.0-10.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 6.918514894262655e-20 \\ 
+v2 & 0.19999999999999998 \\ 
+v3 & 0.299999948487866 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & 0.7999993574232482 \\ 
+va4 & -0.01999999999999172 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 6.0-10.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 2.248917783131985e-17 \\ 
+v2 & 0.19999999999999998 \\ 
+v3 & 0.29999998163366776 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & 0.7999998130038999 \\ 
+va4 & -0.019999999999576166 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 132.19240167267392 \\ 
+v2 & -0.011572520446452668 \\ 
+v3 & -0.05334713695172946 \\ 
+v4 & 0.07694249521149081 \\ 
+va2 & -0.0039659525601325706 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 264.38480424321347 \\ 
+v2 & -0.011572521630306812 \\ 
+v3 & -0.05334713725506707 \\ 
+v4 & 0.07694248356419671 \\ 
+va2 & -0.003965955931699831 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 1.5-2.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 39.1716210713871 \\ 
+v2 & 0.19999999999999998 \\ 
+v3 & 0.29999999999999993 \\ 
+v4 & 0.09999999999999999 \\ 
+va2 & 0.32216193904177254 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 1.5-2.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 78.34324251414074 \\ 
+v2 & 0.19999999999999998 \\ 
+v3 & 0.29999999999999993 \\ 
+v4 & 0.09999999999999999 \\ 
+va2 & 0.3221619491826586 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 2.0-3.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 9.928689198896842e-16 \\ 
+v2 & 0.04609342411907929 \\ 
+v3 & 0.09813127986840317 \\ 
+v4 & 0.09999999975922177 \\ 
+va2 & -0.004999993332618336 \\ 
+va4 & 0.1499999998843357 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 2.0-3.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 1.97034487507235e-15 \\ 
+v2 & 0.10988707158282038 \\ 
+v3 & 0.14655639880817461 \\ 
+v4 & 0.09999999999158149 \\ 
+va2 & 0.7999999999999999 \\ 
+va4 & 0.14999999999678948 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 3.0-4.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 1.934994498459542e-16 \\ 
+v2 & 0.19999324027667484 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & -0.09999999999999973 \\ 
+va2 & -0.004942298288875269 \\ 
+va4 & 0.149999999859772 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 3.0-4.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 2.1035144361137337e-16 \\ 
+v2 & -0.19999999999999998 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & -0.0031207037966834994 \\ 
+va4 & 0.14999845317413193 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 4.0-5.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.0005928604190356973 \\ 
+v2 & 0.19999999999999998 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & -0.004999999999999999 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 4.0-5.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.002663422693036206 \\ 
+v2 & 0.19999999999999998 \\ 
+v3 & -0.19999999999684362 \\ 
+v4 & -0.09999999999977624 \\ 
+va2 & -0.004999999999995956 \\ 
+va4 & 0.14999999999998487 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 5.0-6.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 5.470258647026067e-13 \\ 
+v2 & 0.19999999999999998 \\ 
+v3 & 0.29999999999999993 \\ 
+v4 & -0.09999999999999189 \\ 
+va2 & 0.7999744803803126 \\ 
+va4 & 0.14999664780514843 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 5.0-6.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 8.670346276780902e-14 \\ 
+v2 & 0.19999879557641806 \\ 
+v3 & 0.2999975700977043 \\ 
+v4 & -0.0999999884960855 \\ 
+va2 & 0.7999968925447751 \\ 
+va4 & 0.14999863339493794 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 6.0-10.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.0018276122351349063 \\ 
+v2 & -0.19999999999999998 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & 0.7999999999999999 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 6.0-10.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.008076284529297807 \\ 
+v2 & -0.19999999999999998 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & 0.7999999999999665 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 11421.386858026002 \\ 
+v2 & 0.005189966031341493 \\ 
+v3 & 0.023451763039177398 \\ 
+v4 & 0.001717107763989476 \\ 
+va2 & 7.896767931197609e-06 \\ 
+va4 & -0.006011413555562351 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 22842.773714047205 \\ 
+v2 & 0.005189966039228059 \\ 
+v3 & 0.02345176307150507 \\ 
+v4 & 0.0017171080735705507 \\ 
+va2 & 7.896783014188483e-06 \\ 
+va4 & -0.0060114139937036465 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.5-2.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 5025.354483545863 \\ 
+v2 & 0.015932990385973927 \\ 
+v3 & -0.015749273930442845 \\ 
+v4 & -0.013641545597797147 \\ 
+va2 & 5.124448343040569e-05 \\ 
+va4 & -0.0017424939270787386 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 1.5-2.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 10050.70896419472 \\ 
+v2 & 0.015932990509589268 \\ 
+v3 & -0.015749273840362184 \\ 
+v4 & -0.013641544164903856 \\ 
+va2 & 5.124448837962206e-05 \\ 
+va4 & -0.0017424967841243788 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 2.0-3.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 2760.223636078185 \\ 
+v2 & 0.0004633751361612923 \\ 
+v3 & 0.0496805149654963 \\ 
+v4 & 0.01580841009217117 \\ 
+va2 & -7.626485226687626e-06 \\ 
+va4 & 0.026420156959286307 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 2.0-3.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 5520.447293152839 \\ 
+v2 & 0.0004633751164497905 \\ 
+v3 & 0.04968051571722877 \\ 
+v4 & 0.015808381412051997 \\ 
+va2 & -7.626538227009036e-06 \\ 
+va4 & 0.02642012677855596 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 3.0-4.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 553.8091823930838 \\ 
+v2 & -0.04191870183563022 \\ 
+v3 & -0.00010191554456723555 \\ 
+v4 & 0.008738689700922588 \\ 
+va2 & 0.0013371749721106437 \\ 
+va4 & 0.05106018805780527 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 3.0-4.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 1107.618361083559 \\ 
+v2 & -0.04191870274954379 \\ 
+v3 & -0.00010191592970281967 \\ 
+v4 & 0.008738717131753445 \\ 
+va2 & 0.0013371758603751807 \\ 
+va4 & 0.05106018215216859 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 4.0-5.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.9990373130211003 \\ 
+v2 & 0.19999999999999998 \\ 
+v3 & 0.29999999999999993 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & 0.7999999999999999 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 4.0-5.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 1.998074581943091 \\ 
+v2 & 0.19999999999999998 \\ 
+v3 & 0.29999999999999977 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & 0.7999999999999999 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 5.0-6.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.007790683473857403 \\ 
+v2 & 0.19999999999997692 \\ 
+v3 & 0.2999999999998105 \\ 
+v4 & -0.09999999999901256 \\ 
+va2 & 0.7999999999999999 \\ 
+va4 & -0.019999999837489527 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 5.0-6.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.0345134307822124 \\ 
+v2 & 0.19999999999999607 \\ 
+v3 & 0.29999999999995336 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & 0.7999999999968873 \\ 
+va4 & -0.019999999999859346 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 6.0-10.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 2.858219209100418e-21 \\ 
+v2 & -0.1999998343441644 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & -0.09999999999705253 \\ 
+va2 & -0.004756180058159415 \\ 
+va4 & -0.019999731292495486 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 20-40 GeV, pTassoc 6.0-10.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 2.7308424420552015e-20 \\ 
+v2 & 0.1999999999852808 \\ 
+v3 & -0.19999999994994175 \\ 
+v4 & -0.09999999997919466 \\ 
+va2 & -0.004999999997489884 \\ 
+va4 & -0.01999999999486877 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 747.9856341879916 \\ 
+v2 & 0.030861035350080404 \\ 
+v3 & -0.04930706761490227 \\ 
+v4 & 0.009202775736991648 \\ 
+va2 & 0.0030219362263449704 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 1.0-1.5 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 1495.9712668897594 \\ 
+v2 & 0.03086103187597331 \\ 
+v3 & -0.04930706731360165 \\ 
+v4 & 0.009202775446749226 \\ 
+va2 & 0.0030219296310439107 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 1.5-2.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 491.3577500111087 \\ 
+v2 & 0.020281695387953373 \\ 
+v3 & 0.08340858063962736 \\ 
+v4 & 4.804570287914381e-07 \\ 
+va2 & 0.0012081704313505691 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 1.5-2.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 982.7154993066246 \\ 
+v2 & 0.020281695678673564 \\ 
+v3 & 0.08340858096017346 \\ 
+v4 & 4.840257460153397e-07 \\ 
+va2 & 0.0012081696347978495 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 2.0-3.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 191.37183163683176 \\ 
+v2 & 0.024154695845484034 \\ 
+v3 & 0.053694430199068596 \\ 
+v4 & 0.09999999999999999 \\ 
+va2 & -0.0021512733368154575 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 2.0-3.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 382.74366348220013 \\ 
+v2 & 0.024154694912039882 \\ 
+v3 & 0.053694428524651575 \\ 
+v4 & 0.09999999999999999 \\ 
+va2 & -0.0021512699417411043 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 3.0-4.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 2.1769847384341137e-13 \\ 
+v2 & -0.19999999999999998 \\ 
+v3 & -0.19999999999999976 \\ 
+v4 & -0.099999999999991 \\ 
+va2 & 0.7999999999999999 \\ 
+va4 & -0.01999994176662881 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 3.0-4.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 3.879799441702024e-16 \\ 
+v2 & -0.19999999999999998 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & 0.09999999957171733 \\ 
+va2 & 0.7999999999999999 \\ 
+va4 & 0.14999999961225569 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 4.0-5.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.004292675803820989 \\ 
+v2 & 0.13356232205940832 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & 0.015592110137925438 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 4.0-5.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.01913812696933278 \\ 
+v2 & 0.13538716103213022 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & 0.016561868309846954 \\ 
+va4 & 0.14999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 5.0-6.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.0045337159860813865 \\ 
+v2 & 0.0067769113681805096 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & -0.026503805184846838 \\ 
+va2 & -0.0018831210505664798 \\ 
+va4 & -0.019999999998740692 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 5.0-6.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.0203624428023447 \\ 
+v2 & 0.006739078336758305 \\ 
+v3 & -0.19999999999999998 \\ 
+v4 & -0.026326010640407987 \\ 
+va2 & -0.0018481886834116746 \\ 
+va4 & -0.019999999999999997 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 6.0-10.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.0011020690994012693 \\ 
+v2 & -0.009675881147365811 \\ 
+v3 & 0.2705453116364573 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & -0.004802708024743671 \\ 
+va4 & 0.13807742884563023 \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{RPF parameters for pTtrig 40-60 GeV, pTassoc 6.0-10.0 GeV}
+\begin{tabular}{|c|c|}
+\hline
+Parameter & Value \\ 
+\hline
+B & 0.004944263776036936 \\ 
+v2 & -0.009603505765432237 \\ 
+v3 & 0.27200329295524095 \\ 
+v4 & -0.09999999999999999 \\ 
+va2 & -0.0049899679859688436 \\ 
+va4 & 0.1403415940040048 \\ 
+\hline
+\end{tabular}
+\end{table}
+
