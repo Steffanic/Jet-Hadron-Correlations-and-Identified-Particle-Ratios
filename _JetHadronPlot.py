@@ -8584,7 +8584,7 @@ class PlotMixin:
     
     @print_function_name_with_description_on_call(description="")
     def plot_normalized_background_subtracted_dPhi_for_enhanced_species(
-        self, i, j, k, species, axSigminusBGNormINCSpecies, BGErrorINC, plot_ME_systematic=True, plot_PID_systematic=False
+        self, i, j, k, species, axSigminusBGNormINCSpecies, BGErrorINC, plot_ME_systematic=True, plot_PID_systematic=False, plot_refolded_distribution = True
     ):
         
         if self.analysisType in ["central", "semicentral"]:
@@ -8680,6 +8680,15 @@ class PlotMixin:
                     label="PID Error"
                 )
             
+            if plot_refolded_distribution:
+                if self.analysisType in ["central", "semicentral"]:
+                    dPhiRefolded = self.dPhiSigPIDErrForTrueSpecies[species][i,j,k]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+                elif self.analysisType=='pp':
+                    dPhiErr = self.dPhiSigPIDErrForTrueSpecies[species][i,j]
+                    dPhiErr = np.array([dPhiErr.GetBinContent(l+1) for l in range(n_binsNormINC)])
+
+
             dPhiSigminusBGNormINC.legend()
             dPhiSigminusBGNormINCax.set_xlabel("$\\Delta \\phi$ ($rad$)")
             dPhiSigminusBGNormINCax.set_ylabel(

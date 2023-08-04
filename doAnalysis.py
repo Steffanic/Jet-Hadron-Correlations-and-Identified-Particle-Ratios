@@ -180,6 +180,7 @@ if __name__ == "__main__":
         else:
             if exists("jhAnappPartial.pickle"):
                 jhAnappPartial = pickle.load(open("jhAnappPartial.pickle", "rb"))
+                breakpoint()
                 jhAnappPartial.pick_up_where_you_left_off()
                 jhAnapp = jhAnappPartial
             else:

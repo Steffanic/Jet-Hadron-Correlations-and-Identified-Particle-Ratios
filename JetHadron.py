@@ -124,17 +124,17 @@ class JetHadron(
             # 10,
             20,
             40,
-            60,
+            #60,
         ]  # subject to change based on statistics
         self.pTtrigBinCenters = [
             # 15,
             30,
-            50,
+            #50,
         ]  # subject to change based on statistics
         self.pTtrigBinWidths = [
             # 10,
             20,
-            20,
+            #20,
         ]  # subject to change based on statistics
         self.central_p0s = {
             (i, j): [
@@ -270,6 +270,10 @@ class JetHadron(
         else:
             self.z_vertex_bins = self.z_vertex_bins_PbPb
 
+        self.pionID = self.get_species_id("pion")
+        self.protonID = self.get_species_id("proton")
+        self.kaonID = self.get_species_id("kaon")
+
         # 15 pt assoc bins * 7 pt trig bins * 4 event plane bins = 420 bins
 
         # define signal and background regions
@@ -337,6 +341,7 @@ class JetHadron(
             self.NormalizedBGSubtractedAccCorrectedSEdPhiSigdpionTPCnSigmacorrsminVals = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False,dtype=float)
             self.NormalizedBGSubtracteddPhiForTrueSpeciesminVals = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
             self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminVals = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
+            self.NormalizedBGSubtracteddPhiForRefoldedSpeciesminVals = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
             self.NormalizedBGSubtracteddPhiForTrueSpeciesminValsZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
             self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminValsZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=False, dtype=float)
             with_eventPlane = False
@@ -388,6 +393,7 @@ class JetHadron(
         self.NormalizedBGSubtracteddPhiForTrueSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
         self.NormalizedBGSubtracteddPhiForTrueSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
         self.NormalizedBGSubtracteddPhiForEnhancedSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
+        self.NormalizedBGSubtracteddPhiForRefoldedSpecies = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
         self.NormalizedBGSubtracteddPhiForEnhancedSpeciesZV = self.init_pTtrig_pTassoc_species_dict(with_eventPlane=with_eventPlane, dtype=TH1F)
         self.pionTPCnSigmaInc = self.init_pTtrig_pTassoc_region_dict(with_eventPlane=with_eventPlane, with_species=False, dtype=TH1F)
         self.pionTPCnSigma_pionTOFcut = self.init_pTtrig_pTassoc_region_dict(with_eventPlane=with_eventPlane, with_species=False, dtype=TH1F)
@@ -439,12 +445,12 @@ class JetHadron(
             try:
                 [
                     [
-                        (self.current_trig_bin:=i, self.current_assoc_bin:=j, self.fill_hist_arrays(i, j))
+                        self.fill_hist_arrays(i, j)
                         for j in range(len(self.pTassocBinEdges) - 1)
                     ]
                     for i in range(len(self.pTtrigBinEdges) - 1)
                 ]
-            except:
+            except Exception as e:
                 print("Error in fill_on_init, doing a partial pickle")
                 pickle_filename = (
                     "jhAnappPartial.pickle"
@@ -454,6 +460,7 @@ class JetHadron(
                     else "jhAnaSemiCentralPartial.pickle"
                 )
                 pickle.dump(self, open(pickle_filename, "wb"))
+                raise e
         if pickle_on_init:
             # pickle the object
             pickle_filename = (
@@ -471,12 +478,12 @@ class JetHadron(
         try:
             [
                 [
-                    (self.current_trig_bin:=i, self.current_assoc_bin:=j, self.fill_hist_arrays(i, j))
+                    self.fill_hist_arrays(i, j)
                     for j in range(self.current_assoc_bin, len(self.pTassocBinEdges) - 1)
                 ]
                 for i in range(self.current_trig_bin, len(self.pTtrigBinEdges) - 1)
             ]
-        except:
+        except Exception as e:
                 print("Error in fill_on_init, doing a partial pickle")
                 pickle_filename = (
                     "jhAnappPartial.pickle"
@@ -486,6 +493,7 @@ class JetHadron(
                     else "jhAnaSemiCentralPartial.pickle"
                 )
                 pickle.dump(self, open(pickle_filename, "wb"))
+                raise e
 
     def init_pTtrig_pTassoc_region_dict(self, with_eventPlane, with_species, dtype):
         if with_species:
@@ -515,6 +523,8 @@ class JetHadron(
 
     @log_function_call(description="")
     def fill_hist_arrays(self, i, j, hists_to_fill: "Optional[dict[str, bool]]" = None):
+        self.current_trig_bin=i
+        self.current_assoc_bin=j
         if self.analysisType in ["central", "semicentral"]:
             self.set_pT_epAngle_bin(i, j, 3)
             for region in ['NS', 'AS', 'BG']:
@@ -2067,11 +2077,24 @@ class JetHadron(
             Corr = self.get_normalized_background_subtracted_dPhi_for_enhanced_species(
                 i, j, k, species
             )
-            self.dPhiSigPIDErrForTrueSpecies[species][i, j, k] = Corr
+            self.NormalizedBGSubtracteddPhiForEnhancedSpecies[species][i,j,k] = Corr
         elif self.analysisType == "pp":
             Corr, minVal = self.get_normalized_background_subtracted_dPhi_for_enhanced_species(i, j, k, species)  # type: ignore
             self.NormalizedBGSubtracteddPhiForEnhancedSpecies[species][i, j] = Corr  # type: ignore
             self.NormalizedBGSubtracteddPhiForEnhancedSpeciesminVals[species][i, j] = minVal  # type: ignore
+        del Corr
+    
+    @log_function_call(description="", logging_level=logging.INFO)
+    def fill_normalized_background_subtracted_dPhi_for_refolded_species(self, i, j, k, species):
+        if self.analysisType in ["central", "semicentral"]:
+            Corr = self.get_normalized_background_subtracted_dPhi_for_refolded_species(
+                i, j, k, species
+            )
+            self.NormalizedBGSubtracteddPhiForRefoldedSpecies[species][i,j,k] = Corr
+        elif self.analysisType == "pp":
+            Corr, minVal = self.get_normalized_background_subtracted_dPhi_for_refolded_species(i, j, k, species)  # type: ignore
+            self.NormalizedBGSubtracteddPhiForRefoldedSpecies[species][i, j] = Corr  # type: ignore
+            self.NormalizedBGSubtracteddPhiForRefoldedSpeciesminVals[species][i, j] = minVal  # type: ignore
         del Corr
     
     @log_function_call(description="")
@@ -2289,6 +2312,83 @@ class JetHadron(
             self.MixedEvent[sparse_ind].GetAxis(5).SetRange(0, -1)
             self.Trigger[sparse_ind].GetAxis(2).SetRange(0, -1)
         self.set_has_changed()
+
+    @log_function_call(description="")
+    def set_PID_selection(self, species):
+        for sparse_ind in range(len(self.JH)):
+
+            if species=="pion":
+                self.JH[sparse_ind].GetAxis(self.pionID).SetRangeUser(
+                    -2 , 2
+                ) 
+                self.JH[sparse_ind].GetAxis(self.kaonID).SetRange(0,self.JH[sparse_ind].GetAxis(self.kaonID).FindBin(-2 if self.current_assoc_bin<2 else -1))
+                self.JH[sparse_ind].GetAxis(self.protonID).SetRange(0,self.JH[sparse_ind].GetAxis(self.protonID).FindBin(-2))
+
+            if species=="kaon":
+                self.JH[sparse_ind].GetAxis(self.kaonID).SetRangeUser(
+                    -2 if self.current_assoc_bin<2 else -1 , 2
+                )  
+                self.JH[sparse_ind].GetAxis(self.protonID).SetRange(0,self.JH[sparse_ind].GetAxis(self.protonID).FindBin(-2))
+
+            if species=="proton":
+                self.JH[sparse_ind].GetAxis(self.protonID).SetRangeUser(
+                    -2 , 2
+                )
+
+            if species=="other_p+":
+                self.JH[sparse_ind].GetAxis(self.protonID).SetRange(
+                    self.JH[sparse_ind].GetAxis(self.protonID).FindBin(2), self.JH[sparse_ind].GetAxis(self.protonID).GetNbins()+1
+                )  
+
+            if species=="other_p-_k+":
+                self.JH[sparse_ind].GetAxis(self.protonID).SetRange(
+                    0, self.JH[sparse_ind].GetAxis(self.protonID).FindBin(-2)
+                )  
+                # k
+                self.JH[sparse_ind].GetAxis(self.kaonID).SetRange(
+                     self.JH[sparse_ind].GetAxis(self.kaonID).FindBin(2), self.JH[sparse_ind].GetAxis(self.kaonID).GetNbins()+1
+                )  
+
+            if species=="other_pi-_p-_k-":
+                self.JH[sparse_ind].GetAxis(self.pionID).SetRange(
+                    0, self.JH[sparse_ind].GetAxis(self.pionID).FindBin(-2)
+                )  
+                # p
+                self.JH[sparse_ind].GetAxis(self.protonID).SetRange(
+                     0,self.JH[sparse_ind].GetAxis(self.protonID).FindBin(-2)
+                )  
+                # k
+                self.JH[sparse_ind].GetAxis(self.kaonID).SetRange(
+                     0, self.JH[sparse_ind].GetAxis(self.kaonID).FindBin(-2)
+                )  
+
+            if species=="other_pi+_p-_k-":
+                self.JH[sparse_ind].GetAxis(self.pionID).SetRange(
+                     self.JH[sparse_ind].GetAxis(self.pionID).FindBin(2), self.JH[sparse_ind].GetAxis(self.pionID).GetNbins()+1
+                ) 
+                # p
+                self.JH[sparse_ind].GetAxis(self.protonID).SetRange(
+                     0, self.JH[sparse_ind].GetAxis(self.protonID).FindBin(-2)
+                ) 
+                # k
+                self.JH[sparse_ind].GetAxis(self.kaonID).SetRange(
+                     0, self.JH[sparse_ind].GetAxis(self.kaonID).FindBin(-2)
+                ) 
+            else:
+                raise ValueError(f"{species} is not a recognized particle species or other* specification.")
+
+    @log_function_call(description="")
+    def reset_PID_selection(self):
+        for sparse_ind in range(len(self.JH)):
+            self.JH[sparse_ind].GetAxis(self.pionID).SetRange(
+                0,0
+            )  # type:ignore
+            self.JH[sparse_ind].GetAxis(self.protonID).SetRange(
+                0,0
+            )  # type:ignore
+            self.JH[sparse_ind].GetAxis(self.kaonID).SetRange(
+                0,0
+            )  # type:ignore
 
     @log_function_call(description="")
     def set_has_changed(self):

@@ -8,59 +8,12 @@ from sklearn.preprocessing import normalize
 from scipy.integrate import quad
 from functools import partial
 import logging
-debug_logger = logging.getLogger('debug')
-error_logger = logging.getLogger('error')
-info_logger = logging.getLogger('info')
-unfolding_logger = logging.getLogger('unfolding')
-# let's register a new file for the unfolding logger
-unfolding_logger.addHandler(logging.FileHandler('unfolding.log', mode='w'))
-unfolding_logger.setLevel(logging.INFO)
-
-
-
-def area_under_gaussian_distribution(mean, sigma, x_min, x_max):
-  """
-  Calculates the area under a Gaussian distribution with custom mean and sigma.
-
-  Args:
-    mean: The mean of the Gaussian distribution.
-    sigma: The standard deviation of the Gaussian distribution.
-    x_min: The lower bound of the integration region.
-    x_max: The upper bound of the integration region.
-
-  Returns:
-    The area under the Gaussian distribution.
-  """
-
-  # Calculate the probability density function of the Gaussian distribution.
-  pdf = lambda x: np.exp(-(x - mean)**2 / (2 * sigma**2)) / (sigma * np.sqrt(2 * np.pi))
-
-  # Calculate the integral of the probability density function.
-  integral = np.trapz(pdf, x_min, x_max)
-
-  return integral
-
-def print_function_name_with_description_on_call(description, logging_level=logging.DEBUG):
-    """
-    Prints the name of the function and a description of what it does
-    """
-
-    def function_wrapper(function):
-        def method_wrapper(self, *args, **kwargs):
-            if logging_level == logging.DEBUG:
-                logger = debug_logger
-            elif logging_level == logging.INFO:
-                logger = info_logger
-            elif logging_level == logging.ERROR:
-                logger = error_logger
-            else:
-                raise ValueError(f"Unknown logging level {logging_level}")
-            logger.log(level=logging_level, msg=f"{function.__name__} in {self.__class__.__name__}:\n\t{description}")
-            return function(self, *args, **kwargs)
-
-        return method_wrapper
-
-    return function_wrapper
+from _JetHadronLogging import (
+    debug_logger, 
+    error_logger,
+    info_logger,
+    unfolding_logger
+)
 
 
 class AnalysisMixin:
@@ -69,13 +22,12 @@ class AnalysisMixin:
         Returns TH2 containing the △eta, △phi distribution from the JH sparse
         or TH3 containing the △eta, △phi, △pion distribution from the JH sparse
         """
-    
+        dphi_bin_width, deta_bin_width = [ 
+                    self.JH[0].GetAxis(sparse_dim).GetBinWidth(1)
+                    for sparse_dim in range(1, self.JH[0].GetNdimensions())
+                ][2:4]
         TH2Corr = None
         for sparse_ind in range(len(self.JH)):  # type:ignore
-            bin_widths = [ 
-                    self.JH[sparse_ind].GetAxis(i).GetBinWidth(1)
-                    for i in range(1, self.JH[sparse_ind].GetNdimensions())
-                ]
             if TH2Corr is None:
                 TH2Corr = self.JH[sparse_ind].Projection(4, 3)  # type:ignore
                 # divide by the bin widths to get the correct correlation function
@@ -84,9 +36,8 @@ class AnalysisMixin:
                 # divide by the bin widths to get the correct correlation function
                 if not success:
                     warn("Failed to add to TH2Corr")
-        TH2Corr.Scale(1 / bin_widths[2] / bin_widths[3])
-        self.get_SE_correlation_function_result = TH2Corr
-        self.get_SE_correlation_function_has_changed = False
+        TH2Corr.Scale(1 / dphi_bin_width / deta_bin_width)
+
         return TH2Corr.Clone()
 
     def get_SE_correlation_function_for_species(self, i,j,k,species):
@@ -94,134 +45,42 @@ class AnalysisMixin:
         Returns TH2 containing the △eta, △phi distribution from the JH sparse
         or TH3 containing the △eta, △phi, △pion distribution from the JH sparse
         """
-        offset = 1 if self.analysisType == "pp" else 0  # type:ignore
-        speciesID = (
-            9
-            if species == "pion"
-            else 10
-            if species == "proton"
-            else 11
-        )
-
+        speciesID = self.get_species_id(species)
+        dphi_bin_width, deta_bin_width = [ 
+                    self.JH[0].GetAxis(sparse_dim).GetBinWidth(1)
+                    for sparse_dim in range(1, self.JH[0].GetNdimensions())
+                ][2:4]
         TH2Corr = None
         for sparse_ind in range(len(self.JH)):  # type:ignore
-            bin_widths = [ 
-                    self.JH[sparse_ind].GetAxis(i).GetBinWidth(1)
-                    for i in range(1, self.JH[sparse_ind].GetNdimensions())
-                ]
-
             if species != "other":
-                if species=="pion":
-
-                    self.JH[sparse_ind].GetAxis(9 - offset).SetRangeUser(
-                        -2 , 2
-                    )  # type:ignore
-                    self.JH[sparse_ind].GetAxis(11 - offset).SetRange(0,self.JH[sparse_ind].GetAxis(11-offset).FindBin(-2 if j<2 else -1))
-                    self.JH[sparse_ind].GetAxis(10 - offset).SetRange(0,self.JH[sparse_ind].GetAxis(10-offset).FindBin(-2))
-                    if TH2Corr is None:
-                        TH2Corr = self.JH[sparse_ind].Projection(4, 3)  # type:ignore
-                        
-                    else:
-                        TH2Corr.Add(self.JH[sparse_ind].Projection(4, 3))  # type:ignore
-                    # self.JH[sparse_ind].GetAxis(11-offset).SetRange(0,0)
-                    # TH2Corr.Add(self.JH[sparse_ind].Projection(4, 3))  # type:ignore
-
-                elif species=="kaon":
-
-                    self.JH[sparse_ind].GetAxis(11 - offset).SetRangeUser(
-                        -2 if j<2 else -1 , 2
-                    )  # type:ignore
-                    self.JH[sparse_ind].GetAxis(10 - offset).SetRange(0,self.JH[sparse_ind].GetAxis(10-offset).FindBin(-2))
-                    if TH2Corr is None:
-                        TH2Corr = self.JH[sparse_ind].Projection(4, 3)  # type:ignore
-                        
-                    else:
-                        TH2Corr.Add(self.JH[sparse_ind].Projection(4, 3))  # type:ignore
-                    # self.JH[sparse_ind].GetAxis(10-offset).SetRange(0,0)
-                    # TH2Corr.Add(self.JH[sparse_ind].Projection(4, 3))  # type:ignore
-
-                elif species=="proton":
-
-                    self.JH[sparse_ind].GetAxis(10 - offset).SetRangeUser(
-                        -2 , 2
-                    )
-                    if TH2Corr is None:
-                        TH2Corr = self.JH[sparse_ind].Projection(4, 3)  # type:ignore
-                        
-                    else:
-                        TH2Corr.Add(self.JH[sparse_ind].Projection(4, 3))  # type:ignore
-
-
-
-                
-                self.JH[sparse_ind].GetAxis(9 - offset).SetRange(
-                  0,0
-                )  # type:ignore
-                self.JH[sparse_ind].GetAxis(10 - offset).SetRange(
-                  0,0
-                )  # type:ignore
-                self.JH[sparse_ind].GetAxis(11 - offset).SetRange(
-                  0,0
-                )  # type:ignore
-            else:
-                # p
-                self.JH[sparse_ind].GetAxis(10 - offset).SetRange(
-                     self.JH[sparse_ind].GetAxis(10 - offset).FindBin(2), self.JH[sparse_ind].GetAxis(10 - offset).GetNbins()+1
-                )  # type:ignore
+                self.set_PID_selection(species)
                 if TH2Corr is None:
                     TH2Corr = self.JH[sparse_ind].Projection(4, 3)  # type:ignore
                 else:
                     TH2Corr.Add(self.JH[sparse_ind].Projection(4, 3))  # type:ignore
+                self.reset_PID_selection()
+            else:
+                self.set_PID_selection("other_p+")
+                if TH2Corr is None:
+                    TH2Corr = self.JH[sparse_ind].Projection(4, 3)  # type:ignore
+                else:
+                    TH2Corr.Add(self.JH[sparse_ind].Projection(4, 3))  # type:ignore
+                self.reset_PID_selection()
 
-                # p
-                self.JH[sparse_ind].GetAxis(10 - offset).SetRange(
-                    0, self.JH[sparse_ind].GetAxis(10-offset).FindBin(-2)
-                )  # type:ignore
-                # k
-                self.JH[sparse_ind].GetAxis(11 - offset).SetRange(
-                     self.JH[sparse_ind].GetAxis(11 - offset).FindBin(2), self.JH[sparse_ind].GetAxis(11 - offset).GetNbins()+1
-                )  # type:ignore
+                self.set_PID_selection("other_p-_k+")
                 TH2Corr.Add(self.JH[sparse_ind].Projection(4,3))
-
-                # pi
-                self.JH[sparse_ind].GetAxis(9 - offset).SetRange(
-                    0, self.JH[sparse_ind].GetAxis(9-offset).FindBin(-2)
-                )  # type:ignore
-                # p
-                self.JH[sparse_ind].GetAxis(10 - offset).SetRange(
-                     0,self.JH[sparse_ind].GetAxis(10 - offset).FindBin(-2)
-                )  # type:ignore
-                # k
-                self.JH[sparse_ind].GetAxis(11 - offset).SetRange(
-                     0, self.JH[sparse_ind].GetAxis(11 - offset).FindBin(-2)
-                )  # type:ignore
-                TH2Corr.Add(self.JH[sparse_ind].Projection(4,3))
-
-                # pi
-                self.JH[sparse_ind].GetAxis(9 - offset).SetRange(
-                     self.JH[sparse_ind].GetAxis(9-offset).FindBin(2), self.JH[sparse_ind].GetAxis(9-offset).GetNbins()+1
-                )  # type:ignore
-                # p
-                self.JH[sparse_ind].GetAxis(10 - offset).SetRange(
-                     0, self.JH[sparse_ind].GetAxis(10-offset).FindBin(-2)
-                )  # type:ignore
-                # k
-                self.JH[sparse_ind].GetAxis(11 - offset).SetRange(
-                     0, self.JH[sparse_ind].GetAxis(11 - offset).FindBin(-2)
-                )  # type:ignore
-                TH2Corr.Add(self.JH[sparse_ind].Projection(4,3))
+                self.reset_PID_selection()
                 
+                self.set_PID_selection("other_pi-_p-_k-")
+                TH2Corr.Add(self.JH[sparse_ind].Projection(4,3))
+                self.reset_PID_selection()
 
-                self.JH[sparse_ind].GetAxis(9 - offset).SetRange(
-                  0,0
-                )  # type:ignore
-                self.JH[sparse_ind].GetAxis(10 - offset).SetRange(
-                  0,0
-                )  # type:ignore
-                self.JH[sparse_ind].GetAxis(11 - offset).SetRange(
-                  0,0
-                )  # type:ignore
-        TH2Corr.Scale(1 / bin_widths[2] / bin_widths[3])
+               
+                self.set_PID_selection("other_pi+_p-_k-")
+                TH2Corr.Add(self.JH[sparse_ind].Projection(4,3))
+                self.reset_PID_selection()
+
+        TH2Corr.Scale(1 / dphi_bin_width / deta_bin_width)
         return TH2Corr.Clone()
 
     def get_SE_correlation_function_w_pionTPCnSigma(self, species):
@@ -241,7 +100,7 @@ class AnalysisMixin:
 
         TH3Corr = None
         for sparse_ind in range(len(self.JH)):  # type:ignore
-            self.JH[sparse_ind].GetAxis(speciesID - offset).SetRangeUser(
+            self.JH[sparse_ind].GetAxis(speciesID).SetRangeUser(
                 -2 if self.analysisType=='pp' else -2, 2 if self.analysisType=='pp' else 2
             )  # type:ignore
             if TH3Corr is None:
@@ -252,15 +111,10 @@ class AnalysisMixin:
                 TH3Corr.Add(
                     self.JH[sparse_ind].Projection(3, 4, 7 - offset)
                 )  # type:ignore
-            self.JH[sparse_ind].GetAxis(speciesID - offset).SetRangeUser(
+            self.JH[sparse_ind].GetAxis(speciesID).SetRangeUser(
                 -10, 10
             )  # type:ignore
-        self.get_SE_correlation_function_w_Pion_result[
-            species
-        ] = TH3Corr  # type:ignore
-        self.get_SE_correlation_function_w_Pion_has_changed[
-            species
-        ] = False  # type:ignore
+
         return TH3Corr.Clone()
         
 
@@ -838,15 +692,7 @@ class AnalysisMixin:
         N_assoc = 0
         N_assoc_hist = None
         # restrict sparse to species in question
-        offset = 1 if self.analysisType == "pp" else 0  # type:ignore
-    
-        speciesID = (
-            9
-            if species == "pion"
-            else 10
-            if species == "proton"
-            else 11
-        )
+        speciesID = self.get_species_id(species)
         for sparse_ind in range(len(self.JH)):
             if region is not None:
                 if region == "NS":
@@ -1759,6 +1605,146 @@ class AnalysisMixin:
             BGSubtracteddPhiSigHist.Scale(1 / N_trig)  # type:ignore
             # return the background subtracted signal
             return BGSubtracteddPhiSigHist.Clone(), minValErr
+    
+    def get_normalized_BG_subtracted_AccCorrectedSEdPhiSig_for_refolded_species(
+        self, i, j, k, species, in_z_vertex_bins=False
+    ):
+        """
+        Returns the background subtracted dPhi dpionTPCnSigma distribution after a TOF species cut for the signal region
+        """
+        if self.analysisType in ["central", "semicentral"]:  # type:ignore
+            # get the dPhi distribution
+            if in_z_vertex_bins:
+                raise NotImplementedError("Z vertex bins not implemented for refolded distribution")
+            else:
+                dPhiSig = self.dPhiSigcorrsForRefoldedSpecies[species][i, j, k]  # type:ignore
+        elif self.analysisType == "pp":  # type:ignore
+            # get the dPhi distribution
+            if in_z_vertex_bins:
+                raise NotImplementedError("Z vertex bins not implemented for refolded distribution")
+            else:
+                dPhiSig = self.dPhiSigcorrsForRefoldedSpecies[species][i, j]  # type:ignore
+                dPhiBG = self.dPhiBGcorrsForRefoldedSpecies[species][i, j]  # type:ignore
+
+        # get the bin contents
+        dPhiSigBinContents = self.get_bin_contents_as_array(
+            dPhiSig, forFitting=False
+        )  # type:ignore
+        
+        # get the bin errors
+        dPhiSigBinErrors = self.get_bin_errors_as_array(
+            dPhiSig, forFitting=False
+        )  # type:ignore
+        # get x range
+        x_vals = self.get_bin_centers_as_array(dPhiSig, forFitting=False)  # type:ignore
+      
+        if self.analysisType in ["central", "semicentral"]:  # type:ignore
+            # generate the background distribution from the RPFObj
+            if in_z_vertex_bins:
+                dPhiBGRPFs = np.array(
+                    [
+                        self.RPFObjsForEnhancedSpeciesZV[species][i, j].simultaneous_fit(
+                            x_vals[l], *self.RPFObjsForEnhancedSpeciesZV[species][i, j].popt
+                        )
+                        for l in range(len(x_vals))
+                    ]
+                )  # type:ignore
+                dPhiBGRPFErrs = np.array(
+                    [
+                        self.RPFObjsForEnhancedSpeciesZV[species][i, j].simultaneous_fit_err(
+                            x_vals[l], x_vals[1] - x_vals[0], *self.RPFObjsForEnhancedSpeciesZV[species][i, j].popt
+                        )
+                        for l in range(len(x_vals))
+                    ]
+                )  # type:ignore
+            else:
+                dPhiBGRPFs = np.array(
+                    [
+                        self.RPFObjsForEnhancedSpecies[species][i, j].simultaneous_fit(
+                            x_vals[l], *self.RPFObjsForEnhancedSpecies[species][i, j].popt
+                        )
+                        for l in range(len(x_vals))
+                    ]
+                )  # type:ignore
+                dPhiBGRPFErrs = np.array(
+                    [
+                        self.RPFObjsForEnhancedSpecies[species][i, j].simultaneous_fit_err(
+                            x_vals[l], x_vals[1] - x_vals[0], *self.RPFObjsForEnhancedSpecies[species][i, j].popt
+                        )
+                        for l in range(len(x_vals))
+                    ]
+                )  # type:ignore
+            if k in [0, 1, 2]:
+                dPhiBGRPF = dPhiBGRPFs[:, k]  # type:ignore
+                dPhiBGRPFErr = dPhiBGRPFErrs[:, k]  # type:ignore
+
+            if k == 3:
+                dPhiBGRPF = np.array(np.sum(dPhiBGRPFs*[self.N_trigs[i,0],self.N_trigs[i,1],self.N_trigs[i,2]]/(self.N_trigs[i,0]+self.N_trigs[i,1]+self.N_trigs[i,2]), axis=1)) 
+                dPhiBGRPFErr = np.array(np.sqrt(np.sum(dPhiBGRPFErrs**2, axis=1)))
+            if k not in [0, 1, 2, 3]:
+                raise Exception(f"k must be 0, 1, 2, or 3, got {k=}")
+
+            #
+            # subtract the background from the signal
+            BGSubtracteddPhiSig = dPhiSigBinContents - dPhiBGRPF 
+
+            # get the error on the bdPhiBGRPFErrackground subtracted signal
+            BGSubtracteddPhiSigErr =dPhiBGRPFErr
+
+            # create a new histogram to hold the background subtracted signal
+            BGSubtracteddPhiSigHist = TH1D(
+                "BGSubtracteddPhiSigHist",
+                "BGSubtracteddPhiSigHist",
+                len(x_vals),
+                x_vals[0],
+                x_vals[-1],
+            )
+            # fill the histogram with the background subtracted signal
+            for l in range(len(x_vals)):
+                BGSubtracteddPhiSigHist.SetBinContent(l + 1, BGSubtracteddPhiSig[l])
+                BGSubtracteddPhiSigHist.SetBinError(l + 1, BGSubtracteddPhiSigErr[l])
+
+            BGSubtracteddPhiSigHist.Sumw2()
+            # get the number of triggers
+            N_trig = self.get_N_trig()
+            # normalize the dPhi distribution
+            BGSubtracteddPhiSigHist.Scale(1 / N_trig)  # type:ignore
+            # return the background subtracted signal
+            return BGSubtracteddPhiSigHist.Clone()
+
+        elif self.analysisType == "pp":  # type:ignore
+            dPhiBGBinContents = self.get_bin_contents_as_array(
+                dPhiBG, forFitting=False
+            )  # type:ignore    
+            # get the minimum value of the signal
+            minVal, minValErr = self.get_minVal_and_systematic_error(dPhiBGBinContents)
+            #minVal = self.NormalizedBGSubtractedAccCorrectedSEdPhiSigcorrsminVals[
+            #    i, j
+            #]  # type:ignore
+            # subtract the minimum value from the signal
+            BGSubtracteddPhiSig = dPhiSigBinContents - minVal
+            # get the error on the background subtracted signal
+            BGSubtracteddPhiSigErr = np.sqrt(dPhiSigBinErrors**2)
+            # create a new histogram to hold the background subtracted signal
+            BGSubtracteddPhiSigHist = TH1D(
+                "BGSubtracteddPhiSigHist",
+                "BGSubtracteddPhiSigHist",
+                len(x_vals),
+                x_vals[0],
+                x_vals[-1],
+            )
+            # fill the histogram with the background subtracted signal
+            for l in range(len(x_vals)):
+                BGSubtracteddPhiSigHist.SetBinContent(l + 1, BGSubtracteddPhiSig[l])
+                BGSubtracteddPhiSigHist.SetBinError(l + 1, BGSubtracteddPhiSigErr[l])
+            # return the background subtracted signal
+            BGSubtracteddPhiSigHist.Sumw2()
+            # get the number of triggers
+            N_trig = self.get_N_trig()
+            # normalize the dPhi distribution
+            BGSubtracteddPhiSigHist.Scale(1 / N_trig)  # type:ignore
+            # return the background subtracted signal
+            return BGSubtracteddPhiSigHist.Clone(), minValErr
 
     def get_normalized_background_subtracted_dPhi_for_true_species(self, i, j, k, species, in_z_vertex_bins=False):
         """
@@ -1807,6 +1793,32 @@ class AnalysisMixin:
                 BGSubtracteddPhiSigForSpeciesHist,
                 minValErr,
             ) = self.get_normalized_BG_subtracted_AccCorrectedSEdPhiSig_for_enhanced_species(
+                i, j, k, species, in_z_vertex_bins=in_z_vertex_bins
+            )
+            # return the background subtracted dPhi distribution
+            return BGSubtracteddPhiSigForSpeciesHist.Clone(), minValErr
+    
+    def get_normalized_background_subtracted_dPhi_for_refolded_species(self, i, j, k, species, in_z_vertex_bins=False):
+        """
+        Returns the normalized background subtracted dPhi distribution for a given species after refolding
+        """
+        if self.analysisType in ["central", "semicentral"]:  # type:ignore
+            # get the background subtracted dPhi distribution for a given species
+            BGSubtracteddPhiSigForSpeciesHist = (
+                self.get_normalized_BG_subtracted_AccCorrectedSEdPhiSig_for_refolded_species(
+                    i, j, k, species, in_z_vertex_bins=in_z_vertex_bins
+                )
+            )
+            # project the dPhi distribution onto the x-axis
+            # return the background subtracted dPhi distribution
+            return BGSubtracteddPhiSigForSpeciesHist.Clone()
+
+        elif self.analysisType == "pp":  # type:ignore
+            # get the background subtracted dPhi distribution for a given species
+            (
+                BGSubtracteddPhiSigForSpeciesHist,
+                minValErr,
+            ) = self.get_normalized_BG_subtracted_AccCorrectedSEdPhiSig_for_refolded_species(
                 i, j, k, species, in_z_vertex_bins=in_z_vertex_bins
             )
             # return the background subtracted dPhi distribution
@@ -2473,3 +2485,14 @@ class AnalysisMixin:
             ])/self.N_assoc[region][i,j]
 
         return A
+
+    def get_species_id(self, species):
+        offset = 1 if self.analysisType == "pp" else 0  # type:ignore
+        speciesID = (
+            9
+            if species == "pion"
+            else 10
+            if species == "proton"
+            else 11
+        )
+        return speciesID-offset
