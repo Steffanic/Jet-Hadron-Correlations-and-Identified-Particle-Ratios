@@ -30,9 +30,11 @@ class AnalysisMixin:
         for sparse_ind in range(len(self.JH)):  # type:ignore
             if TH2Corr is None:
                 TH2Corr = self.JH[sparse_ind].Projection(4, 3)  # type:ignore
+                breakpoint()
                 # divide by the bin widths to get the correct correlation function
             else:
                 success = TH2Corr.Add(self.JH[sparse_ind].Projection(4, 3))  # type:ignore
+                breakpoint()
                 # divide by the bin widths to get the correct correlation function
                 if not success:
                     warn("Failed to add to TH2Corr")
@@ -82,40 +84,6 @@ class AnalysisMixin:
 
         TH2Corr.Scale(1 / dphi_bin_width / deta_bin_width)
         return TH2Corr.Clone()
-
-    def get_SE_correlation_function_w_pionTPCnSigma(self, species):
-        """
-        Returns TH2 containing the △eta, △phi distribution from the JH sparse
-        or TH3 containing the △eta, △phi, △pion distribution from the JH sparse
-        """
-        offset = 1 if self.analysisType == "pp" else 0  # type:ignore
-    
-        speciesID = (
-            9
-            if species == "pion"
-            else 10
-            if species == "proton"
-            else 11
-        )
-
-        TH3Corr = None
-        for sparse_ind in range(len(self.JH)):  # type:ignore
-            self.JH[sparse_ind].GetAxis(speciesID).SetRangeUser(
-                -2 if self.analysisType=='pp' else -2, 2 if self.analysisType=='pp' else 2
-            )  # type:ignore
-            if TH3Corr is None:
-                TH3Corr = self.JH[sparse_ind].Projection(
-                    3, 4, 7 - offset
-                )  # type:ignore
-            else:
-                TH3Corr.Add(
-                    self.JH[sparse_ind].Projection(3, 4, 7 - offset)
-                )  # type:ignore
-            self.JH[sparse_ind].GetAxis(speciesID).SetRangeUser(
-                -10, 10
-            )  # type:ignore
-
-        return TH3Corr.Clone()
         
 
     def get_ME_correlation_function(self):
@@ -546,60 +514,7 @@ class AnalysisMixin:
 
         
 
-    def get_acceptance_corrected_correlation_function_w_pionTPCnSigma(self, species):
-    
-        # get the raw correlation functions
-        Corr = self.get_SE_correlation_function_w_pionTPCnSigma(species)
-        # get normalized mixed event correlation function
-        NormMEC, norm_systematic = self.get_normalized_ME_correlation_function()
-        # we need to make a compatible 3d histogram. Let's do this be taking NormMEC and making a 3d histogram with the same binning as Corr
-        # get the binning of Corr
-        xbins = Corr.GetXaxis().GetNbins()
-        xlow = Corr.GetXaxis().GetXmin()
-        xhigh = Corr.GetXaxis().GetXmax()
-        ybins = Corr.GetYaxis().GetNbins()
-        ylow = Corr.GetYaxis().GetXmin()
-        yhigh = Corr.GetYaxis().GetXmax()
-        zbins = Corr.GetZaxis().GetNbins()
-        zlow = Corr.GetZaxis().GetXmin()
-        zhigh = Corr.GetZaxis().GetXmax()
 
-        # make a 3d histogram with the same binning as Corr
-        NormMEC_3d = TH3D(
-            "NormMEC_3d",
-            "NormMEC_3d",
-            xbins,
-            xlow,
-            xhigh,
-            ybins,
-            ylow,
-            yhigh,
-            zbins,
-            zlow,
-            zhigh,
-        )
-        # fill the 3d histogram with the 2d histogram and errors from the 2d histogram
-        for i in range(0, xbins + 2):
-            for j in range(0, ybins + 2):
-                for k in range(0, zbins + 2):
-                    NormMEC_3d.SetBinContent(
-                        i, j, k, NormMEC.GetBinContent(i, j) / zbins
-                    )  # yay for github copilot ! 🥳🥳🥂
-                    NormMEC_3d.SetBinError(
-                        i, j, k, NormMEC.GetBinError(i, j) / zbins
-                    )
-
-        # divide the raw correlation function by the mixed event correlation function
-        Corr.Divide(NormMEC_3d)
-        # Corr.GetXaxis().SetRangeUser(-0.9, 0.9)
-        del NormMEC
-        self.get_acceptance_corrected_correlation_function_w_pionTPCnSigma_result[
-            species
-        ] = Corr
-        self.get_acceptance_corrected_correlation_function_w_pionTPCnSigma_has_changed[
-            species
-        ] = False
-        return Corr.Clone()
         
 
     def get_N_trig(self):
@@ -933,32 +848,7 @@ class AnalysisMixin:
 
         return dPhi.Clone(), nbins, binwidth
 
-    def get_dPhi_dpionTPCnSigma_projection_in_dEta_range(
-        self, dEtaRange, TOFcutSpecies, rebin=True, scaleUp=False
-    ):
-        """
-        Returns the dPhi distribution for a given dEta range
-        """
-        tempHist = self.get_acceptance_corrected_correlation_function_w_pionTPCnSigma(
-            TOFcutSpecies
-        )
-        lowerBin, upperBin = (tempHist.GetXaxis().FindBin(bin) for bin in dEtaRange)
-        tempHist.GetXaxis().SetRange(lowerBin, upperBin)
-        dPhidpionTPCnSigma = tempHist.Project3D("zy")
-        if scaleUp:
-            # Scale background up
-            nbins = upperBin - lowerBin
-            binwidth = tempHist.GetXaxis().GetBinWidth(1)
-            nbins_sig = tempHist.GetXaxis().FindBin(0.6) - tempHist.GetXaxis().FindBin(
-                -0.6
-            )
-            debug_logger.info(f"Grabbing between bins {upperBin} and {lowerBin}")
-            dPhidpionTPCnSigma.Scale((nbins_sig + 1) / (nbins + 1))
-        # rebin dPhi
-        if rebin:
-            dPhidpionTPCnSigma = dPhidpionTPCnSigma.RebinX(2)
-            dPhidpionTPCnSigma.Scale(0.5)
-        return dPhidpionTPCnSigma.Clone()
+    
 
     def get_dEta_projection_NS(self):
         """

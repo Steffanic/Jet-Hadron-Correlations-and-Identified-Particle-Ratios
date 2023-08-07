@@ -292,9 +292,6 @@ class JetHadron(
         self.get_acceptance_corrected_correlation_function_has_changed = True
         self.get_acceptance_corrected_dPhi_dEta_dPion_distribution_has_changed = True
         self.get_normalized_acceptance_corrected_correlation_function_has_changed = True
-        self.get_acceptance_corrected_correlation_function_w_pionTPCnSigma_has_changed = (
-            init_bool_dict()
-        )
         self.ME_norm_sliding_window_has_changed = True
 
         self.get_SE_correlation_function_result = None
@@ -305,9 +302,6 @@ class JetHadron(
         self.get_acceptance_corrected_correlation_function_result = None
         self.get_acceptance_corrected_dPhi_dEta_dPion_distribution_result = None
         self.get_normalized_acceptance_corrected_correlation_function_result = None
-        self.get_acceptance_corrected_correlation_function_w_pionTPCnSigma_result = (
-            init_none_dict()
-        )
         self.ME_norm_sliding_window_result = None
         self.unfoldedTruthValues = None
         self.unfoldedTruthErrors = None
@@ -699,9 +693,7 @@ class JetHadron(
                 self.plot_normalized_acceptance_corrected_correlation_function_in_z_vertex_bins(i,j,k)
                 
                 for species in ["pion", "proton", "kaon"]:
-                    self.fill_dPhi_dpionTPCnSigma_correlation_functions(
-                        i, j, k, species
-                    )
+                    
                     self.fill_normalized_BG_subtracted_AccCorrected_SE_correlation_functions_w_pionTPCnSigma(
                         i, j, k, species
                     )
@@ -918,7 +910,7 @@ class JetHadron(
             for species in ["pion", "proton", "kaon"]:
                 self.fill_dPhi_correlation_functions_for_true_species(i, j, 3, species)
                 self.fill_dPhi_correlation_functions_for_enhanced_species(i, j, 3, species)
-                self.fill_dPhi_dpionTPCnSigma_correlation_functions(i, j, 3, species)
+                
                 self.fill_normalized_BG_subtracted_AccCorrected_SE_correlation_functions_w_pionTPCnSigma(
                     i, j, 3, species
                 )
@@ -1968,18 +1960,7 @@ class JetHadron(
             self.dPhiSigcorrsForEnhancedSpeciesZV[species][i, j] = dPhiSig
         del dPhiSig
 
-    @log_function_call(description="")
-    def fill_dPhi_dpionTPCnSigma_correlation_functions(self, i, j, k, TOFcutSpecies):
 
-        # print(f"dPhiBG is at {hex(id(dPhiBG))}")
-        dPhiSig = self.get_dPhi_dpionTPCnSigma_projection_in_dEta_range(
-            self.dEtaSig, TOFcutSpecies
-        ).Clone()
-        if self.analysisType in ["central", "semicentral"]:
-            self.dPhiSigdpionTPCnSigmacorrs[TOFcutSpecies][i, j, k] = dPhiSig
-        elif self.analysisType == "pp":
-            self.dPhiSigdpionTPCnSigmacorrs[TOFcutSpecies][i, j] = dPhiSig
-        del dPhiSig
 
     @log_function_call(description="", logging_level=logging.INFO)
     def fill_BG_subtracted_AccCorrected_SE_correlation_functions(self, i, j, k):
@@ -2400,9 +2381,6 @@ class JetHadron(
         self.get_acceptance_corrected_correlation_function_has_changed = True
         self.get_acceptance_corrected_dPhi_dEta_dPion_distribution_has_changed = True
         self.get_normalized_acceptance_corrected_correlation_function_has_changed = True
-        self.get_acceptance_corrected_correlation_function_w_pionTPCnSigma_has_changed = (
-            init_bool_dict()
-        )
         self.ME_norm_sliding_window_has_changed = True
         self.resetUnfoldingResults = True
 

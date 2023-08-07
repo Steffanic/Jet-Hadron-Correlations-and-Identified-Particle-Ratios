@@ -12208,6 +12208,10 @@ class PlotMixin:
         yieldFigAS.savefig(f"{self.base_save_path}YieldAS_{species}EnhZV.png")  # type:ignore
         plt.close(yieldFigAS)
 
+    @print_function_name_with_description_on_call(description="")
+    def plot_ratio_for_true_species(self, numerator_species, denominator_species):
+        
+
     def get_bin_contents_as_array(self, th1, forFitting=True, forAS=False):
         bin_contents = []
         assert not (forFitting and forAS)
