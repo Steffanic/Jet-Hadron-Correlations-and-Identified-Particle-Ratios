@@ -42,4 +42,9 @@ class Analysis:
         file.Close()
 
     def setRegionForSparses(self, region: Region):
+        '''
+        Sets the delta-phi and delta-eta ranges for the JetHadron sparse and the Mixed Event sparse
+        '''
         pass
+
+    def setParticleSelectionForSparses(self, species: ParticleType)
