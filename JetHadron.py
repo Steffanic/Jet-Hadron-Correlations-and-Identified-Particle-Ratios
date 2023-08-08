@@ -33,7 +33,6 @@ from _JetHadronLogging import (
     info_logger,
     log_function_call,
 )
-
 # turn latex on in matplotlib
 plt.rc("text", usetex=True)
 plt.rc("font", family="serif")
@@ -74,7 +73,7 @@ class JetHadron(
         for filename in rootFileNames:
             debug_logger.debug(f"Loading file {filename}")
             file = TFile(filename)
-            fileJH, fileME, fileT = self.get_sparses(file)
+            fileJH, fileME, fileT = self.get_sparses_from_file(file)
             self.JH.append(fileJH)
             self.MixedEvent.append(fileME)
             self.Trigger.append(fileT)
@@ -2392,7 +2391,7 @@ class JetHadron(
                                 """
         return string_rep
 
-    def get_sparses(self, f):
+    def get_sparses_from_file(self, f):
         """
         Returns tuple of (fhnJH, fhnMixedEvent, fhnTrigger) for central events
         """
