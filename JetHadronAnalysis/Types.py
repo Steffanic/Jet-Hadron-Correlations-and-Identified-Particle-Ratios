@@ -10,3 +10,7 @@ class ParticleType(Enum):
     PROTON = 2
     KAON = 3
     OTHER = 4
+
+class NormalizationMethod(Enum):
+    SLIDING_WINDOW = 1
+    MAX = 2

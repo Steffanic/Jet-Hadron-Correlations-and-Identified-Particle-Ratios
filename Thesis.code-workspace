@@ -34,7 +34,7 @@
 			"globalvariables .C": "cpp"
 		},
 		"python.analysis.typeCheckingMode": "basic",
-		"workbench.colorTheme": "Cobalt2",
+		"workbench.colorTheme": "GitHub Dark Colorblind (Beta)",
 		"themeRandomizer.themes.blacklist": [
 			"SynthWave '84"
 		],
