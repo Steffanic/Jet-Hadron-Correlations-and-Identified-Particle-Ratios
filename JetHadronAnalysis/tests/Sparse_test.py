@@ -5,13 +5,15 @@ from JetHadronAnalysis.Sparse import Sparse, TriggerSparse
 from JetHadronAnalysis.Types import AnalysisType
 from ROOT import THnSparseD
 
+
+#TODO: Figure out how to parametrize this fixture so that I can test for adding errors when there are a different number of bins in the different axes
 @pytest.fixture
-def empty_THnSparse_2D():
-    return THnSparseD("test2D", "test2D", 2, array.array("i", [2,2]))
+def empty_THnSparse_2D(nbins_x: int = 2, nbins_y: int = 2):
+    return THnSparseD("test2D", "test2D", 2, array.array("i", [nbins_x, nbins_y]))
 
 @pytest.fixture
 def empty_THnSparse_1D():
-    return THnSparseD("test1D", "test1D", 1, array.array("i", [2,2]))
+    return THnSparseD("test1D", "test1D", 1, array.array("i", [2]))
 
 @pytest.fixture
 def filled_THnSparse_2D(empty_THnSparse_2D):

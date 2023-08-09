@@ -55,7 +55,7 @@ class Analysis:
         This function opens the root file and appends the sparse data to the appropriate Sparse object then closes the file
         '''
         file = TFile(rootFileName)
-        rootFileListName = f"AliAnalysisTaskJetH_tracks_caloClusters_biased" if self.analysisType == AnalysisType.PP else f"AliAnalysisTaskJetH_tracks_caloClusters_dEdxtrackBias5R2_{'SemiCentral' if self.analysisType == AnalysisType.SEMICENTRAL else 'Central'}q"
+        rootFileListName = f"AliAnalysisTaskJetH_tracks_caloClusters_biased" if self.analysisType == AnalysisType.PP else f"AliAnalysisTaskJetH_tracks_caloClusters_dEdxtrackBias5R2{'SemiCentral' if self.analysisType == AnalysisType.SEMICENTRAL else 'Central'}q"
         rootFileList = file.Get(rootFileListName)
         self.JetHadron.addSparse(rootFileList.FindObject("fhnJH"))
         self.Trigger.addSparse(rootFileList.FindObject("fhnTrigger"))
