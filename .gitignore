@@ -18,3 +18,4 @@ __pycache__/PionTPCNSigmaFitter.cpython-39.pyc
 __pycache__/RPF.cpython-39.pyc
 tests/__pycache__/JetHadron_test.cpython-39-pytest-7.3.0.pyc
 jet_hadron.log
+*.pyc
