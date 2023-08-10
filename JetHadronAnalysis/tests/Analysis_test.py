@@ -51,8 +51,26 @@ def test_setRegionForSparses(analysis):
     assert analysis.MixedEvent.minDeltaEta == - 1.4
     assert analysis.MixedEvent.maxDeltaEta == 1.4
 
-    with pytest.raises(NotImplementedError):
-       analysis.setRegionForSparses(Region.BACKGROUND)
+    analysis.setRegionForSparses(Region.BACKGROUND_ETAPOS)
+    assert analysis.JetHadron.minDeltaPhi == - pi/2
+    assert analysis.JetHadron.maxDeltaPhi ==  pi/2
+    assert analysis.JetHadron.minDeltaEta == 0.8
+    assert analysis.JetHadron.maxDeltaEta == 1.2
+    assert analysis.MixedEvent.minDeltaPhi == - pi/2
+    assert analysis.MixedEvent.maxDeltaPhi == pi/2
+    assert analysis.MixedEvent.minDeltaEta == 0.8
+    assert analysis.MixedEvent.maxDeltaEta == 1.2
+
+    analysis.setRegionForSparses(Region.BACKGROUND_ETANEG)
+    assert analysis.JetHadron.minDeltaPhi == - pi/2
+    assert analysis.JetHadron.maxDeltaPhi ==  pi/2
+    assert analysis.JetHadron.minDeltaEta == - 1.2
+    assert analysis.JetHadron.maxDeltaEta == - 0.8
+    assert analysis.MixedEvent.minDeltaPhi == - pi/2
+    assert analysis.MixedEvent.maxDeltaPhi == pi/2
+    assert analysis.MixedEvent.minDeltaEta == - 1.2
+    assert analysis.MixedEvent.maxDeltaEta == - 0.8
+
 
 @pytest.mark.parametrize("analysis", [lazy_fixture("analysis_pp"), lazy_fixture("analysis_PbPb")])
 def test_setRegionThenSetInclusiveRegion(analysis):
