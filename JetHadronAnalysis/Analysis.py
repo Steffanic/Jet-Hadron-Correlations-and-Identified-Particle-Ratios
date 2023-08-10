@@ -34,6 +34,7 @@ speciesTOFRangeDictionary = {
     ParticleType.PION: ([-2,2], [-5,-2], [-5,-2]),
     ParticleType.KAON: ([-5,5], [-2,2], [-5,-2]),
     ParticleType.PROTON: ([-5,5], [-5,5], [-2,2]),
+    ParticleType.INCLUSIVE: ([-5,5], [-5,5], [-5,5]),
 }
 
 
@@ -48,6 +49,8 @@ class Analysis:
         self.JetHadron = JetHadronSparse(analysisType)
         self.Trigger = TriggerSparse(analysisType)
         self.MixedEvent = MixedEventSparse(analysisType)
+
+        self.currentRegion = Region.INCLUSIVE
 
         for rootFileName in rootFileNames:
             self.fillSparsesFromFile(rootFileName)
@@ -65,18 +68,18 @@ class Analysis:
         self.MixedEvent.addSparse(rootFileList.FindObject("fhnMixedEvents"))
         file.Close()
 
-    def setRegionForSparses(self, region: Region):
+    def setRegion(self, region: Region):
         '''
         Sets the delta-phi and delta-eta ranges for the JetHadron sparse and the Mixed Event sparse
         '''
-        
+        self.currentRegion = region
         self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
         self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[region])
-        self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
-        self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[region])
+        # self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
+        # self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[region])
 
 
-    def setParticleSelectionForSparses(self, species: ParticleType):
+    def setParticleSelectionForJetHadron(self, species: ParticleType):
         '''
         Sets the pion, kaon, and proton TOF ranges to get the particle type specified in JetHadron sparse
         TODO: Unclear how to cleanly select ParticleType.OTHER
@@ -87,21 +90,57 @@ class Analysis:
         self.JetHadron.setKaonTOFnSigma(*speciesTOFRangeDictionary[species][1])
         self.JetHadron.setProtonTOFnSigma(*speciesTOFRangeDictionary[species][2])
 
-    def getDifferentialCorrelationFunction(self):
+    def getDifferentialCorrelationFunction(self, per_trigger_normalized=False):
         '''
         Returns the differential correlation function
         '''
         correlationFunction = self.JetHadron.getProjection(self.JetHadron.Axes.DELTA_PHI, self.JetHadron.Axes.DELTA_ETA)
         correlationFunction.Scale(1 / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI) / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_ETA))
+        if per_trigger_normalized:
+            correlationFunction.Scale(1 / self.getNumberOfTriggerJets())
         return correlationFunction
     
+    def getAcceptanceCorrectedDifferentialCorrelationFunction(self, differentialCorrelationFunction, acceptanceCorrection):
+        '''
+        Returns the acceptance corrected differential correlation function
+        This is the raw differential correlation function divided by the normalized mixed event correlation function
+        '''
+        acceptanceCorrectedDifferentialCorrelationFunction = differentialCorrelationFunction.Clone()
+        acceptanceCorrection = acceptanceCorrection.Clone()
+        # Set the x and y bin ranges in the acceptance correction to match the raw correlation function
+        acceptanceCorrection.GetXaxis().SetRangeUser(differentialCorrelationFunction.GetXaxis().GetXmin(), differentialCorrelationFunction.GetXaxis().GetXmax())
+        acceptanceCorrection.GetYaxis().SetRangeUser(differentialCorrelationFunction.GetYaxis().GetXmin(), differentialCorrelationFunction.GetYaxis().GetXmax())
+        acceptanceCorrectedDifferentialCorrelationFunction.Divide(acceptanceCorrection)
+        return acceptanceCorrectedDifferentialCorrelationFunction
+    
+    def getAcceptanceCorrectedDifferentialAzimuthalCorrelationFunction(self, acceptanceCorrectedDifferentialCorrelationFunction):
+        '''
+        Returns the acceptance corrected differential azimuthal correlation function
+        This is the acceptance corrected differential correlation function integrated over delta-eta
+        '''
+        acceptanceCorrectedDifferentialAzimuthalCorrelationFunction = acceptanceCorrectedDifferentialCorrelationFunction.ProjectionX()
+        acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Scale(self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_ETA))
+        # scale by the number of bins in delta-eta over which the correlation function was integrated
+        number_of_delta_eta_bins = acceptanceCorrectedDifferentialCorrelationFunction.GetYaxis().GetNbins()
+        acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Scale(1 / number_of_delta_eta_bins)
+        return acceptanceCorrectedDifferentialAzimuthalCorrelationFunction
+
     def getNormalizedDifferentialMixedEventCorrelationFunction(self, normMethod: NormalizationMethod, **kwargs):
         '''
         Returns the differential mixed event correlation function
         '''
         mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
         mixedEventCorrelationFunction.Scale(1 / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_PHI) / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_ETA))
-        mixedEventCorrelationFunction.Scale(1 / self.computeMixedEventNormalizationFactor(mixedEventCorrelationFunction, normMethod, **kwargs))
+
+        normalization_factor = self.computeMixedEventNormalizationFactor(mixedEventCorrelationFunction, normMethod, **kwargs)
+
+        self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[self.currentRegion])
+        self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[self.currentRegion])
+        mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+        self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
+        self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+        mixedEventCorrelationFunction.Scale(1 / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_PHI) / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_ETA))
+        mixedEventCorrelationFunction.Scale(1 / normalization_factor)
         return mixedEventCorrelationFunction
     
     def computeMixedEventNormalizationFactor(self, mixedEventCorrelationFunction, normMethod: NormalizationMethod, **kwargs):
@@ -160,4 +199,14 @@ class Analysis:
         return mixedEventAzimuthalCorrelationFunction.GetMaximum()
 
 
+    def getNumberOfAssociatedParticles(self):
+        '''
+        Returns the number of associated particles
+        '''
+        return self.JetHadron.getNumberOfAssociatedParticles()
 
+    def getNumberOfTriggerJets(self):
+        '''
+        Returns the number of trigger jets
+        '''
+        return self.Trigger.getNumberOfTriggerJets()
