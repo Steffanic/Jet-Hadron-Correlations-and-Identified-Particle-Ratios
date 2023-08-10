@@ -3,7 +3,7 @@
 
 from JetHadronAnalysis.Sparse import TriggerSparse, MixedEventSparse, JetHadronSparse
 from JetHadronAnalysis.Types import AnalysisType, ParticleType, NormalizationMethod
-from ROOT import TFile
+from ROOT import TFile # type: ignore
 from enum import Enum
 from math import pi
 
@@ -31,10 +31,10 @@ regionDeltaEtaRangeDictionary = {
 }
 
 speciesTOFRangeDictionary = {
-    ParticleType.PION: ([-2,2], [-5,-2], [-5,-2]),
-    ParticleType.KAON: ([-5,5], [-2,2], [-5,-2]),
-    ParticleType.PROTON: ([-5,5], [-5,5], [-2,2]),
-    ParticleType.INCLUSIVE: ([-5,5], [-5,5], [-5,5]),
+    ParticleType.PION: ([-2,2], [-10,-2], [-10,-2]),#  -10 includes the underflow bin
+    ParticleType.KAON: ([-10,10], [-2,2], [-10,-2]),
+    ParticleType.PROTON: ([-10,10], [-10,10], [-2,2]),
+    ParticleType.INCLUSIVE: ([-10,10], [-10,10], [-10,10]),
 }
 
 
@@ -124,6 +124,14 @@ class Analysis:
         number_of_delta_eta_bins = acceptanceCorrectedDifferentialCorrelationFunction.GetYaxis().GetNbins()
         acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Scale(1 / number_of_delta_eta_bins)
         return acceptanceCorrectedDifferentialAzimuthalCorrelationFunction
+
+    def getAcceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction(self, acceptanceCorrectedDifferentialCorrelationFunction, backgroundFunction):
+        '''
+        Returns the acceptance corrected background subtracted differential correlation function
+        This is the acceptance corrected differential correlation function minus the background function
+        '''
+        pass
+
 
     def getNormalizedDifferentialMixedEventCorrelationFunction(self, normMethod: NormalizationMethod, **kwargs):
         '''
