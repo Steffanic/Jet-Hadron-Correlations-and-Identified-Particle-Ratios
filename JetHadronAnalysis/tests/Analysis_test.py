@@ -20,8 +20,8 @@ def test_fillSparseFromFile(analysis):
     assert analysis.MixedEvent.getNumberOfSparses() == 1
 
 @pytest.mark.parametrize("analysis", [lazy_fixture("analysis_pp"), lazy_fixture("analysis_PbPb")])
-def test_setRegionForJetHadron(analysis):
-    analysis.setRegionForJetHadron(Region.NEAR_SIDE_SIGNAL)
+def test_setRegion(analysis):
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
     assert analysis.JetHadron.minDeltaPhi == - pi/2
     assert analysis.JetHadron.maxDeltaPhi == pi/2
     assert analysis.JetHadron.minDeltaEta == - 0.6
@@ -31,7 +31,7 @@ def test_setRegionForJetHadron(analysis):
     # assert analysis.MixedEvent.minDeltaEta == - 0.6
     # assert analysis.MixedEvent.maxDeltaEta == 0.6
     
-    analysis.setRegionForJetHadron(Region.AWAY_SIDE_SIGNAL)
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
     assert analysis.JetHadron.minDeltaPhi == pi/2
     assert analysis.JetHadron.maxDeltaPhi == 3 *pi/2
     assert analysis.JetHadron.minDeltaEta == - 1.2
@@ -41,7 +41,7 @@ def test_setRegionForJetHadron(analysis):
     # assert analysis.MixedEvent.minDeltaEta == - 1.2
     # assert analysis.MixedEvent.maxDeltaEta == 1.2
 
-    analysis.setRegionForJetHadron(Region.INCLUSIVE)
+    analysis.setRegion(Region.INCLUSIVE)
     assert analysis.JetHadron.minDeltaPhi == - pi/2
     assert analysis.JetHadron.maxDeltaPhi == 3 *pi/2
     assert analysis.JetHadron.minDeltaEta == - 1.4
@@ -51,7 +51,7 @@ def test_setRegionForJetHadron(analysis):
     # assert analysis.MixedEvent.minDeltaEta == - 1.4
     # assert analysis.MixedEvent.maxDeltaEta == 1.4
 
-    analysis.setRegionForJetHadron(Region.BACKGROUND_ETAPOS)
+    analysis.setRegion(Region.BACKGROUND_ETAPOS)
     assert analysis.JetHadron.minDeltaPhi == - pi/2
     assert analysis.JetHadron.maxDeltaPhi ==  pi/2
     assert analysis.JetHadron.minDeltaEta == 0.8
@@ -61,7 +61,7 @@ def test_setRegionForJetHadron(analysis):
     # assert analysis.MixedEvent.minDeltaEta == 0.8
     # assert analysis.MixedEvent.maxDeltaEta == 1.2
 
-    analysis.setRegionForJetHadron(Region.BACKGROUND_ETANEG)
+    analysis.setRegion(Region.BACKGROUND_ETANEG)
     assert analysis.JetHadron.minDeltaPhi == - pi/2
     assert analysis.JetHadron.maxDeltaPhi ==  pi/2
     assert analysis.JetHadron.minDeltaEta == - 1.2
@@ -74,8 +74,8 @@ def test_setRegionForJetHadron(analysis):
 
 @pytest.mark.parametrize("analysis", [lazy_fixture("analysis_pp"), lazy_fixture("analysis_PbPb")])
 def test_setRegionThenSetInclusiveRegion(analysis):
-    analysis.setRegionForJetHadron(Region.NEAR_SIDE_SIGNAL)
-    analysis.setRegionForJetHadron(Region.INCLUSIVE)
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    analysis.setRegion(Region.INCLUSIVE)
     assert analysis.JetHadron.minDeltaPhi == - pi/2
     assert analysis.JetHadron.maxDeltaPhi == 3 *pi/2
     assert analysis.JetHadron.minDeltaEta == - 1.4
@@ -94,13 +94,13 @@ def test_getDifferentialCorrelationFunction(analysis):
 
 @pytest.mark.parametrize("analysis", [lazy_fixture("analysis_pp"), lazy_fixture("analysis_PbPb")])
 def test_getDifferentialCorrelationFunctionInNearSide(analysis):
-    analysis.setRegionForJetHadron(Region.NEAR_SIDE_SIGNAL)
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
     correlationFunction = analysis.getDifferentialCorrelationFunction()
     assert correlationFunction.GetNbinsX() == 36
 
 @pytest.mark.parametrize("analysis", [lazy_fixture("analysis_pp"), lazy_fixture("analysis_PbPb")])
 def test_getDifferentialCorrelationFunctionInAwaySide(analysis):
-    analysis.setRegionForJetHadron(Region.AWAY_SIDE_SIGNAL)
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
     correlationFunction = analysis.getDifferentialCorrelationFunction()
     assert correlationFunction.GetNbinsX() == 36
 
@@ -112,41 +112,41 @@ def test_getDifferentialCorrelationFunctionForPions(analysis):
 
 @pytest.mark.parametrize("analysis", [lazy_fixture("analysis_pp"), lazy_fixture("analysis_PbPb")])
 def test_getNormalizedDifferentialMixedEventCorrelationFunction(analysis):
-    analysis.setRegionForJetHadron(Region.INCLUSIVE)
+    analysis.setRegion(Region.INCLUSIVE)
     correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW)
     assert correlationFunction.GetNbinsX() == 72
 
-    analysis.setRegionForJetHadron(Region.NEAR_SIDE_SIGNAL)
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
     correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi/2)
     assert correlationFunction.GetNbinsX() == 36
 
-    analysis.setRegionForJetHadron(Region.AWAY_SIDE_SIGNAL)
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
     correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi/2)
     assert correlationFunction.GetNbinsX() == 36
     
-    analysis.setRegionForJetHadron(Region.INCLUSIVE)
+    analysis.setRegion(Region.INCLUSIVE)
     correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.MAX)
     assert correlationFunction.GetNbinsX() == 72
 
-    analysis.setRegionForJetHadron(Region.NEAR_SIDE_SIGNAL)
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
     correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.MAX)
     assert correlationFunction.GetNbinsX() == 36
 
-    analysis.setRegionForJetHadron(Region.AWAY_SIDE_SIGNAL)
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
     correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.MAX)
     assert correlationFunction.GetNbinsX() == 36
 
 @pytest.mark.parametrize("analysis", [lazy_fixture("analysis_pp"), lazy_fixture("analysis_PbPb")])
 def test_getNormalizedDifferentialMixedEventCorrelationFunctionFailsOnWindowSizeTooLarge(analysis):
-    analysis.setRegionForJetHadron(Region.NEAR_SIDE_SIGNAL)
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
     with pytest.raises(AssertionError):
         analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi)
 
-    analysis.setRegionForJetHadron(Region.AWAY_SIDE_SIGNAL)
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
     with pytest.raises(AssertionError):
         analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi)
 
-    analysis.setRegionForJetHadron(Region.INCLUSIVE)
+    analysis.setRegion(Region.INCLUSIVE)
     with pytest.raises(AssertionError):
         analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=2*pi)
 
@@ -173,7 +173,7 @@ def test_getAcceptanceCorrectedDifferentialCorrelationFunction(analysis: Analysi
 
 @pytest.mark.parametrize("analysis", [lazy_fixture("analysis_pp"), lazy_fixture("analysis_PbPb")])
 def test_number_of_associated_particles_is_less_than_inclusive(analysis):
-    analysis.setRegionForJetHadron(Region.INCLUSIVE)
+    analysis.setRegion(Region.INCLUSIVE)
     analysis.setParticleSelectionForJetHadron(ParticleType.INCLUSIVE)
     number_of_inclusive_particles = analysis.getNumberOfAssociatedParticles()
 
