@@ -10,20 +10,23 @@ from math import pi
 class Region(Enum):
     NEAR_SIDE_SIGNAL = 1
     AWAY_SIDE_SIGNAL = 2
-    BACKGROUND = 3
-    INCLUSIVE = 4
+    BACKGROUND_ETAPOS = 3
+    BACKGROUND_ETANEG = 4
+    INCLUSIVE = 5
     
 regionDeltaPhiRangeDictionary = {
     Region.NEAR_SIDE_SIGNAL: [-pi / 2, pi / 2],
     Region.AWAY_SIDE_SIGNAL: [pi / 2, 3 * pi / 2],
-    Region.BACKGROUND: [-pi / 2, pi / 2],
+    Region.BACKGROUND_ETAPOS: [-pi / 2, pi / 2],
+    Region.BACKGROUND_ETANEG: [-pi / 2, pi / 2],
     Region.INCLUSIVE: [-pi / 2, 3 * pi / 2]
 }
 
 regionDeltaEtaRangeDictionary = {
     Region.NEAR_SIDE_SIGNAL: [-0.6, 0.6],
     Region.AWAY_SIDE_SIGNAL: [-1.2, 1.2],
-    Region.BACKGROUND: ([-1.2, -0.8], [0.8, 1.2]),
+    Region.BACKGROUND_ETAPOS: [0.8, 1.2],
+    Region.BACKGROUND_ETANEG: [-1.2, -0.8],
     Region.INCLUSIVE: [-1.4, 1.4]
 }
 
@@ -66,9 +69,7 @@ class Analysis:
         '''
         Sets the delta-phi and delta-eta ranges for the JetHadron sparse and the Mixed Event sparse
         '''
-        if region == Region.BACKGROUND:
-            # TODO: Unclear how to handle background region
-            raise NotImplementedError("Background region not yet implemented")
+        
         self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
         self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[region])
         self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
