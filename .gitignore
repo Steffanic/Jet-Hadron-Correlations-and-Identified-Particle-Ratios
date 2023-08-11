@@ -19,3 +19,13 @@ __pycache__/RPF.cpython-39.pyc
 tests/__pycache__/JetHadron_test.cpython-39-pytest-7.3.0.pyc
 jet_hadron.log
 *.pyc
+Thesis.code-workspace
+JetHadronAnalysis/__pycache__/Analysis.cpython-39.pyc
+JetHadronAnalysis/__pycache__/Analysis.cpython-310.pyc
+JetHadronAnalysis/__pycache__/Sparse.cpython-310.pyc
+JetHadronAnalysis/__pycache__/Types.cpython-39.pyc
+JetHadronAnalysis/__pycache__/Types.cpython-310.pyc
+JetHadronAnalysis/tests/__pycache__/Analysis_test.cpython-39-pytest-7.4.0.pyc
+JetHadronAnalysis/tests/__pycache__/Analysis_test.cpython-310-pytest-7.4.0.pyc
+JetHadronAnalysis/tests/__pycache__/Sparse_test.cpython-39-pytest-7.4.0.pyc
+JetHadronAnalysis/tests/__pycache__/Sparse_test.cpython-310-pytest-7.4.0.pyc
