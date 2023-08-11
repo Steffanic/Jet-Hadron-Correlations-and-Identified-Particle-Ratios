@@ -3,7 +3,8 @@
 
 from JetHadronAnalysis.Sparse import TriggerSparse, MixedEventSparse, JetHadronSparse
 from JetHadronAnalysis.Types import AnalysisType, ParticleType, NormalizationMethod
-from ROOT import TFile # type: ignore
+from JetHadronAnalysis.Background import BackgroundFunction
+from ROOT import TFile, TH1 # type: ignore
 from enum import Enum
 from math import pi
 
@@ -125,7 +126,7 @@ class Analysis:
         acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Scale(1 / number_of_delta_eta_bins)
         return acceptanceCorrectedDifferentialAzimuthalCorrelationFunction
 
-    def getAcceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction(self, acceptanceCorrectedDifferentialCorrelationFunction, backgroundFunction):
+    def getAcceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction(self, acceptanceCorrectedDifferentialAzimuthalCorrelationFunction: TH1, backgroundFunction:BackgroundFunction):
         '''
         Returns the acceptance corrected background subtracted differential correlation function
         This is the acceptance corrected differential correlation function minus the background function
@@ -206,6 +207,26 @@ class Analysis:
         # return the maximum value
         return mixedEventAzimuthalCorrelationFunction.GetMaximum()
 
+    def getBackgroundFunction(self):
+        '''
+        Returns the background function. In proton-proton collisions this is a pedestal function estimated as the average value in the background region.
+        '''
+        # get the positive eta and negative eta background regions of the Jet Hadron correlation function and add them together
+        self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETANEG])
+        self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETANEG])
+        backgroundCorrelationFunction_etaneg = self.JetHadron.getProjection(self.JetHadron.Axes.DELTA_PHI, self.JetHadron.Axes.DELTA_ETA)
+        self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETAPOS])
+        self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETAPOS])
+        backgroundCorrelationFunction_etapos = self.JetHadron.getProjection(self.JetHadron.Axes.DELTA_PHI, self.JetHadron.Axes.DELTA_ETA)
+        backgroundCorrelationFunction = backgroundCorrelationFunction_etaneg.Clone()
+        backgroundCorrelationFunction.Add(backgroundCorrelationFunction_etapos)
+        # divide by the delta-phi bin width and the delta-eta bin width to get the average
+        backgroundCorrelationFunction.Scale(1 / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI) / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_ETA))
+        # set the delta-phi and delta-eta ranges back to the inclusive region
+        self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
+        self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+        # pass backgroundCorrelationFunction to the BackgroundFunction constructor
+        return BackgroundFunction(backgroundCorrelationFunction, self.analysisType)
 
     def getNumberOfAssociatedParticles(self):
         '''
@@ -218,3 +239,6 @@ class Analysis:
         Returns the number of trigger jets
         '''
         return self.Trigger.getNumberOfTriggerJets()
+
+
+
