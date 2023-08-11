@@ -138,10 +138,10 @@ class Analysis:
         This is the acceptance corrected differential correlation function minus the background function
         '''
         acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction = acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Clone()
-        acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction.Add(backgroundFunction, -1)
+        backgroundFunction = backgroundFunction.Clone()
+        backgroundFunction.Scale(-1)
+        acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction.Add(backgroundFunction)
         return acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction
-
-
 
     def getNormalizedDifferentialMixedEventCorrelationFunction(self, normMethod: NormalizationMethod, **kwargs):
         '''
@@ -216,21 +216,35 @@ class Analysis:
         # return the maximum value
         return mixedEventAzimuthalCorrelationFunction.GetMaximum()
 
-    def getBackgroundCorrelationFunction(self):
+    def getBackgroundCorrelationFunction(self, per_trigger_normalized=False):
         '''
         Returns the background correlation function
         '''
         # get the positive eta and negative eta background regions of the Jet Hadron correlation function and add them together
         self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETANEG])
         self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETANEG])
+
         backgroundCorrelationFunction_etaneg = self.JetHadron.getProjection(self.JetHadron.Axes.DELTA_PHI, self.JetHadron.Axes.DELTA_ETA)
+
+        nbins_delta_eta_neg = backgroundCorrelationFunction_etaneg.GetYaxis().GetNbins()
+        backgroundCorrelationFunction_etaneg = backgroundCorrelationFunction_etaneg.ProjectionX()
+        backgroundCorrelationFunction_etaneg.Scale(1 / nbins_delta_eta_neg)
+
         self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETAPOS])
         self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETAPOS])
+
         backgroundCorrelationFunction_etapos = self.JetHadron.getProjection(self.JetHadron.Axes.DELTA_PHI, self.JetHadron.Axes.DELTA_ETA)
+
+        nbins_delta_eta_pos = backgroundCorrelationFunction_etapos.GetYaxis().GetNbins()
+        backgroundCorrelationFunction_etapos = backgroundCorrelationFunction_etapos.ProjectionX()
+        backgroundCorrelationFunction_etapos.Scale(1 / nbins_delta_eta_pos)
+        
         backgroundCorrelationFunction = backgroundCorrelationFunction_etaneg.Clone()
         backgroundCorrelationFunction.Add(backgroundCorrelationFunction_etapos)
         # divide by the delta-phi bin width and the delta-eta bin width to get the average
-        backgroundCorrelationFunction.Scale(1 / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI) / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_ETA))
+        backgroundCorrelationFunction.Scale(1 / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI))
+        if per_trigger_normalized:
+            backgroundCorrelationFunction.Scale(1 / self.getNumberOfTriggerJets())
         # set the delta-phi and delta-eta ranges back to the previous values
         self.setRegion(self.currentRegion)
         return backgroundCorrelationFunction
