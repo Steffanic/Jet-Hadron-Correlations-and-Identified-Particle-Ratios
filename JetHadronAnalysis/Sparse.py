@@ -80,9 +80,10 @@ class Sparse:
         if len(projectionAxes) == 2:
             # For some reason the implementation of ROOT's THnSparse::Projection method for two axes is reversed order, (y_axis, x_axis) instead of (x_axis, y_axis), which is pretty dumb.
             projectionAxes = projectionAxes[::-1]
-        projection = self.sparseList[0].Projection(*projectionAxes).Clone()
+        # When we clone the projection, we pass the representation of the sparse as the name of the projection, so that it is uniquely identified in ROOT's memory. It's super hacky and dumb that I have to do that...
+        projection = self.sparseList[0].Projection(*projectionAxes).Clone(repr(self)+"_".join([str(axis) for axis in projectionAxes]))
         for sparse_ind in range(self.getNumberOfSparses()-1):
-            addition_success = projection.Add(self.sparseList[sparse_ind].Projection(*projectionAxes).Clone())
+            addition_success = projection.Add(self.sparseList[sparse_ind].Projection(*projectionAxes).Clone(repr(self)+"_".join([str(axis) for axis in projectionAxes])))
             if not addition_success:
                 raise RuntimeError(f"Adding projection onto axes {[axis.name for axis in projectionAxes]} from sparse {sparse_ind} in {self.__class__.__name__} was not succesful")
             
@@ -90,6 +91,9 @@ class Sparse:
     
     def getBinWidth(self, axis):
         return self.sparseList[0].GetAxis(axis.value).GetBinWidth(1) # here we get the firtst bin because in ROOT, bins are 1-ordered, not 0-ordered, which is pretty dumb
+    
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.analysisType.name})"
 
 
 
@@ -394,7 +398,7 @@ class JetHadronSparse(Sparse):
         repr_str += "Z Vertex Range: " + str(self.minZVertex) + " - " + str(self.maxZVertex) + "\n"
         repr_str += "Delta Phi Range: " + str(self.minDeltaPhi) + " - " + str(self.maxDeltaPhi) + "\n"
         repr_str += "Delta Eta Range: " + str(self.minDeltaEta) + " - " + str(self.maxDeltaEta) + "\n"
-        repr_str += "Associated Hadron Eta Range: " + str(self.minAssociatedHadronEta) + " - " + str(self.maxAssociatedHadronEta) + "\n"
+        #repr_str += "Associated Hadron Eta Range: " + str(self.minAssociatedHadronEta) + " - " + str(self.maxAssociatedHadronEta) + "\n"
         repr_str += "Pion TPC nSigma Range: " + str(self.minPionTPCnSigma) + " - " + str(self.maxPionTPCnSigma) + "\n"
         repr_str += "Pion TOF nSigma Range: " + str(self.minPionTOFnSigma) + " - " + str(self.maxPionTOFnSigma) + "\n"
         repr_str += "Proton TOF nSigma Range: " + str(self.minProtonTOFnSigma) + " - " + str(self.maxProtonTOFnSigma) + "\n"
