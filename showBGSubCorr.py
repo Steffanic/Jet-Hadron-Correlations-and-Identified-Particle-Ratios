@@ -1,6 +1,7 @@
 from JetHadronAnalysis.Analysis import Analysis, Region
 from JetHadronAnalysis.Types import AnalysisType as at
 from JetHadronAnalysis.Types import NormalizationMethod as nm
+from JetHadronAnalysis.Types import ParticleType as pt
 
 from ROOT import TCanvas
 
@@ -9,6 +10,9 @@ def pause_for_input():
     
 if __name__=="__main__":
     ana_pp = Analysis(at.PP, ["/mnt/d/pp/17p.root"])
+
+    ana_pp.setParticleSelectionForJetHadron(pt.PION)
+
     corr = ana_pp.getDifferentialCorrelationFunction(True)
     corrCanvas = TCanvas("corrCanvas", "corrCanvas", 800, 600)
     corr.Draw("lego")
