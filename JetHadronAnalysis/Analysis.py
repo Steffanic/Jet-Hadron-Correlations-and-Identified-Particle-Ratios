@@ -4,7 +4,7 @@
 from JetHadronAnalysis.Sparse import TriggerSparse, MixedEventSparse, JetHadronSparse
 from JetHadronAnalysis.Types import AnalysisType, ParticleType, NormalizationMethod
 from JetHadronAnalysis.Background import BackgroundFunction
-from ROOT import TFile, TH1 # type: ignore
+from ROOT import TFile, TH1D # type: ignore
 from enum import Enum
 from math import pi
 
@@ -29,6 +29,14 @@ regionDeltaEtaRangeDictionary = {
     Region.BACKGROUND_ETAPOS: [0.8, 1.2],
     Region.BACKGROUND_ETANEG: [-1.2, -0.8],
     Region.INCLUSIVE: [-1.4, 1.4]
+}
+
+regionDeltaPhiBinCountsDictionary = {
+    Region.NEAR_SIDE_SIGNAL: 36,
+    Region.AWAY_SIDE_SIGNAL: 36,
+    Region.BACKGROUND_ETAPOS: 36,
+    Region.BACKGROUND_ETANEG: 36,
+    Region.INCLUSIVE: 72
 }
 
 speciesTOFRangeDictionary = {
@@ -71,13 +79,11 @@ class Analysis:
 
     def setRegion(self, region: Region):
         '''
-        Sets the delta-phi and delta-eta ranges for the JetHadron sparse and the Mixed Event sparse
+        Sets the delta-phi and delta-eta ranges for the JetHadron sparse 
         '''
         self.currentRegion = region
         self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
         self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[region])
-        # self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
-        # self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[region])
 
 
     def setParticleSelectionForJetHadron(self, species: ParticleType):
@@ -126,12 +132,15 @@ class Analysis:
         acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Scale(1 / number_of_delta_eta_bins)
         return acceptanceCorrectedDifferentialAzimuthalCorrelationFunction
 
-    def getAcceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction(self, acceptanceCorrectedDifferentialAzimuthalCorrelationFunction: TH1, backgroundFunction:BackgroundFunction):
+    def getAcceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction(self, acceptanceCorrectedDifferentialAzimuthalCorrelationFunction: TH1D, backgroundFunction:TH1D):
         '''
         Returns the acceptance corrected background subtracted differential correlation function
         This is the acceptance corrected differential correlation function minus the background function
         '''
-        pass
+        acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction = acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Clone()
+        acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction.Add(backgroundFunction, -1)
+        return acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction
+
 
 
     def getNormalizedDifferentialMixedEventCorrelationFunction(self, normMethod: NormalizationMethod, **kwargs):
@@ -207,9 +216,9 @@ class Analysis:
         # return the maximum value
         return mixedEventAzimuthalCorrelationFunction.GetMaximum()
 
-    def getBackgroundFunction(self):
+    def getBackgroundCorrelationFunction(self):
         '''
-        Returns the background function. In proton-proton collisions this is a pedestal function estimated as the average value in the background region.
+        Returns the background correlation function
         '''
         # get the positive eta and negative eta background regions of the Jet Hadron correlation function and add them together
         self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETANEG])
@@ -222,11 +231,31 @@ class Analysis:
         backgroundCorrelationFunction.Add(backgroundCorrelationFunction_etapos)
         # divide by the delta-phi bin width and the delta-eta bin width to get the average
         backgroundCorrelationFunction.Scale(1 / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI) / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_ETA))
-        # set the delta-phi and delta-eta ranges back to the inclusive region
-        self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
-        self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+        # set the delta-phi and delta-eta ranges back to the previous values
+        self.setRegion(self.currentRegion)
+        return backgroundCorrelationFunction
+    
+    def getAzimuthalBackgroundFunction(self, backgroundCorrelationFunction: TH1D):
+        '''
+        Returns the background function. In proton-proton collisions this is a pedestal function estimated as the average value in the background region.
+        '''
         # pass backgroundCorrelationFunction to the BackgroundFunction constructor
-        return BackgroundFunction(backgroundCorrelationFunction, self.analysisType)
+        backgroundFunction = BackgroundFunction(backgroundCorrelationFunction, self.analysisType)
+        # make a TH1D of the background function
+        backgroundFunctionHistogram = TH1D("backgroundFunctionHistogram", "backgroundFunctionHistogram", regionDeltaPhiBinCountsDictionary[self.currentRegion], regionDeltaPhiRangeDictionary[self.currentRegion][0], regionDeltaPhiRangeDictionary[self.currentRegion][1])
+        # fill the histogram with the background function values
+        for deltaPhiBin in range(1, backgroundFunctionHistogram.GetNbinsX() + 1):
+            backgroundFunctionHistogram.SetBinContent(
+                deltaPhiBin,
+                backgroundFunction(backgroundFunctionHistogram.GetBinCenter(deltaPhiBin))
+                )
+            backgroundFunctionHistogram.SetBinError(
+                deltaPhiBin, 
+                backgroundFunction.error(backgroundFunctionHistogram.GetBinCenter(deltaPhiBin))
+                )
+
+        return backgroundFunctionHistogram
+
 
     def getNumberOfAssociatedParticles(self):
         '''
