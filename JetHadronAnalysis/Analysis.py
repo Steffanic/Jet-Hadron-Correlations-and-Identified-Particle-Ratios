@@ -238,7 +238,7 @@ class Analysis:
         nbins_delta_eta_pos = backgroundCorrelationFunction_etapos.GetYaxis().GetNbins()
         backgroundCorrelationFunction_etapos = backgroundCorrelationFunction_etapos.ProjectionX()
         backgroundCorrelationFunction_etapos.Scale(1 / nbins_delta_eta_pos)
-        
+
         backgroundCorrelationFunction = backgroundCorrelationFunction_etaneg.Clone()
         backgroundCorrelationFunction.Add(backgroundCorrelationFunction_etapos)
         # divide by the delta-phi bin width and the delta-eta bin width to get the average
