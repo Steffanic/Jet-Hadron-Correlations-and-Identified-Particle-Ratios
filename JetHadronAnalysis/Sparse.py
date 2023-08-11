@@ -89,7 +89,7 @@ class Sparse:
         return projection
     
     def getBinWidth(self, axis):
-        return self.sparseList[0].GetAxis(axis.value).GetBinWidth(1) # here we get the firtst bin because ion ROOT, bins are 1-ordered, not 0-ordered, which is pretty dumb
+        return self.sparseList[0].GetAxis(axis.value).GetBinWidth(1) # here we get the firtst bin because in ROOT, bins are 1-ordered, not 0-ordered, which is pretty dumb
 
 
 
