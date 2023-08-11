@@ -80,9 +80,9 @@ class Sparse:
         if len(projectionAxes) == 2:
             # For some reason the implementation of ROOT's THnSparse::Projection method for two axes is reversed order, (y_axis, x_axis) instead of (x_axis, y_axis), which is pretty dumb.
             projectionAxes = projectionAxes[::-1]
-        projection = self.sparseList[0].Projection(*projectionAxes)
+        projection = self.sparseList[0].Projection(*projectionAxes).Clone()
         for sparse_ind in range(self.getNumberOfSparses()-1):
-            addition_success = projection.Add(self.sparseList[sparse_ind].Projection(*projectionAxes))
+            addition_success = projection.Add(self.sparseList[sparse_ind].Projection(*projectionAxes).Clone())
             if not addition_success:
                 raise RuntimeError(f"Adding projection onto axes {[axis.name for axis in projectionAxes]} from sparse {sparse_ind} in {self.__class__.__name__} was not succesful")
             
