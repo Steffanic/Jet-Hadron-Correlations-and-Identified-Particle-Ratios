@@ -14,6 +14,15 @@ class Region(Enum):
     BACKGROUND_ETAPOS = 3
     BACKGROUND_ETANEG = 4
     INCLUSIVE = 5
+
+class AssociatedHadronMomentumBin(Enum):
+    PT_1_15 = 1
+    PT_15_2 = 2
+    PT_2_3 = 3
+    PT_3_4 = 4
+    PT_4_5 = 5
+    PT_5_6 = 6
+    PT_6_10 = 7
     
 regionDeltaPhiRangeDictionary = {
     Region.NEAR_SIDE_SIGNAL: [-pi / 2, pi / 2],
@@ -46,6 +55,16 @@ speciesTOFRangeDictionary = {
     ParticleType.INCLUSIVE: ([-10,10], [-10,10], [-10,10]),
 }
 
+associatedHadronMomentumBinRangeDictionary = {
+    AssociatedHadronMomentumBin.PT_1_15: (1, 1.5),
+    AssociatedHadronMomentumBin.PT_15_2: (1.5, 2),
+    AssociatedHadronMomentumBin.PT_2_3: (2, 3),
+    AssociatedHadronMomentumBin.PT_3_4: (3, 4),
+    AssociatedHadronMomentumBin.PT_4_5: (4, 5),
+    AssociatedHadronMomentumBin.PT_5_6: (5, 6),
+    AssociatedHadronMomentumBin.PT_6_10: (6, 10),
+}
+
 
 class Analysis:
     '''
@@ -60,6 +79,8 @@ class Analysis:
         self.MixedEvent = MixedEventSparse(analysisType)
 
         self.currentRegion = Region.INCLUSIVE
+
+        self.currentAssociatedHadronMomentumBin = AssociatedHadronMomentumBin.PT_1_15
 
         for rootFileName in rootFileNames:
             self.fillSparsesFromFile(rootFileName)
@@ -161,6 +182,13 @@ class Analysis:
         mixedEventCorrelationFunction.Scale(1 / normalization_factor)
         return mixedEventCorrelationFunction
     
+    def getTPCPionNsigma(self):
+        '''
+        Returns the projection onto the TPC pion nsigma axis
+        '''
+        return self.JetHadron.getProjection(self.JetHadron.Axes.PION_TPC_N_SIGMA)
+        
+
     def computeMixedEventNormalizationFactor(self, mixedEventCorrelationFunction, normMethod: NormalizationMethod, **kwargs):
         '''
         Returns the normalization factor for the mixed event correlation function
