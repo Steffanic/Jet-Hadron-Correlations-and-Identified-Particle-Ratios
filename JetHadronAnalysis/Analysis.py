@@ -1,9 +1,12 @@
 # © Patrick John Steffanic 2023
 # This file contains the class whose responsibility it is to manage the analysis and its configuration 
 
+import numpy as np
+import uncertainties
 from JetHadronAnalysis.Sparse import TriggerSparse, MixedEventSparse, JetHadronSparse
 from JetHadronAnalysis.Types import AnalysisType, ParticleType, NormalizationMethod
 from JetHadronAnalysis.Background import BackgroundFunction
+from JetHadronAnalysis.TPCPionNsigmaFit import FitTPCPionNsigma
 from ROOT import TFile, TH1D # type: ignore
 from enum import Enum
 from math import pi
@@ -106,6 +109,12 @@ class Analysis:
         self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
         self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[region])
 
+    def setAssociatedHadronMomentumBin(self, associatedHadronMomentumBin: AssociatedHadronMomentumBin):
+        '''
+        Sets the associated hadron momentum bin for the JetHadron sparse
+        '''
+        self.currentAssociatedHadronMomentumBin = associatedHadronMomentumBin
+        self.JetHadron.setAssociatedHadronMomentumRange(*associatedHadronMomentumBinRangeDictionary[associatedHadronMomentumBin])
 
     def setParticleSelectionForJetHadron(self, species: ParticleType):
         '''
@@ -182,6 +191,44 @@ class Analysis:
         mixedEventCorrelationFunction.Scale(1 / normalization_factor)
         return mixedEventCorrelationFunction
     
+    def getPIDFractions(self):
+        '''
+        Prepares the projections for each enhanced species
+        Converts them into arrays for fitting
+        Fits and Extracts the optimal fit params
+        Computes the PID fractions
+        Returns the PID fractions
+        '''
+        # get the projections
+        pionEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PION)
+        protonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PROTON)
+        kaonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.KAON)
+        inclusiveEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.INCLUSIVE)
+        # convert to arrays using FitTPCPionNsigma.prepareData 
+        x, y, yerr = FitTPCPionNsigma.prepareData(pionEnhancedTPCnSigma, protonEnhancedTPCnSigma, kaonEnhancedTPCnSigma, inclusiveEnhancedTPCnSigma)
+        # fit and extract the optimal fit params
+        # start by creating the fitter instance
+        fitter = FitTPCPionNsigma()
+        # initialize the default parameters for the analysis type and current associated hadron momentum bin
+        fitter.initializeDefaultParameters(self.analysisType, self.currentAssociatedHadronMomentumBin)
+        optimal_params, covariance = fitter.performFit(x, y, yerr)
+        if  not hasattr(self, "numberOfAssociatedHadronsDictionary"):
+            self.fillNumberOfAssociatedHadronsDictionary()
+        # compute the PID fractions
+        pid_fractions, pid_fraction_errors = fitter.computeAveragePIDFractions(optimal_params, covariance, self.numberOfAssociatedHadronsDictionary)
+
+        return pid_fractions, pid_fraction_errors
+
+    def getEnhancedTPCnSigmaProjection(self, species: ParticleType):
+        '''
+        Sets the particle type for the jet hadron sparse and returns the projection onto the TPC nsigma axis, then resets the particle type
+        '''
+        self.setParticleSelectionForJetHadron(species)
+        projection = self.getTPCPionNsigma()
+        self.setParticleSelectionForJetHadron(ParticleType.INCLUSIVE)
+        return projection
+
+
     def getTPCPionNsigma(self):
         '''
         Returns the projection onto the TPC pion nsigma axis
@@ -298,6 +345,17 @@ class Analysis:
 
         return backgroundFunctionHistogram
 
+    def fillNumberOfAssociatedHadronsDictionary(self):
+        '''
+        Returns a dictionary of the number of associated hadrons in current associated hadron momentum bin
+        '''
+        self.numberOfAssociatedHadronsDictionary = {}
+        for species in ParticleType:
+            if species==ParticleType.OTHER:
+                continue
+            self.setParticleSelectionForJetHadron(species)
+            self.numberOfAssociatedHadronsDictionary[species] = self.getNumberOfAssociatedParticles()
+        self.setParticleSelectionForJetHadron(ParticleType.INCLUSIVE)
 
     def getNumberOfAssociatedParticles(self):
         '''

@@ -1,31 +1,54 @@
+import warnings
 import numpy as np
+import uncertainties.unumpy as unp
+from scipy.special import erf
 
-def piKpInc_generalized_fit(self, x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak):
+def gauss(self, x, mu, sig, a):
+    return a*np.exp(-0.5*((x-mu)/sig)**2)
+
+def generalized_gauss(self, x, mu, sig, a, alpha):
+    return a*np.exp(-0.5*((x-mu)/sig)**2)*(1 + erf(alpha*(x-mu)/(sig*2**0.5)))
+
+def ugauss(x, mu, sig, a):
+    return a*unp.exp(-0.5*((x-mu)/sig)**2)
+
+def ugeneralized_gauss(x, mu, sig, a, alpha):
+    return a*unp.exp(-0.5*((x-mu)/sig)**2)*(1 + unp.erf(alpha*(x-mu)/(sig*2**0.5)))
+
+def two_generalized_gaussians_and_one_gaussian(x, mup, mupi, muk, sigp, sigpi, sigk, ap, api, ak, alphap, alphak):
+    return api*np.exp(-0.5*((x-mupi)/sigpi)**2) + ap*np.exp(-0.5*((x-mup)/sigp)**2)*(1 + erf(alphap*(x-mup)/(sigp*2**0.5))) + ak*np.exp(-0.5*((x-muk)/sigk)**2)*(1 + erf(alphak*(x-muk)/(sigk*2**0.5)))
+
+def utwo_generalized_gaussians_and_one_gaussian(x, mup, mupi, muk, sigp, sigpi, sigk, ap, api, ak, alphap, alphak):
+    return api*unp.exp(-0.5*((x-mupi)/sigpi)**2) + ap*unp.exp(-0.5*((x-mup)/sigp)**2)*(1 + unp.erf(alphap*(x-mup)/(sigp*2**0.5))) + ak*unp.exp(-0.5*((x-muk)/sigk)**2)*(1 + unp.erf(alphak*(x-muk)/(sigk*2**0.5)))
+
+def piKpInc_generalized_fit(non_zero_masks, x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak):
     """
     Generalized fit function for piKpInc
     """
-    non_zero_masks = self.non_zero_masks or None
-    if non_zero_masks is not None:
-        # Order is pi, p, K, inc
-        return np.hstack([self.two_generalized_gaussians_and_one_gaussian(x[non_zero_masks[0]], mup, mupi, muk, sigp, sigpi, sigk, appi, apipi, akpi, alphap, alphak), self.two_generalized_gaussians_and_one_gaussian(x[non_zero_masks[1]], mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, alphap, alphak), self.two_generalized_gaussians_and_one_gaussian(x[non_zero_masks[2]], mup, mupi, muk, sigp, sigpi, sigk, apk, apik, akk, alphap, alphak), self.two_generalized_gaussians_and_one_gaussian(x[non_zero_masks[3]], mup, mupi, muk, sigp, sigpi, sigk, apinc, apiinc, akinc, alphap, alphak)])
-    else:
-        return np.hstack([self.two_generalized_gaussians_and_one_gaussian(x, mup, mupi, muk, sigp, sigpi, sigk, appi, apipi, akpi, alphap, alphak), self.two_generalized_gaussians_and_one_gaussian(x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, alphap, alphak), self.two_generalized_gaussians_and_one_gaussian(x, mup, mupi, muk, sigp, sigpi, sigk, apk, apik, akk, alphap, alphak), self.two_generalized_gaussians_and_one_gaussian(x, mup, mupi, muk, sigp, sigpi, sigk, apinc, apiinc, akinc, alphap, alphak)])
-
-def upiKpInc_generalized_fit(self, x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak):
-    """
-    Generalized fit function for piKpInc
-    """
-    non_zero_masks = self.non_zero_masks or None
-    if non_zero_masks is not None:
-        # Order is pi, p, K, inc
-        return np.hstack([self.utwo_generalized_gaussians_and_one_gaussian(x[non_zero_masks[0]], mup, mupi, muk, sigp, sigpi, sigk, appi, apipi, akpi, alphap, alphak), self.utwo_generalized_gaussians_and_one_gaussian(x[non_zero_masks[1]], mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, alphap, alphak), self.utwo_generalized_gaussians_and_one_gaussian(x[non_zero_masks[2]], mup, mupi, muk, sigp, sigpi, sigk, apk, apik, akk, alphap, alphak), self.utwo_generalized_gaussians_and_one_gaussian(x[non_zero_masks[3]], mup, mupi, muk, sigp, sigpi, sigk, apinc, apiinc, akinc, alphap, alphak)])
-    else:
-        return np.hstack([self.utwo_generalized_gaussians_and_one_gaussian(x, mup, mupi, muk, sigp, sigpi, sigk, appi, apipi, akpi, alphap, alphak), self.utwo_generalized_gaussians_and_one_gaussian(x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, alphap, alphak), self.utwo_generalized_gaussians_and_one_gaussian(x, mup, mupi, muk, sigp, sigpi, sigk, apk, apik, akk, alphap, alphak), self.utwo_generalized_gaussians_and_one_gaussian(x, mup, mupi, muk, sigp, sigpi, sigk, apinc, apiinc, akinc, alphap, alphak)])
-    
-def piKpInc_generalized_jac(self, x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak):
-    non_zero_masks = self.non_zero_masks or None
+    non_zero_masks = non_zero_masks or None
     if non_zero_masks is None:
-        raise ValueError("Non zero masks not set")
+        warnings.warn("No non_zero_masks passed to generalized_fit. Setting to np.ones_like(x)")
+        non_zero_masks = [np.ones_like(x, dtype=bool)]*4
+
+    return np.hstack([two_generalized_gaussians_and_one_gaussian(x[non_zero_masks[0]], mup, mupi, muk, sigp, sigpi, sigk, appi, apipi, akpi, alphap, alphak), two_generalized_gaussians_and_one_gaussian(x[non_zero_masks[1]], mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, alphap, alphak), two_generalized_gaussians_and_one_gaussian(x[non_zero_masks[2]], mup, mupi, muk, sigp, sigpi, sigk, apk, apik, akk, alphap, alphak), two_generalized_gaussians_and_one_gaussian(x[non_zero_masks[3]], mup, mupi, muk, sigp, sigpi, sigk, apinc, apiinc, akinc, alphap, alphak)])
+
+def upiKpInc_generalized_fit(non_zero_masks, x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak):
+    """
+    Generalized fit function for piKpInc
+    """
+    non_zero_masks = non_zero_masks or None
+    if non_zero_masks is None:
+        warnings.warn("No non_zero_masks passed to ugeneralized_fit. Setting to np.ones_like(x)")
+        non_zero_masks = [np.ones_like(x, dtype=bool)]*4
+
+    return np.hstack([utwo_generalized_gaussians_and_one_gaussian(x[non_zero_masks[0]], mup, mupi, muk, sigp, sigpi, sigk, appi, apipi, akpi, alphap, alphak), utwo_generalized_gaussians_and_one_gaussian(x[non_zero_masks[1]], mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, alphap, alphak), utwo_generalized_gaussians_and_one_gaussian(x[non_zero_masks[2]], mup, mupi, muk, sigp, sigpi, sigk, apk, apik, akk, alphap, alphak), utwo_generalized_gaussians_and_one_gaussian(x[non_zero_masks[3]], mup, mupi, muk, sigp, sigpi, sigk, apinc, apiinc, akinc, alphap, alphak)])
+        
+    
+def piKpInc_generalized_jac(non_zero_masks, x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak):
+    non_zero_masks = non_zero_masks or None
+    if non_zero_masks is None:
+        warnings.warn("No non_zero_masks passed to generalized_jac. Setting to np.ones_like(x)")
+        non_zero_masks = [np.ones_like(x,dtype=bool)]*4
     partial_F_appi = np.exp(-(x[non_zero_masks[0]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[0]]-mup)/(sigp*2**0.5)))
     partial_F_apipi = np.exp(-(x[non_zero_masks[0]] - mupi)**2 / (2 * sigpi**2))
     partial_F_akpi = np.exp(-(x[non_zero_masks[0]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[0]]-muk)/(sigk*2**0.5)))
@@ -108,8 +131,8 @@ def piKpInc_generalized_jac(self, x, mup, mupi, muk, sigp, sigpi, sigk, app, api
     jacobian = np.column_stack((partial_F_mup, partial_F_mupi, partial_F_muk, partial_F_sigp, partial_F_sigpi, partial_F_sigk, partial_F_app, partial_F_apip, partial_F_akp, partial_F_appi, partial_F_apipi, partial_F_akpi, partial_F_apk, partial_F_apik, partial_F_akk, partial_F_apinc, partial_F_apiinc, partial_F_akinc, partial_F_alphap, partial_F_alphak))
     return jacobian
 
-def piKpInc_generalized_error(self, x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak, pcov):
-    non_zero_masks = self.non_zero_masks or None
+def piKpInc_generalized_error(non_zero_masks, x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak, pcov):
+    non_zero_masks = non_zero_masks or None
     if non_zero_masks is not None:
             
         partial_F_appi = np.exp(-(x[non_zero_masks[0]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[0]]-mup)/(sigp*2**0.5)))
