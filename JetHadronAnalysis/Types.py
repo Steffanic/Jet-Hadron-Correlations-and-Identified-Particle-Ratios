@@ -21,7 +21,8 @@ class Region(Enum):
     AWAY_SIDE_SIGNAL = 2
     BACKGROUND_ETAPOS = 3
     BACKGROUND_ETANEG = 4
-    INCLUSIVE = 5
+    BACKGROUND =5
+    INCLUSIVE = 6
 
 class AssociatedHadronMomentumBin(Enum):
     PT_1_15 = 1
