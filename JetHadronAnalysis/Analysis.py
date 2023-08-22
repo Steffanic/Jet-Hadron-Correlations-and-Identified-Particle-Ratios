@@ -11,6 +11,8 @@ from ROOT import TFile, TH1D # type: ignore
 from enum import Enum
 from math import pi
 
+from JetHadronAnalysis.Plotting import plotArrays
+
 class Region(Enum):
     NEAR_SIDE_SIGNAL = 1
     AWAY_SIDE_SIGNAL = 2
@@ -85,6 +87,8 @@ class Analysis:
 
         self.currentAssociatedHadronMomentumBin = AssociatedHadronMomentumBin.PT_1_15
 
+        self.current_species=ParticleType.INCLUSIVE
+
         for rootFileName in rootFileNames:
             self.fillSparsesFromFile(rootFileName)
 
@@ -108,6 +112,8 @@ class Analysis:
         self.currentRegion = region
         self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
         self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[region])
+        if hasattr(self, "numberOfAssociatedHadronsDictionary"):
+            self.fillNumberOfAssociatedHadronsDictionary()
 
     def setAssociatedHadronMomentumBin(self, associatedHadronMomentumBin: AssociatedHadronMomentumBin):
         '''
@@ -115,17 +121,21 @@ class Analysis:
         '''
         self.currentAssociatedHadronMomentumBin = associatedHadronMomentumBin
         self.JetHadron.setAssociatedHadronMomentumRange(*associatedHadronMomentumBinRangeDictionary[associatedHadronMomentumBin])
+        if hasattr(self, "numberOfAssociatedHadronsDictionary"):
+            self.fillNumberOfAssociatedHadronsDictionary()
 
     def setParticleSelectionForJetHadron(self, species: ParticleType):
         '''
         Sets the pion, kaon, and proton TOF ranges to get the particle type specified in JetHadron sparse
-        TODO: Unclear how to cleanly select ParticleType.OTHER
         '''
+        self.current_species = species
         if species == ParticleType.OTHER:
-            raise NotImplementedError("ParticleType.OTHER not yet implemented")
-        self.JetHadron.setPionTOFnSigma(*speciesTOFRangeDictionary[species][0])
-        self.JetHadron.setKaonTOFnSigma(*speciesTOFRangeDictionary[species][1])
-        self.JetHadron.setProtonTOFnSigma(*speciesTOFRangeDictionary[species][2])
+            self.JetHadron.setParticleTypeIsOther(True)
+        else:
+            self.JetHadron.setParticleTypeIsOther(False)
+            self.JetHadron.setPionTOFnSigma(*speciesTOFRangeDictionary[species][0])
+            self.JetHadron.setKaonTOFnSigma(*speciesTOFRangeDictionary[species][1])
+            self.JetHadron.setProtonTOFnSigma(*speciesTOFRangeDictionary[species][2])
 
     def getDifferentialCorrelationFunction(self, per_trigger_normalized=False):
         '''
@@ -191,7 +201,7 @@ class Analysis:
         mixedEventCorrelationFunction.Scale(1 / normalization_factor)
         return mixedEventCorrelationFunction
     
-    def getPIDFractions(self):
+    def getPIDFractions(self, makeIntermediatePlots=True):
         '''
         Prepares the projections for each enhanced species
         Converts them into arrays for fitting
@@ -212,12 +222,18 @@ class Analysis:
         # initialize the default parameters for the analysis type and current associated hadron momentum bin
         fitter.initializeDefaultParameters(self.analysisType, self.currentAssociatedHadronMomentumBin)
         optimal_params, covariance = fitter.performFit(x, y, yerr)
+
+        chi2OverNDF = fitter.chi2OverNDF(optimal_params, covariance, x, y, yerr)
+
+        if makeIntermediatePlots:
+            self.plotTPCPionNsigmaFit(x, y, yerr, optimal_params, covariance, fitter.fittingFunction, fitter.fittingErrorFunction, fitter.pionFittingFunction, fitter.kaonFittingFunction, fitter.protonFittingFunction, fitter.chi2OverNDF)
+
         if  not hasattr(self, "numberOfAssociatedHadronsDictionary"):
             self.fillNumberOfAssociatedHadronsDictionary()
         # compute the PID fractions
         pid_fractions, pid_fraction_errors = fitter.computeAveragePIDFractions(optimal_params, covariance, self.numberOfAssociatedHadronsDictionary)
 
-        return pid_fractions, pid_fraction_errors
+        return pid_fractions, pid_fraction_errors, chi2OverNDF
 
     def getEnhancedTPCnSigmaProjection(self, species: ParticleType):
         '''
@@ -225,7 +241,7 @@ class Analysis:
         '''
         self.setParticleSelectionForJetHadron(species)
         projection = self.getTPCPionNsigma()
-        self.setParticleSelectionForJetHadron(ParticleType.INCLUSIVE)
+        self.setParticleSelectionForJetHadron(self.current_species)
         return projection
 
 
@@ -235,6 +251,202 @@ class Analysis:
         '''
         return self.JetHadron.getProjection(self.JetHadron.Axes.PION_TPC_N_SIGMA)
         
+
+    def plotTPCPionNsigmaFit(self, x, y, yerr, optimal_params, covariance, fitFunction, fitErrorFunction, pionFitFunction, kaonFitFunction, protonFitFunction, chi2OverNDFFunction):
+        y_pion = y[0]
+        y_proton = y[1]
+        y_kaon = y[2]
+        y_inclusive = y[3]
+
+        y_err_pion = yerr[0]
+        y_err_proton = yerr[1]
+        y_err_kaon = yerr[2]
+        y_err_inclusive = yerr[3]
+
+        x_fit = np.linspace(x[0], x[-1], 100)
+        y_fit = fitFunction(None, x_fit, *optimal_params)
+        y_fit_err = fitErrorFunction(None, x_fit, *optimal_params, pcov=covariance)
+        y_fit_pion = y_fit[:len(x_fit)]
+        y_fit_proton = y_fit[len(x_fit):2*len(x_fit)]
+        y_fit_kaon = y_fit[2*len(x_fit):3*len(x_fit)]
+        y_fit_inclusive = y_fit[3*len(x_fit):]
+        y_fit_err_pion = y_fit_err[:len(x_fit)]
+        y_fit_err_proton = y_fit_err[len(x_fit):2*len(x_fit)]
+        y_fit_err_kaon = y_fit_err[2*len(x_fit):3*len(x_fit)]
+        y_fit_err_inclusive = y_fit_err[3*len(x_fit):]
+
+        chi2OverNDF = chi2OverNDFFunction(optimal_params, covariance, x, y, yerr)
+
+        mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = optimal_params
+        y_fit_pion_pion = pionFitFunction(x=x_fit, mu=mupi, sig=sigpi, a=apipi)
+        y_fit_pion_proton = protonFitFunction(x_fit, mup, sigp, appi, alphap)
+        y_fit_pion_kaon = kaonFitFunction(x_fit, muk, sigk, akpi, alphak)
+
+        y_fit_proton_pion = pionFitFunction(x_fit, mupi, sigpi, apip)
+        y_fit_proton_proton = protonFitFunction(x_fit, mup, sigp, app, alphap)
+        y_fit_proton_kaon = kaonFitFunction(x_fit, muk, sigk, akp, alphak)
+
+        y_fit_kaon_pion = pionFitFunction(x_fit, mupi, sigpi, apik)
+        y_fit_kaon_proton = protonFitFunction(x_fit, mup, sigp, apk, alphap)
+        y_fit_kaon_kaon = kaonFitFunction(x_fit, muk, sigk, akk, alphak)
+
+        y_fit_inclusive_pion = pionFitFunction(x_fit, mupi, sigpi, apiinc)
+        y_fit_inclusive_proton = protonFitFunction(x_fit, mup, sigp, apinc, alphap)
+        y_fit_inclusive_kaon = kaonFitFunction(x_fit, muk, sigk, akinc, alphak)
+
+
+        x_data_pion = {
+            "raw_pion": x,
+            "pion_total": x_fit,
+            "pion_pion": x_fit,
+            "pion_proton": x_fit,
+            "pion_kaon": x_fit,
+        }
+        x_data_proton = {
+            "raw_proton": x,
+            "proton_total": x_fit,
+            "proton_pion": x_fit,
+            "proton_proton": x_fit,
+            "proton_kaon": x_fit,
+        }
+        x_data_kaon = {
+            "raw_kaon": x,
+            "kaon_total": x_fit,
+            "kaon_pion": x_fit,
+            "kaon_proton": x_fit,
+            "kaon_kaon": x_fit,
+        }
+        x_data_inclusive = {
+            "raw_inclusive": x,
+            "inclusive_total": x_fit,
+            "inclusive_pion": x_fit,
+            "inclusive_proton": x_fit,
+            "inclusive_kaon": x_fit,
+        }
+        y_data_pion = {
+            "raw_pion": y_pion,
+            "pion_total": y_fit_pion,
+            "pion_pion": y_fit_pion_pion,
+            "pion_proton": y_fit_pion_proton,
+            "pion_kaon": y_fit_pion_kaon,
+        }
+        y_data_proton = {
+            "raw_proton": y_proton,
+            "proton_total": y_fit_proton,
+            "proton_pion": y_fit_proton_pion,
+            "proton_proton": y_fit_proton_proton,
+            "proton_kaon": y_fit_proton_kaon,
+        }
+        y_data_kaon = {
+            "raw_kaon": y_kaon,
+            "kaon_total": y_fit_kaon,
+            "kaon_pion": y_fit_kaon_pion,
+            "kaon_proton": y_fit_kaon_proton,
+            "kaon_kaon": y_fit_kaon_kaon,
+        }
+        y_data_inclusive = {
+            "raw_inclusive": y_inclusive,
+            "inclusive_total": y_fit_inclusive,
+            "inclusive_pion": y_fit_inclusive_pion,
+            "inclusive_proton": y_fit_inclusive_proton,
+            "inclusive_kaon": y_fit_inclusive_kaon,
+        }
+
+        yerr_data_pion = {
+            "raw_pion": y_err_pion,
+            "pion_total": y_fit_err_pion,
+            "pion_pion": None,
+            "pion_proton": None,
+            "pion_kaon": None,
+        }
+        yerr_data_proton = {
+            "raw_proton": y_err_proton,
+            "proton_total": y_fit_err_proton,
+            "proton_pion": None,
+            "proton_proton": None,
+            "proton_kaon": None,
+        }
+        yerr_data_kaon = {
+            "raw_kaon": y_err_kaon,
+            "kaon_total": y_fit_err_kaon,
+            "kaon_pion": None,
+            "kaon_proton": None,
+            "kaon_kaon": None,
+        }
+        yerr_data_inclusive = {
+            "raw_inclusive": y_err_inclusive,
+            "inclusive_total": y_fit_err_inclusive,
+            "inclusive_pion": None,
+            "inclusive_proton": None,
+            "inclusive_kaon": None,
+        }
+        
+        data_labels_pion = {
+            "raw_pion": "Enhanced Pion",
+            "pion_total": "Pion Fit",
+            "pion_pion": "Pion Component",
+            "pion_proton": "Proton Component",
+            "pion_kaon": "Kaon Component",
+        }
+        data_labels_proton = {
+            "raw_proton": "Enhanced Proton",
+            "proton_total": "Proton Fit",
+            "proton_pion": "Pion Component",
+            "proton_proton": "Proton Component",
+            "proton_kaon": "Kaon Component",
+        }
+        data_labels_kaon = {
+            "raw_kaon": "Enhanced Kaon",
+            "kaon_total": "Kaon Fit",
+            "kaon_pion": "Pion Component",
+            "kaon_proton": "Proton Component",
+            "kaon_kaon": "Kaon Component",
+        }
+        data_labels_inclusive = {
+            "raw_inclusive": "Enhanced Inclusive",
+            "inclusive_total": "Inclusive Fit",
+            "inclusive_pion": "Pion Component",
+            "inclusive_proton": "Proton Component",
+            "inclusive_kaon": "Kaon Component",
+        }
+
+        format_style_pion = {
+            "raw_pion": "o",
+            "pion_total": "-",
+            "pion_pion": "--",
+            "pion_proton": "--",
+            "pion_kaon": "--",
+        }
+        format_style_proton = {
+            "raw_proton": "o",
+            "proton_total": "-",
+            "proton_pion": "--",
+            "proton_proton": "--",
+            "proton_kaon": "--",
+        }
+        format_style_kaon = {
+            "raw_kaon": "o",
+            "kaon_total": "-",
+            "kaon_pion": "--",
+            "kaon_proton": "--",
+            "kaon_kaon": "--",
+        }
+        format_style_inclusive = {
+            "raw_inclusive": "o",
+            "inclusive_total": "-",
+            "inclusive_pion": "--",
+            "inclusive_proton": "--",
+            "inclusive_kaon": "--",
+        }
+
+        plotArrays(x_data_pion, y_data_pion, yerr_data_pion, data_label=data_labels_pion, format_style=format_style_pion, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Pions Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Pion.png")
+        plotArrays(x_data_proton, y_data_proton, yerr_data_proton, data_label=data_labels_proton, format_style=format_style_proton, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Protons Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Proton.png")
+        plotArrays(x_data_kaon, y_data_kaon, yerr_data_kaon, data_label=data_labels_kaon, format_style=format_style_kaon, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Kaons Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Kaon.png")
+        plotArrays(x_data_inclusive, y_data_inclusive, yerr_data_inclusive, data_label=data_labels_inclusive, format_style=format_style_inclusive, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Inclusive Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Inclusive.png")
+
+        # y_fit_pi = pionFitFunction(None, x_fit, *optimal_params[:3])
+        # y_fit_k = kaonFitFunction(None, x_fit, *optimal_params[3:6])
+        # y_fit_p = protonFitFunction(None, x_fit, *optimal_params[6:9])
 
     def computeMixedEventNormalizationFactor(self, mixedEventCorrelationFunction, normMethod: NormalizationMethod, **kwargs):
         '''
@@ -351,11 +563,9 @@ class Analysis:
         '''
         self.numberOfAssociatedHadronsDictionary = {}
         for species in ParticleType:
-            if species==ParticleType.OTHER:
-                continue
             self.setParticleSelectionForJetHadron(species)
             self.numberOfAssociatedHadronsDictionary[species] = self.getNumberOfAssociatedParticles()
-        self.setParticleSelectionForJetHadron(ParticleType.INCLUSIVE)
+        self.setParticleSelectionForJetHadron(self.current_species)
 
     def getNumberOfAssociatedParticles(self):
         '''

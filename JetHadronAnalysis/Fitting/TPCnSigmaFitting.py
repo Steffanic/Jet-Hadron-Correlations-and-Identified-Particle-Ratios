@@ -3,10 +3,10 @@ import numpy as np
 import uncertainties.unumpy as unp
 from scipy.special import erf
 
-def gauss(self, x, mu, sig, a):
+def gauss(x, mu, sig, a):
     return a*np.exp(-0.5*((x-mu)/sig)**2)
 
-def generalized_gauss(self, x, mu, sig, a, alpha):
+def generalized_gauss(x, mu, sig, a, alpha):
     return a*np.exp(-0.5*((x-mu)/sig)**2)*(1 + erf(alpha*(x-mu)/(sig*2**0.5)))
 
 def ugauss(x, mu, sig, a):
@@ -133,160 +133,86 @@ def piKpInc_generalized_jac(non_zero_masks, x, mup, mupi, muk, sigp, sigpi, sigk
 
 def piKpInc_generalized_error(non_zero_masks, x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak, pcov):
     non_zero_masks = non_zero_masks or None
-    if non_zero_masks is not None:
-            
-        partial_F_appi = np.exp(-(x[non_zero_masks[0]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[0]]-mup)/(sigp*2**0.5)))
-        partial_F_apipi = np.exp(-(x[non_zero_masks[0]] - mupi)**2 / (2 * sigpi**2))
-        partial_F_akpi = np.exp(-(x[non_zero_masks[0]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[0]]-muk)/(sigk*2**0.5)))
+    if non_zero_masks is None:
+        warnings.warn("No non_zero_masks passed to ugeneralized_fit. Setting to np.ones_like(x)")
+        non_zero_masks = [np.ones_like(x, dtype=bool)]*4
 
-        # now let's hstack with the other masks
-        partial_F_appi = np.hstack([partial_F_appi, np.zeros(len(x[non_zero_masks[1]])), np.zeros(len(x[non_zero_masks[2]])), np.zeros(len(x[non_zero_masks[3]]))])
-        partial_F_apipi = np.hstack([partial_F_apipi, np.zeros(len(x[non_zero_masks[1]])), np.zeros(len(x[non_zero_masks[2]])), np.zeros(len(x[non_zero_masks[3]]))])
-        partial_F_akpi = np.hstack([partial_F_akpi, np.zeros(len(x[non_zero_masks[1]])), np.zeros(len(x[non_zero_masks[2]])), np.zeros(len(x[non_zero_masks[3]]))])
+    partial_F_appi = np.exp(-(x[non_zero_masks[0]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[0]]-mup)/(sigp*2**0.5)))
+    partial_F_apipi = np.exp(-(x[non_zero_masks[0]] - mupi)**2 / (2 * sigpi**2))
+    partial_F_akpi = np.exp(-(x[non_zero_masks[0]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[0]]-muk)/(sigk*2**0.5)))
 
-        partial_F_app = np.exp(-(x[non_zero_masks[1]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[1]]-mup)/(sigp*2**0.5)))
-        partial_F_apip = np.exp(-(x[non_zero_masks[1]] - mupi)**2 / (2 * sigpi**2))
-        partial_F_akp = np.exp(-(x[non_zero_masks[1]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[1]]-muk)/(sigk*2**0.5)))
+    # now let's hstack with the other masks
+    partial_F_appi = np.hstack([partial_F_appi, np.zeros(len(x[non_zero_masks[1]])), np.zeros(len(x[non_zero_masks[2]])), np.zeros(len(x[non_zero_masks[3]]))])
+    partial_F_apipi = np.hstack([partial_F_apipi, np.zeros(len(x[non_zero_masks[1]])), np.zeros(len(x[non_zero_masks[2]])), np.zeros(len(x[non_zero_masks[3]]))])
+    partial_F_akpi = np.hstack([partial_F_akpi, np.zeros(len(x[non_zero_masks[1]])), np.zeros(len(x[non_zero_masks[2]])), np.zeros(len(x[non_zero_masks[3]]))])
 
-        partial_F_app = np.hstack([np.zeros(len(x[non_zero_masks[0]])), partial_F_app, np.zeros(len(x[non_zero_masks[2]])), np.zeros(len(x[non_zero_masks[3]]))])
-        partial_F_apip = np.hstack([np.zeros(len(x[non_zero_masks[0]])), partial_F_apip, np.zeros(len(x[non_zero_masks[2]])), np.zeros(len(x[non_zero_masks[3]]))])
-        partial_F_akp = np.hstack([np.zeros(len(x[non_zero_masks[0]])), partial_F_akp, np.zeros(len(x[non_zero_masks[2]])), np.zeros(len(x[non_zero_masks[3]]))])
-        
-        partial_F_apk = np.exp(-(x[non_zero_masks[2]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[2]]-mup)/(sigp*2**0.5)))
-        partial_F_apik = np.exp(-(x[non_zero_masks[2]] - mupi)**2 / (2 * sigpi**2))
-        partial_F_akk = np.exp(-(x[non_zero_masks[2]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[2]]-muk)/(sigk*2**0.5)))
+    partial_F_app = np.exp(-(x[non_zero_masks[1]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[1]]-mup)/(sigp*2**0.5)))
+    partial_F_apip = np.exp(-(x[non_zero_masks[1]] - mupi)**2 / (2 * sigpi**2))
+    partial_F_akp = np.exp(-(x[non_zero_masks[1]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[1]]-muk)/(sigk*2**0.5)))
 
-        partial_F_apk = np.hstack([np.zeros(len(x[non_zero_masks[0]])), np.zeros(len(x[non_zero_masks[1]])), partial_F_apk, np.zeros(len(x[non_zero_masks[3]]))])
-        partial_F_apik = np.hstack([np.zeros(len(x[non_zero_masks[0]])), np.zeros(len(x[non_zero_masks[1]])), partial_F_apik, np.zeros(len(x[non_zero_masks[3]]))])
-        partial_F_akk = np.hstack([np.zeros(len(x[non_zero_masks[0]])), np.zeros(len(x[non_zero_masks[1]])), partial_F_akk, np.zeros(len(x[non_zero_masks[3]]))])
+    partial_F_app = np.hstack([np.zeros(len(x[non_zero_masks[0]])), partial_F_app, np.zeros(len(x[non_zero_masks[2]])), np.zeros(len(x[non_zero_masks[3]]))])
+    partial_F_apip = np.hstack([np.zeros(len(x[non_zero_masks[0]])), partial_F_apip, np.zeros(len(x[non_zero_masks[2]])), np.zeros(len(x[non_zero_masks[3]]))])
+    partial_F_akp = np.hstack([np.zeros(len(x[non_zero_masks[0]])), partial_F_akp, np.zeros(len(x[non_zero_masks[2]])), np.zeros(len(x[non_zero_masks[3]]))])
+    
+    partial_F_apk = np.exp(-(x[non_zero_masks[2]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[2]]-mup)/(sigp*2**0.5)))
+    partial_F_apik = np.exp(-(x[non_zero_masks[2]] - mupi)**2 / (2 * sigpi**2))
+    partial_F_akk = np.exp(-(x[non_zero_masks[2]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[2]]-muk)/(sigk*2**0.5)))
 
-        partial_F_apinc = np.exp(-(x[non_zero_masks[3]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[3]]-mup)/(sigp*2**0.5)))
-        partial_F_apiinc = np.exp(-(x[non_zero_masks[3]] - mupi)**2 / (2 * sigpi**2))
-        partial_F_akinc = np.exp(-(x[non_zero_masks[3]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[3]]-muk)/(sigk*2**0.5)))
+    partial_F_apk = np.hstack([np.zeros(len(x[non_zero_masks[0]])), np.zeros(len(x[non_zero_masks[1]])), partial_F_apk, np.zeros(len(x[non_zero_masks[3]]))])
+    partial_F_apik = np.hstack([np.zeros(len(x[non_zero_masks[0]])), np.zeros(len(x[non_zero_masks[1]])), partial_F_apik, np.zeros(len(x[non_zero_masks[3]]))])
+    partial_F_akk = np.hstack([np.zeros(len(x[non_zero_masks[0]])), np.zeros(len(x[non_zero_masks[1]])), partial_F_akk, np.zeros(len(x[non_zero_masks[3]]))])
 
-        partial_F_apinc = np.hstack([np.zeros(len(x[non_zero_masks[0]])), np.zeros(len(x[non_zero_masks[1]])), np.zeros(len(x[non_zero_masks[2]])), partial_F_apinc])
-        partial_F_apiinc = np.hstack([np.zeros(len(x[non_zero_masks[0]])), np.zeros(len(x[non_zero_masks[1]])), np.zeros(len(x[non_zero_masks[2]])), partial_F_apiinc])
-        partial_F_akinc = np.hstack([np.zeros(len(x[non_zero_masks[0]])), np.zeros(len(x[non_zero_masks[1]])), np.zeros(len(x[non_zero_masks[2]])), partial_F_akinc])
+    partial_F_apinc = np.exp(-(x[non_zero_masks[3]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[3]]-mup)/(sigp*2**0.5)))
+    partial_F_apiinc = np.exp(-(x[non_zero_masks[3]] - mupi)**2 / (2 * sigpi**2))
+    partial_F_akinc = np.exp(-(x[non_zero_masks[3]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[3]]-muk)/(sigk*2**0.5)))
 
-        partial_F_mup = np.hstack([
-                                    (appi) * ((2*(x[non_zero_masks[0]]-mup))/(2*sigp**2) * np.exp(-(x[non_zero_masks[0]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[0]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp * np.exp(-(x[non_zero_masks[0]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[0]]-mup)**2 / (2 * sigp**2))),
-                                    (app) * ((2*(x[non_zero_masks[1]]-mup))/(2*sigp**2) * np.exp(-(x[non_zero_masks[1]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[1]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp * np.exp(-(x[non_zero_masks[1]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[1]]-mup)**2 / (2 * sigp**2))), 
-                                    (apk) * ((2*(x[non_zero_masks[2]]-mup))/(2*sigp**2) * np.exp(-(x[non_zero_masks[2]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[2]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp * np.exp(-(x[non_zero_masks[2]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[2]]-mup)**2 / (2 * sigp**2))), 
-                                    (apinc) * ((2*(x[non_zero_masks[3]]-mup))/(2*sigp**2) * np.exp(-(x[non_zero_masks[3]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[3]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp * np.exp(-(x[non_zero_masks[3]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[3]]-mup)**2 / (2 * sigp**2)))])
-        partial_F_mupi = np.hstack([
-                                        (apipi) * (x[non_zero_masks[0]] - mupi) * np.exp(-(x[non_zero_masks[0]] - mupi)**2 / (2 * sigpi**2)) / sigpi**2,
-                                        (apip) * (x[non_zero_masks[1]] - mupi) * np.exp(-(x[non_zero_masks[1]] - mupi)**2 / (2 * sigpi**2)) / sigpi**2,
-                                        (apik) * (x[non_zero_masks[2]] - mupi) * np.exp(-(x[non_zero_masks[2]] - mupi)**2 / (2 * sigpi**2)) / sigpi**2,
-                                        (apiinc) * (x[non_zero_masks[3]] - mupi) * np.exp(-(x[non_zero_masks[3]] - mupi)**2 / (2 * sigpi**2)) / sigpi**2])
-        partial_F_muk = np.hstack([
-            (akpi) * (2*(x[non_zero_masks[0]]-muk))/(2*sigk**2) * np.exp(-(x[non_zero_masks[0]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[0]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk * np.exp(-(x[non_zero_masks[0]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[0]]-muk)**2 / (2 * sigk**2)),
-            (akp) * (2*(x[non_zero_masks[1]]-muk))/(2*sigk**2) * np.exp(-(x[non_zero_masks[1]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[1]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk * np.exp(-(x[non_zero_masks[1]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[1]]-muk)**2 / (2 * sigk**2)),
-            (akk) * (2*(x[non_zero_masks[2]]-muk))/(2*sigk**2) * np.exp(-(x[non_zero_masks[2]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[2]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk * np.exp(-(x[non_zero_masks[2]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[2]]-muk)**2 / (2 * sigk**2)),
-            (akinc) * (2*(x[non_zero_masks[3]]-muk))/(2*sigk**2) * np.exp(-(x[non_zero_masks[3]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[3]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk * np.exp(-(x[non_zero_masks[3]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[3]]-muk)**2 / (2 * sigk**2))])
+    partial_F_apinc = np.hstack([np.zeros(len(x[non_zero_masks[0]])), np.zeros(len(x[non_zero_masks[1]])), np.zeros(len(x[non_zero_masks[2]])), partial_F_apinc])
+    partial_F_apiinc = np.hstack([np.zeros(len(x[non_zero_masks[0]])), np.zeros(len(x[non_zero_masks[1]])), np.zeros(len(x[non_zero_masks[2]])), partial_F_apiinc])
+    partial_F_akinc = np.hstack([np.zeros(len(x[non_zero_masks[0]])), np.zeros(len(x[non_zero_masks[1]])), np.zeros(len(x[non_zero_masks[2]])), partial_F_akinc])
 
-        partial_F_sigp =  np.hstack([(appi) * ((2*(x[non_zero_masks[0]]-mup)**2)/(2*sigp) * np.exp(-(x[non_zero_masks[0]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[0]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp**2 * (x[non_zero_masks[0]]-mup) * np.exp(-(x[non_zero_masks[0]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[0]]-mup)**2 / (2 * sigp**2))),
-                                    (app) * ((2*(x[non_zero_masks[1]]-mup)**2)/(2*sigp) * np.exp(-(x[non_zero_masks[1]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[1]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp**2 * (x[non_zero_masks[1]]-mup) * np.exp(-(x[non_zero_masks[1]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[1]]-mup)**2 / (2 * sigp**2))),
-                                        (apip) * ((2*(x[non_zero_masks[2]]-mup)**2)/(2*sigp) * np.exp(-(x[non_zero_masks[2]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[2]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp**2 * (x[non_zero_masks[2]]-mup) * np.exp(-(x[non_zero_masks[2]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[2]]-mup)**2 / (2 * sigp**2))),
-                                        (apinc) * ((2*(x[non_zero_masks[3]]-mup)**2)/(2*sigp) * np.exp(-(x[non_zero_masks[3]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[3]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp**2 * (x[non_zero_masks[3]]-mup) * np.exp(-(x[non_zero_masks[3]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[3]]-mup)**2 / (2 * sigp**2)))
-        ])
-        partial_F_sigpi = np.hstack([(apipi) * (x[non_zero_masks[0]] - mupi)**2 * np.exp(-(x[non_zero_masks[0]] - mupi)**2 / (2 * sigpi**2)) / sigpi**3,
-                                    (apip) * (x[non_zero_masks[1]] - mupi)**2 * np.exp(-(x[non_zero_masks[1]] - mupi)**2 / (2 * sigpi**2)) / sigpi**3,
-                                    (apik)* (x[non_zero_masks[2]] - mupi)**2 * np.exp(-(x[non_zero_masks[2]] - mupi)**2 / (2 * sigpi**2)) / sigpi**3,
-                                        (apiinc) * (x[non_zero_masks[3]] - mupi)**2 * np.exp(-(x[non_zero_masks[3]] - mupi)**2 / (2 * sigpi**2)) / sigpi**3
-                                    ])
-        partial_F_sigk = np.hstack([( akpi) * ((2*(x[non_zero_masks[0]]-muk)**2)/(2*sigk) * np.exp(-(x[non_zero_masks[0]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[0]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk**2 * (x[non_zero_masks[0]]-muk) * np.exp(-(x[non_zero_masks[0]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[0]]-muk)**2 / (2 * sigk**2))),
-                                    (akp) * ((2*(x[non_zero_masks[1]]-muk)**2)/(2*sigk) * np.exp(-(x[non_zero_masks[1]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[1]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk**2 * (x[non_zero_masks[1]]-muk) * np.exp(-(x[non_zero_masks[1]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[1]]-muk)**2 / (2 * sigk**2))),
-                                    (akk) * ((2*(x[non_zero_masks[2]]-muk)**2)/(2*sigk) * np.exp(-(x[non_zero_masks[2]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[2]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk**2 * (x[non_zero_masks[2]]-muk) * np.exp(-(x[non_zero_masks[2]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[2]]-muk)**2 / (2 * sigk**2))),
-                                        (akinc) * ((2*(x[non_zero_masks[3]]-muk)**2)/(2*sigk) * np.exp(-(x[non_zero_masks[3]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[3]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk**2 * (x[non_zero_masks[3]]-muk) * np.exp(-(x[non_zero_masks[3]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[3]]-muk)**2 / (2 * sigk**2)))
-                                    ])
+    partial_F_mup = np.hstack([
+                                (appi) * ((2*(x[non_zero_masks[0]]-mup))/(2*sigp**2) * np.exp(-(x[non_zero_masks[0]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[0]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp * np.exp(-(x[non_zero_masks[0]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[0]]-mup)**2 / (2 * sigp**2))),
+                                (app) * ((2*(x[non_zero_masks[1]]-mup))/(2*sigp**2) * np.exp(-(x[non_zero_masks[1]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[1]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp * np.exp(-(x[non_zero_masks[1]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[1]]-mup)**2 / (2 * sigp**2))), 
+                                (apk) * ((2*(x[non_zero_masks[2]]-mup))/(2*sigp**2) * np.exp(-(x[non_zero_masks[2]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[2]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp * np.exp(-(x[non_zero_masks[2]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[2]]-mup)**2 / (2 * sigp**2))), 
+                                (apinc) * ((2*(x[non_zero_masks[3]]-mup))/(2*sigp**2) * np.exp(-(x[non_zero_masks[3]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[3]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp * np.exp(-(x[non_zero_masks[3]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[3]]-mup)**2 / (2 * sigp**2)))])
+    partial_F_mupi = np.hstack([
+                                    (apipi) * (x[non_zero_masks[0]] - mupi) * np.exp(-(x[non_zero_masks[0]] - mupi)**2 / (2 * sigpi**2)) / sigpi**2,
+                                    (apip) * (x[non_zero_masks[1]] - mupi) * np.exp(-(x[non_zero_masks[1]] - mupi)**2 / (2 * sigpi**2)) / sigpi**2,
+                                    (apik) * (x[non_zero_masks[2]] - mupi) * np.exp(-(x[non_zero_masks[2]] - mupi)**2 / (2 * sigpi**2)) / sigpi**2,
+                                    (apiinc) * (x[non_zero_masks[3]] - mupi) * np.exp(-(x[non_zero_masks[3]] - mupi)**2 / (2 * sigpi**2)) / sigpi**2])
+    partial_F_muk = np.hstack([
+        (akpi) * (2*(x[non_zero_masks[0]]-muk))/(2*sigk**2) * np.exp(-(x[non_zero_masks[0]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[0]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk * np.exp(-(x[non_zero_masks[0]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[0]]-muk)**2 / (2 * sigk**2)),
+        (akp) * (2*(x[non_zero_masks[1]]-muk))/(2*sigk**2) * np.exp(-(x[non_zero_masks[1]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[1]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk * np.exp(-(x[non_zero_masks[1]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[1]]-muk)**2 / (2 * sigk**2)),
+        (akk) * (2*(x[non_zero_masks[2]]-muk))/(2*sigk**2) * np.exp(-(x[non_zero_masks[2]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[2]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk * np.exp(-(x[non_zero_masks[2]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[2]]-muk)**2 / (2 * sigk**2)),
+        (akinc) * (2*(x[non_zero_masks[3]]-muk))/(2*sigk**2) * np.exp(-(x[non_zero_masks[3]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[3]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk * np.exp(-(x[non_zero_masks[3]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[3]]-muk)**2 / (2 * sigk**2))])
 
-        partial_F_alphap = np.hstack([(appi) * (2/np.pi)**.5 * (x[non_zero_masks[0]]-mup)/(sigp) * np.exp(-(x[non_zero_masks[0]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[0]]-mup)**2 / (2 * sigp**2)),
-                                        (app) * (2/np.pi)**.5 * (x[non_zero_masks[1]]-mup)/(sigp) * np.exp(-(x[non_zero_masks[1]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[1]]-mup)**2 / (2 * sigp**2)),
-                                        (apk) * (2/np.pi)**.5 * (x[non_zero_masks[2]]-mup)/(sigp) * np.exp(-(x[non_zero_masks[2]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[2]]-mup)**2 / (2 * sigp**2)),
-                                        (apinc) * (2/np.pi)**.5 * (x[non_zero_masks[3]]-mup)/(sigp) * np.exp(-(x[non_zero_masks[3]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[3]]-mup)**2 / (2 * sigp**2))
-                                    ])
-        partial_F_alphak = np.hstack([( akpi ) * (2/np.pi)**.5 * (x[non_zero_masks[0]]-muk)/(sigk) * np.exp(-(x[non_zero_masks[0]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[0]]-muk)**2 / (2 * sigk**2)),
-                                    (akp) * (2/np.pi)**.5 * (x[non_zero_masks[1]]-muk)/(sigk) * np.exp(-(x[non_zero_masks[1]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[1]]-muk)**2 / (2 * sigk**2)),
-                                        (akk) * (2/np.pi)**.5 * (x[non_zero_masks[2]]-muk)/(sigk) * np.exp(-(x[non_zero_masks[2]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[2]]-muk)**2 / (2 * sigk**2)),
-                                        (akinc) * (2/np.pi)**.5 * (x[non_zero_masks[3]]-muk)/(sigk) * np.exp(-(x[non_zero_masks[3]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[3]]-muk)**2 / (2 * sigk**2))
-                                    ])
-    else:   
-        partial_F_appi = np.exp(-(x - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x-mup)/(sigp*2**0.5)))
-        partial_F_apipi = np.exp(-(x - mupi)**2 / (2 * sigpi**2))
-        partial_F_akpi = np.exp(-(x - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x-muk)/(sigk*2**0.5)))
+    partial_F_sigp =  np.hstack([(appi) * ((2*(x[non_zero_masks[0]]-mup)**2)/(2*sigp) * np.exp(-(x[non_zero_masks[0]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[0]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp**2 * (x[non_zero_masks[0]]-mup) * np.exp(-(x[non_zero_masks[0]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[0]]-mup)**2 / (2 * sigp**2))),
+                                (app) * ((2*(x[non_zero_masks[1]]-mup)**2)/(2*sigp) * np.exp(-(x[non_zero_masks[1]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[1]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp**2 * (x[non_zero_masks[1]]-mup) * np.exp(-(x[non_zero_masks[1]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[1]]-mup)**2 / (2 * sigp**2))),
+                                    (apip) * ((2*(x[non_zero_masks[2]]-mup)**2)/(2*sigp) * np.exp(-(x[non_zero_masks[2]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[2]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp**2 * (x[non_zero_masks[2]]-mup) * np.exp(-(x[non_zero_masks[2]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[2]]-mup)**2 / (2 * sigp**2))),
+                                    (apinc) * ((2*(x[non_zero_masks[3]]-mup)**2)/(2*sigp) * np.exp(-(x[non_zero_masks[3]] - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x[non_zero_masks[3]]-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp**2 * (x[non_zero_masks[3]]-mup) * np.exp(-(x[non_zero_masks[3]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[3]]-mup)**2 / (2 * sigp**2)))
+    ])
+    partial_F_sigpi = np.hstack([(apipi) * (x[non_zero_masks[0]] - mupi)**2 * np.exp(-(x[non_zero_masks[0]] - mupi)**2 / (2 * sigpi**2)) / sigpi**3,
+                                (apip) * (x[non_zero_masks[1]] - mupi)**2 * np.exp(-(x[non_zero_masks[1]] - mupi)**2 / (2 * sigpi**2)) / sigpi**3,
+                                (apik)* (x[non_zero_masks[2]] - mupi)**2 * np.exp(-(x[non_zero_masks[2]] - mupi)**2 / (2 * sigpi**2)) / sigpi**3,
+                                    (apiinc) * (x[non_zero_masks[3]] - mupi)**2 * np.exp(-(x[non_zero_masks[3]] - mupi)**2 / (2 * sigpi**2)) / sigpi**3
+                                ])
+    partial_F_sigk = np.hstack([( akpi) * ((2*(x[non_zero_masks[0]]-muk)**2)/(2*sigk) * np.exp(-(x[non_zero_masks[0]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[0]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk**2 * (x[non_zero_masks[0]]-muk) * np.exp(-(x[non_zero_masks[0]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[0]]-muk)**2 / (2 * sigk**2))),
+                                (akp) * ((2*(x[non_zero_masks[1]]-muk)**2)/(2*sigk) * np.exp(-(x[non_zero_masks[1]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[1]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk**2 * (x[non_zero_masks[1]]-muk) * np.exp(-(x[non_zero_masks[1]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[1]]-muk)**2 / (2 * sigk**2))),
+                                (akk) * ((2*(x[non_zero_masks[2]]-muk)**2)/(2*sigk) * np.exp(-(x[non_zero_masks[2]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[2]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk**2 * (x[non_zero_masks[2]]-muk) * np.exp(-(x[non_zero_masks[2]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[2]]-muk)**2 / (2 * sigk**2))),
+                                    (akinc) * ((2*(x[non_zero_masks[3]]-muk)**2)/(2*sigk) * np.exp(-(x[non_zero_masks[3]] - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x[non_zero_masks[3]]-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk**2 * (x[non_zero_masks[3]]-muk) * np.exp(-(x[non_zero_masks[3]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[3]]-muk)**2 / (2 * sigk**2)))
+                                ])
 
-        # now let's hstack with the other masks
-        partial_F_appi = np.hstack([partial_F_appi, np.zeros(len(x)), np.zeros(len(x)), np.zeros(len(x))])
-        partial_F_apipi = np.hstack([partial_F_apipi, np.zeros(len(x)), np.zeros(len(x)), np.zeros(len(x))])
-        partial_F_akpi = np.hstack([partial_F_akpi, np.zeros(len(x)), np.zeros(len(x)), np.zeros(len(x))])
-
-        partial_F_app = np.exp(-(x - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x-mup)/(sigp*2**0.5)))
-        partial_F_apip = np.exp(-(x - mupi)**2 / (2 * sigpi**2))
-        partial_F_akp = np.exp(-(x - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x-muk)/(sigk*2**0.5)))
-
-        partial_F_app = np.hstack([np.zeros(len(x)), partial_F_app, np.zeros(len(x)), np.zeros(len(x))])
-        partial_F_apip = np.hstack([np.zeros(len(x)), partial_F_apip, np.zeros(len(x)), np.zeros(len(x))])
-        partial_F_akp = np.hstack([np.zeros(len(x)), partial_F_akp, np.zeros(len(x)), np.zeros(len(x))])
-        
-        partial_F_apk = np.exp(-(x - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x-mup)/(sigp*2**0.5)))
-        partial_F_apik = np.exp(-(x - mupi)**2 / (2 * sigpi**2))
-        partial_F_akk = np.exp(-(x - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x-muk)/(sigk*2**0.5)))
-
-        partial_F_apk = np.hstack([np.zeros(len(x)), np.zeros(len(x)), partial_F_apk, np.zeros(len(x))])
-        partial_F_apik = np.hstack([np.zeros(len(x)), np.zeros(len(x)), partial_F_apik, np.zeros(len(x))])
-        partial_F_akk = np.hstack([np.zeros(len(x)), np.zeros(len(x)), partial_F_akk, np.zeros(len(x))])
-
-        partial_F_apinc = np.exp(-(x - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x-mup)/(sigp*2**0.5)))
-        partial_F_apiinc = np.exp(-(x - mupi)**2 / (2 * sigpi**2))
-        partial_F_akinc = np.exp(-(x - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x-muk)/(sigk*2**0.5)))
-
-        partial_F_apinc = np.hstack([np.zeros(len(x)), np.zeros(len(x)), np.zeros(len(x)), partial_F_apinc])
-        partial_F_apiinc = np.hstack([np.zeros(len(x)), np.zeros(len(x)), np.zeros(len(x)), partial_F_apiinc])
-        partial_F_akinc = np.hstack([np.zeros(len(x)), np.zeros(len(x)), np.zeros(len(x)), partial_F_akinc])
-
-        partial_F_mup = np.hstack([
-                                    (appi) * ((2*(x-mup))/(2*sigp**2) * np.exp(-(x - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp * np.exp(-(x - mup)**2 / (2 * sigp**2) - alphap**2 * (x-mup)**2 / (2 * sigp**2))),
-                                    (app) * ((2*(x-mup))/(2*sigp**2) * np.exp(-(x - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp * np.exp(-(x - mup)**2 / (2 * sigp**2) - alphap**2 * (x-mup)**2 / (2 * sigp**2))), 
-                                    (apk) * ((2*(x-mup))/(2*sigp**2) * np.exp(-(x - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp * np.exp(-(x - mup)**2 / (2 * sigp**2) - alphap**2 * (x-mup)**2 / (2 * sigp**2))), 
-                                    (apinc) * ((2*(x-mup))/(2*sigp**2) * np.exp(-(x - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp * np.exp(-(x - mup)**2 / (2 * sigp**2) - alphap**2 * (x-mup)**2 / (2 * sigp**2)))])
-        partial_F_mupi = np.hstack([
-                                        (apipi) * (x - mupi) * np.exp(-(x - mupi)**2 / (2 * sigpi**2)) / sigpi**2,
-                                        (apip) * (x - mupi) * np.exp(-(x - mupi)**2 / (2 * sigpi**2)) / sigpi**2,
-                                        (apik) * (x - mupi) * np.exp(-(x - mupi)**2 / (2 * sigpi**2)) / sigpi**2,
-                                        (apiinc) * (x - mupi) * np.exp(-(x - mupi)**2 / (2 * sigpi**2)) / sigpi**2])
-        partial_F_muk = np.hstack([
-            (akpi) * (2*(x-muk))/(2*sigk**2) * np.exp(-(x - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk * np.exp(-(x - muk)**2 / (2 * sigk**2) - alphak**2 * (x-muk)**2 / (2 * sigk**2)),
-            (akp) * (2*(x-muk))/(2*sigk**2) * np.exp(-(x - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk * np.exp(-(x - muk)**2 / (2 * sigk**2) - alphak**2 * (x-muk)**2 / (2 * sigk**2)),
-            (akk) * (2*(x-muk))/(2*sigk**2) * np.exp(-(x - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk * np.exp(-(x - muk)**2 / (2 * sigk**2) - alphak**2 * (x-muk)**2 / (2 * sigk**2)),
-            (akinc) * (2*(x-muk))/(2*sigk**2) * np.exp(-(x - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk * np.exp(-(x - muk)**2 / (2 * sigk**2) - alphak**2 * (x-muk)**2 / (2 * sigk**2))])
-
-        partial_F_sigp =  np.hstack([(appi) * ((2*(x-mup)**2)/(2*sigp) * np.exp(-(x - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp**2 * (x-mup) * np.exp(-(x - mup)**2 / (2 * sigp**2) - alphap**2 * (x-mup)**2 / (2 * sigp**2))),
-                                    (app) * ((2*(x-mup)**2)/(2*sigp) * np.exp(-(x - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp**2 * (x-mup) * np.exp(-(x - mup)**2 / (2 * sigp**2) - alphap**2 * (x-mup)**2 / (2 * sigp**2))),
-                                        (apip) * ((2*(x-mup)**2)/(2*sigp) * np.exp(-(x - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp**2 * (x-mup) * np.exp(-(x - mup)**2 / (2 * sigp**2) - alphap**2 * (x-mup)**2 / (2 * sigp**2))),
-                                        (apinc) * ((2*(x-mup)**2)/(2*sigp) * np.exp(-(x - mup)**2 / (2 * sigp**2))*(1 + erf(alphap*(x-mup)/(sigp*2**0.5))) - (2/np.pi)**.5 * alphap/sigp**2 * (x-mup) * np.exp(-(x - mup)**2 / (2 * sigp**2) - alphap**2 * (x-mup)**2 / (2 * sigp**2)))
-        ])
-        partial_F_sigpi = np.hstack([(apipi) * (x - mupi)**2 * np.exp(-(x - mupi)**2 / (2 * sigpi**2)) / sigpi**3,
-                                    (apip) * (x - mupi)**2 * np.exp(-(x - mupi)**2 / (2 * sigpi**2)) / sigpi**3,
-                                    (apik)* (x - mupi)**2 * np.exp(-(x - mupi)**2 / (2 * sigpi**2)) / sigpi**3,
-                                        (apiinc) * (x - mupi)**2 * np.exp(-(x - mupi)**2 / (2 * sigpi**2)) / sigpi**3
-                                    ])
-        partial_F_sigk = np.hstack([( akpi) * ((2*(x-muk)**2)/(2*sigk) * np.exp(-(x - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk**2 * (x-muk) * np.exp(-(x - muk)**2 / (2 * sigk**2) - alphak**2 * (x-muk)**2 / (2 * sigk**2))),
-                                    (akp) * ((2*(x-muk)**2)/(2*sigk) * np.exp(-(x - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk**2 * (x-muk) * np.exp(-(x - muk)**2 / (2 * sigk**2) - alphak**2 * (x-muk)**2 / (2 * sigk**2))),
-                                    (akk) * ((2*(x-muk)**2)/(2*sigk) * np.exp(-(x - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk**2 * (x-muk) * np.exp(-(x - muk)**2 / (2 * sigk**2) - alphak**2 * (x-muk)**2 / (2 * sigk**2))),
-                                        (akinc) * ((2*(x-muk)**2)/(2*sigk) * np.exp(-(x - muk)**2 / (2 * sigk**2))*(1 + erf(alphak*(x-muk)/(sigk*2**0.5))) - (2/np.pi)**.5 * alphak/sigk**2 * (x-muk) * np.exp(-(x - muk)**2 / (2 * sigk**2) - alphak**2 * (x-muk)**2 / (2 * sigk**2)))
-                                    ])
-
-        partial_F_alphap = np.hstack([(appi) * (2/np.pi)**.5 * (x-mup)/(sigp) * np.exp(-(x - mup)**2 / (2 * sigp**2) - alphap**2 * (x-mup)**2 / (2 * sigp**2)),
-                                        (app) * (2/np.pi)**.5 * (x-mup)/(sigp) * np.exp(-(x - mup)**2 / (2 * sigp**2) - alphap**2 * (x-mup)**2 / (2 * sigp**2)),
-                                        (apk) * (2/np.pi)**.5 * (x-mup)/(sigp) * np.exp(-(x - mup)**2 / (2 * sigp**2) - alphap**2 * (x-mup)**2 / (2 * sigp**2)),
-                                        (apinc) * (2/np.pi)**.5 * (x-mup)/(sigp) * np.exp(-(x - mup)**2 / (2 * sigp**2) - alphap**2 * (x-mup)**2 / (2 * sigp**2))
-                                    ])
-        partial_F_alphak = np.hstack([( akpi ) * (2/np.pi)**.5 * (x-muk)/(sigk) * np.exp(-(x - muk)**2 / (2 * sigk**2) - alphak**2 * (x-muk)**2 / (2 * sigk**2)),
-                                    (akp) * (2/np.pi)**.5 * (x-muk)/(sigk) * np.exp(-(x - muk)**2 / (2 * sigk**2) - alphak**2 * (x-muk)**2 / (2 * sigk**2)),
-                                        (akk) * (2/np.pi)**.5 * (x-muk)/(sigk) * np.exp(-(x - muk)**2 / (2 * sigk**2) - alphak**2 * (x-muk)**2 / (2 * sigk**2)),
-                                        (akinc) * (2/np.pi)**.5 * (x-muk)/(sigk) * np.exp(-(x - muk)**2 / (2 * sigk**2) - alphak**2 * (x-muk)**2 / (2 * sigk**2))
-                                    ])
-
+    partial_F_alphap = np.hstack([(appi) * (2/np.pi)**.5 * (x[non_zero_masks[0]]-mup)/(sigp) * np.exp(-(x[non_zero_masks[0]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[0]]-mup)**2 / (2 * sigp**2)),
+                                    (app) * (2/np.pi)**.5 * (x[non_zero_masks[1]]-mup)/(sigp) * np.exp(-(x[non_zero_masks[1]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[1]]-mup)**2 / (2 * sigp**2)),
+                                    (apk) * (2/np.pi)**.5 * (x[non_zero_masks[2]]-mup)/(sigp) * np.exp(-(x[non_zero_masks[2]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[2]]-mup)**2 / (2 * sigp**2)),
+                                    (apinc) * (2/np.pi)**.5 * (x[non_zero_masks[3]]-mup)/(sigp) * np.exp(-(x[non_zero_masks[3]] - mup)**2 / (2 * sigp**2) - alphap**2 * (x[non_zero_masks[3]]-mup)**2 / (2 * sigp**2))
+                                ])
+    partial_F_alphak = np.hstack([( akpi ) * (2/np.pi)**.5 * (x[non_zero_masks[0]]-muk)/(sigk) * np.exp(-(x[non_zero_masks[0]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[0]]-muk)**2 / (2 * sigk**2)),
+                                (akp) * (2/np.pi)**.5 * (x[non_zero_masks[1]]-muk)/(sigk) * np.exp(-(x[non_zero_masks[1]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[1]]-muk)**2 / (2 * sigk**2)),
+                                    (akk) * (2/np.pi)**.5 * (x[non_zero_masks[2]]-muk)/(sigk) * np.exp(-(x[non_zero_masks[2]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[2]]-muk)**2 / (2 * sigk**2)),
+                                    (akinc) * (2/np.pi)**.5 * (x[non_zero_masks[3]]-muk)/(sigk) * np.exp(-(x[non_zero_masks[3]] - muk)**2 / (2 * sigk**2) - alphak**2 * (x[non_zero_masks[3]]-muk)**2 / (2 * sigk**2))
+                                ])
+  
     cov_mup = pcov[0][0]
     cov_mupi = pcov[1][1]
     cov_muk = pcov[2][2]
