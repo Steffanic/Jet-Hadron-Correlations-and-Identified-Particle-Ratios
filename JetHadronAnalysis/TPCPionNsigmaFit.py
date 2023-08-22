@@ -85,7 +85,7 @@ class FitTPCPionNsigma:
 
     def initializeDatabase(self):
         '''
-        establish connection to the parameter and particle fraction database nnamed PID.db
+        establish connection to the parameter and particle fraction database named PID.db
         '''
         fitting_logger.info("Initializing database")
         self.databaseConnection = sqlite3.connect("PID.db")
