@@ -2,6 +2,7 @@
 # This file contains the class whose responsibility it is to manage the analysis and its configuration 
 
 import numpy as np
+import os
 import uncertainties
 from JetHadronAnalysis.Sparse import TriggerSparse, MixedEventSparse, JetHadronSparse
 from JetHadronAnalysis.Types import AnalysisType, ParticleType, NormalizationMethod, Region, AssociatedHadronMomentumBin
@@ -212,7 +213,7 @@ class Analysis:
         chi2OverNDF = fitter.chi2OverNDF(optimal_params, covariance, x, y, yerr)
 
         if makeIntermediatePlots:
-            self.plotTPCPionNsigmaFit(x, y, yerr, optimal_params, covariance, fitter.fittingFunction, fitter.fittingErrorFunction, fitter.pionFittingFunction, fitter.kaonFittingFunction, fitter.protonFittingFunction, fitter.chi2OverNDF)
+            self.plotTPCPionNsigmaFit(x, y, yerr, optimal_params, covariance, fitter.fittingFunction, fitter.fittingErrorFunction, fitter.pionFittingFunction, fitter.kaonFittingFunction, fitter.protonFittingFunction, fitter.chi2OverNDF, "TPCnSigmaFitPlots")
 
         if  not hasattr(self, "numberOfAssociatedHadronsDictionary"):
             self.fillNumberOfAssociatedHadronsDictionary()
@@ -238,7 +239,14 @@ class Analysis:
         return self.JetHadron.getProjection(self.JetHadron.Axes.PION_TPC_N_SIGMA)
         
 
-    def plotTPCPionNsigmaFit(self, x, y, yerr, optimal_params, covariance, fitFunction, fitErrorFunction, pionFitFunction, kaonFitFunction, protonFitFunction, chi2OverNDFFunction):
+    def plotTPCPionNsigmaFit(self, x, y, yerr, optimal_params, covariance, fitFunction, fitErrorFunction, pionFitFunction, kaonFitFunction, protonFitFunction, chi2OverNDFFunction, save_path=None):
+
+        if save_path is not None:
+            if save_path[-1] != "/":
+                save_path += "/"
+            if not os.path.exists(save_path):
+                os.makedirs(save_path)
+
         y_pion = y[0]
         y_proton = y[1]
         y_kaon = y[2]
@@ -425,10 +433,10 @@ class Analysis:
             "inclusive_kaon": "--",
         }
 
-        plotArrays(x_data_pion, y_data_pion, yerr_data_pion, data_label=data_labels_pion, format_style=format_style_pion, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Pions Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Pion.png")
-        plotArrays(x_data_proton, y_data_proton, yerr_data_proton, data_label=data_labels_proton, format_style=format_style_proton, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Protons Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Proton.png")
-        plotArrays(x_data_kaon, y_data_kaon, yerr_data_kaon, data_label=data_labels_kaon, format_style=format_style_kaon, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Kaons Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Kaon.png")
-        plotArrays(x_data_inclusive, y_data_inclusive, yerr_data_inclusive, data_label=data_labels_inclusive, format_style=format_style_inclusive, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Inclusive Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Inclusive.png")
+        plotArrays(x_data_pion, y_data_pion, yerr_data_pion, data_label=data_labels_pion, format_style=format_style_pion, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Pions Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Pion.png")
+        plotArrays(x_data_proton, y_data_proton, yerr_data_proton, data_label=data_labels_proton, format_style=format_style_proton, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Protons Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Proton.png")
+        plotArrays(x_data_kaon, y_data_kaon, yerr_data_kaon, data_label=data_labels_kaon, format_style=format_style_kaon, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Kaons Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Kaon.png")
+        plotArrays(x_data_inclusive, y_data_inclusive, yerr_data_inclusive, data_label=data_labels_inclusive, format_style=format_style_inclusive, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Inclusive Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Inclusive.png")
 
         # y_fit_pi = pionFitFunction(None, x_fit, *optimal_params[:3])
         # y_fit_k = kaonFitFunction(None, x_fit, *optimal_params[3:6])
