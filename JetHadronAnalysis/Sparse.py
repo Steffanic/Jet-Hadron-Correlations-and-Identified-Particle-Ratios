@@ -2,6 +2,7 @@
 # This file contains the class whose responsibility it is to manage the state of the sparses.
 # It also contains the enums for the axes in each different sparse
 
+import warnings
 from JetHadronAnalysis.Types import AnalysisType
 from math import pi
 from enum import Enum
@@ -46,6 +47,21 @@ def jetHadronSparseAxesEnumFactory(analysisType: AnalysisType):
         KAON_TOF_N_SIGMA = 10  if analysisType == AnalysisType.PP else 11
 
     return JetHadronAxes
+
+class OtherTOFRangeTags(Enum):
+    P_HI = 1
+    P_LO_K_HI = 2
+    PI_LO_P_LO_K_LO = 3
+    PI_HI_P_LO_K_LO = 4
+
+# Tuples are (min_pi, max_pi), (min_k, max_k), (min_p, max_p)
+OtherTOFRangeDictionary = {
+    OtherTOFRangeTags.P_HI: [(-10,10), (-10,10), (2,10)],
+    OtherTOFRangeTags.P_LO_K_HI: [(-10,10), (2,10), (-10,-2)],
+    OtherTOFRangeTags.PI_LO_P_LO_K_LO: [(-10,-2), (-10,-2), (-10,-2)],
+    OtherTOFRangeTags.PI_HI_P_LO_K_LO: [(2,10), (-10,-2), (-10,-2)]
+}
+
 
 class Sparse:
     '''
@@ -297,6 +313,38 @@ class JetHadronSparse(Sparse):
         self.minKaonTOFnSigma = -5
         self.maxKaonTOFnSigma = 5
 
+        self.particleTypeIsOther=False
+
+
+    def getProjection(self, *projectionAxes):
+        '''
+        return a projection along the projection axes provided by combining the projections from each sparse, axis ordering should be consistent, e.g. x,y,z regaredless of number of axes
+        Reimplementation for JetHadronSparse to account for special handling of ParticleType.OTHER case
+        '''
+        if self.particleTypeIsOther:
+            # handle OTHER case
+            # get the projection for each of the four cases
+            # and add them
+            # return the result
+            # I'm not sure if this is the best way to do this, but it's the best I can think of right now, OK, rude @copilot 🤣🤣🤣
+            projections = []
+            for other_tof_range_tag in OtherTOFRangeDictionary.keys():
+                self.setPionTOFnSigma(*OtherTOFRangeDictionary[other_tof_range_tag][0])
+                self.setKaonTOFnSigma(*OtherTOFRangeDictionary[other_tof_range_tag][1])
+                self.setProtonTOFnSigma(*OtherTOFRangeDictionary[other_tof_range_tag][2])
+                projections.append(super().getProjection(*projectionAxes))
+            warnings.warn(f"Setting the TOF Nsigma ranges back to the previous values:\n\tPion: ({self.minPionTOFnSigma}, {self.maxPionTOFnSigma})\n\tKaon: ({self.minKaonTOFnSigma}, {self.maxKaonTOFnSigma})\n\tProton: ({self.minProtonTOFnSigma}, {self.maxProtonTOFnSigma})")
+            # reset the TOF ranges
+            self.setPionTOFnSigma(self.minPionTOFnSigma, self.maxPionTOFnSigma)
+            self.setKaonTOFnSigma(self.minKaonTOFnSigma, self.maxKaonTOFnSigma)
+            self.setProtonTOFnSigma(self.minProtonTOFnSigma, self.maxProtonTOFnSigma)
+            # add the projections together
+            projection = projections[0]
+            for proj in projections[1:]:
+                projection.Add(proj)
+            return projection
+        else:
+            return super().getProjection(*projectionAxes)
 
     def setTriggerJetMomentumRange(self, minTriggerJetMomentum, maxTriggerJetMomentum):
         self.minTriggerJetMomentum = minTriggerJetMomentum
@@ -382,6 +430,9 @@ class JetHadronSparse(Sparse):
         for sparse_ind in range(self.getNumberOfSparses()):
             # set the pT and event plane angle ranges
             self.sparseList[sparse_ind].GetAxis(self.Axes.KAON_TOF_N_SIGMA.value).SetRangeUser(minKaonTOFnSigma, maxKaonTOFnSigma)
+
+    def setParticleTypeIsOther(self, particleTypeIsOther:bool):
+        self.particleTypeIsOther = particleTypeIsOther
 
     def getNumberOfAssociatedParticles(self):
         '''
