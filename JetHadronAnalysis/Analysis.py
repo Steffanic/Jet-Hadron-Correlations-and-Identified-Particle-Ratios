@@ -4,7 +4,7 @@
 import numpy as np
 import uncertainties
 from JetHadronAnalysis.Sparse import TriggerSparse, MixedEventSparse, JetHadronSparse
-from JetHadronAnalysis.Types import AnalysisType, ParticleType, NormalizationMethod
+from JetHadronAnalysis.Types import AnalysisType, ParticleType, NormalizationMethod, Region, AssociatedHadronMomentumBin
 from JetHadronAnalysis.Background import BackgroundFunction
 from JetHadronAnalysis.TPCPionNsigmaFit import FitTPCPionNsigma
 from ROOT import TFile, TH1D # type: ignore
@@ -13,21 +13,7 @@ from math import pi
 
 from JetHadronAnalysis.Plotting import plotArrays
 
-class Region(Enum):
-    NEAR_SIDE_SIGNAL = 1
-    AWAY_SIDE_SIGNAL = 2
-    BACKGROUND_ETAPOS = 3
-    BACKGROUND_ETANEG = 4
-    INCLUSIVE = 5
 
-class AssociatedHadronMomentumBin(Enum):
-    PT_1_15 = 1
-    PT_15_2 = 2
-    PT_2_3 = 3
-    PT_3_4 = 4
-    PT_4_5 = 5
-    PT_5_6 = 6
-    PT_6_10 = 7
     
 regionDeltaPhiRangeDictionary = {
     Region.NEAR_SIDE_SIGNAL: [-pi / 2, pi / 2],
@@ -218,9 +204,9 @@ class Analysis:
         x, y, yerr = FitTPCPionNsigma.prepareData(pionEnhancedTPCnSigma, protonEnhancedTPCnSigma, kaonEnhancedTPCnSigma, inclusiveEnhancedTPCnSigma)
         # fit and extract the optimal fit params
         # start by creating the fitter instance
-        fitter = FitTPCPionNsigma()
+        fitter = FitTPCPionNsigma(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin)
         # initialize the default parameters for the analysis type and current associated hadron momentum bin
-        fitter.initializeDefaultParameters(self.analysisType, self.currentAssociatedHadronMomentumBin)
+        fitter.initializeDefaultParameters()
         optimal_params, covariance = fitter.performFit(x, y, yerr)
 
         chi2OverNDF = fitter.chi2OverNDF(optimal_params, covariance, x, y, yerr)
