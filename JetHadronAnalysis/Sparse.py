@@ -3,7 +3,7 @@
 # It also contains the enums for the axes in each different sparse
 
 import warnings
-from JetHadronAnalysis.Types import AnalysisType
+from JetHadronAnalysis.Types import AnalysisType, regionDeltaEtaRangeDictionary, regionDeltaPhiRangeDictionary, Region, OtherTOFRangeDictionary, OtherTOFRangeTags
 from math import pi
 from enum import Enum
 
@@ -47,20 +47,6 @@ def jetHadronSparseAxesEnumFactory(analysisType: AnalysisType):
         KAON_TOF_N_SIGMA = 10  if analysisType == AnalysisType.PP else 11
 
     return JetHadronAxes
-
-class OtherTOFRangeTags(Enum):
-    P_HI = 1
-    P_LO_K_HI = 2
-    PI_LO_P_LO_K_LO = 3
-    PI_HI_P_LO_K_LO = 4
-
-# Tuples are (min_pi, max_pi), (min_k, max_k), (min_p, max_p)
-OtherTOFRangeDictionary = {
-    OtherTOFRangeTags.P_HI: [(-10,10), (-10,10), (2,10)],
-    OtherTOFRangeTags.P_LO_K_HI: [(-10,10), (2,10), (-10,-2)],
-    OtherTOFRangeTags.PI_LO_P_LO_K_LO: [(-10,-2), (-10,-2), (-10,-2)],
-    OtherTOFRangeTags.PI_HI_P_LO_K_LO: [(2,10), (-10,-2), (-10,-2)]
-}
 
 
 class Sparse:
@@ -314,6 +300,7 @@ class JetHadronSparse(Sparse):
         self.maxKaonTOFnSigma = 5
 
         self.particleTypeIsOther=False
+        self.regionIsBackground=False
 
 
     def getProjection(self, *projectionAxes):
@@ -321,30 +308,51 @@ class JetHadronSparse(Sparse):
         return a projection along the projection axes provided by combining the projections from each sparse, axis ordering should be consistent, e.g. x,y,z regaredless of number of axes
         Reimplementation for JetHadronSparse to account for special handling of ParticleType.OTHER case
         '''
-        if self.particleTypeIsOther:
-            # handle OTHER case
-            # get the projection for each of the four cases
-            # and add them
-            # return the result
-            # I'm not sure if this is the best way to do this, but it's the best I can think of right now, OK, rude @copilot 🤣🤣🤣
-            projections = []
-            for other_tof_range_tag in OtherTOFRangeDictionary.keys():
-                self.setPionTOFnSigma(*OtherTOFRangeDictionary[other_tof_range_tag][0])
-                self.setKaonTOFnSigma(*OtherTOFRangeDictionary[other_tof_range_tag][1])
-                self.setProtonTOFnSigma(*OtherTOFRangeDictionary[other_tof_range_tag][2])
-                projections.append(super().getProjection(*projectionAxes))
-            warnings.warn(f"Setting the TOF Nsigma ranges back to the previous values:\n\tPion: ({self.minPionTOFnSigma}, {self.maxPionTOFnSigma})\n\tKaon: ({self.minKaonTOFnSigma}, {self.maxKaonTOFnSigma})\n\tProton: ({self.minProtonTOFnSigma}, {self.maxProtonTOFnSigma})")
-            # reset the TOF ranges
-            self.setPionTOFnSigma(self.minPionTOFnSigma, self.maxPionTOFnSigma)
-            self.setKaonTOFnSigma(self.minKaonTOFnSigma, self.maxKaonTOFnSigma)
-            self.setProtonTOFnSigma(self.minProtonTOFnSigma, self.maxProtonTOFnSigma)
-            # add the projections together
+        projections = []
+        if self.regionIsBackground:
+            # handle background case
+            # get the projection for Region.BACKGROUND_ETANEG, Region.BACKGROUND_ETAPOS
+            for region in [Region.BACKGROUND_ETANEG, Region.BACKGROUND_ETAPOS]:
+                self.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[region])
+                self.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
+                if self.particleTypeIsOther:
+                    projections += self.getProjectionsForOtherTOFRange(*projectionAxes)
+                else:
+                    projections.append(super().getProjection(*projectionAxes))
+                # add the projections together
+            # reset the delta eta and delta phi ranges
+            warnings.warn(f"Setting the delta eta and delta phi ranges back to the previous values:\n\tDelta Eta: ({self.minDeltaEta}, {self.maxDeltaEta})\n\tDelta Phi: ({self.minDeltaPhi}, {self.maxDeltaPhi})")
+            self.setDeltaEtaRange(self.minDeltaEta, self.maxDeltaEta)
+            self.setDeltaPhiRange(self.minDeltaPhi, self.maxDeltaPhi)
             projection = projections[0]
             for proj in projections[1:]:
                 projection.Add(proj)
             return projection
         else:
-            return super().getProjection(*projectionAxes)
+            # handle non-background case
+            if self.particleTypeIsOther:
+                projections =  self.getProjectionsForOtherTOFRange(*projectionAxes)
+                projection = projections[0]
+                for proj in projections[1:]:
+                    projection.Add(proj)
+                return projection
+            
+        return super().getProjection(*projectionAxes)
+        
+
+    def getProjectionsForOtherTOFRange(self, *projectionAxes):
+        projections = []
+        for other_tof_range_tag in OtherTOFRangeDictionary.keys():
+            self.setPionTOFnSigma(*OtherTOFRangeDictionary[other_tof_range_tag][0])
+            self.setKaonTOFnSigma(*OtherTOFRangeDictionary[other_tof_range_tag][1])
+            self.setProtonTOFnSigma(*OtherTOFRangeDictionary[other_tof_range_tag][2])
+            projections.append(super().getProjection(*projectionAxes))
+        warnings.warn(f"Setting the TOF Nsigma ranges back to the previous values:\n\tPion: ({self.minPionTOFnSigma}, {self.maxPionTOFnSigma})\n\tKaon: ({self.minKaonTOFnSigma}, {self.maxKaonTOFnSigma})\n\tProton: ({self.minProtonTOFnSigma}, {self.maxProtonTOFnSigma})")
+        # reset the TOF ranges
+        self.setPionTOFnSigma(self.minPionTOFnSigma, self.maxPionTOFnSigma)
+        self.setKaonTOFnSigma(self.minKaonTOFnSigma, self.maxKaonTOFnSigma)
+        self.setProtonTOFnSigma(self.minProtonTOFnSigma, self.maxProtonTOFnSigma)
+        return projections
 
     def setTriggerJetMomentumRange(self, minTriggerJetMomentum, maxTriggerJetMomentum):
         self.minTriggerJetMomentum = minTriggerJetMomentum
@@ -433,6 +441,9 @@ class JetHadronSparse(Sparse):
 
     def setParticleTypeIsOther(self, particleTypeIsOther:bool):
         self.particleTypeIsOther = particleTypeIsOther
+    
+    def setRegionIsBackground(self, regionIsBackground:bool):
+        self.regionIsBackground = regionIsBackground
 
     def getNumberOfAssociatedParticles(self):
         '''

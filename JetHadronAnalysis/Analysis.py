@@ -5,7 +5,7 @@ import numpy as np
 import os
 import uncertainties
 from JetHadronAnalysis.Sparse import TriggerSparse, MixedEventSparse, JetHadronSparse
-from JetHadronAnalysis.Types import AnalysisType, ParticleType, NormalizationMethod, Region, AssociatedHadronMomentumBin
+from JetHadronAnalysis.Types import AnalysisType, ParticleType, NormalizationMethod, Region, AssociatedHadronMomentumBin, regionDeltaPhiRangeDictionary, regionDeltaEtaRangeDictionary, regionDeltaPhiBinCountsDictionary, speciesTOFRangeDictionary, associatedHadronMomentumBinRangeDictionary
 from JetHadronAnalysis.Background import BackgroundFunction
 from JetHadronAnalysis.TPCPionNsigmaFit import FitTPCPionNsigma
 from ROOT import TFile, TH1D # type: ignore
@@ -13,49 +13,6 @@ from enum import Enum
 from math import pi
 
 from JetHadronAnalysis.Plotting import plotArrays
-
-
-    
-regionDeltaPhiRangeDictionary = {
-    Region.NEAR_SIDE_SIGNAL: [-pi / 2, pi / 2],
-    Region.AWAY_SIDE_SIGNAL: [pi / 2, 3 * pi / 2],
-    Region.BACKGROUND_ETAPOS: [-pi / 2, pi / 2],
-    Region.BACKGROUND_ETANEG: [-pi / 2, pi / 2],
-    Region.INCLUSIVE: [-pi / 2, 3 * pi / 2]
-}
-
-regionDeltaEtaRangeDictionary = {
-    Region.NEAR_SIDE_SIGNAL: [-0.6, 0.6],
-    Region.AWAY_SIDE_SIGNAL: [-1.2, 1.2],
-    Region.BACKGROUND_ETAPOS: [0.8, 1.2],
-    Region.BACKGROUND_ETANEG: [-1.2, -0.8],
-    Region.INCLUSIVE: [-1.4, 1.4]
-}
-
-regionDeltaPhiBinCountsDictionary = {
-    Region.NEAR_SIDE_SIGNAL: 36,
-    Region.AWAY_SIDE_SIGNAL: 36,
-    Region.BACKGROUND_ETAPOS: 36,
-    Region.BACKGROUND_ETANEG: 36,
-    Region.INCLUSIVE: 72
-}
-
-speciesTOFRangeDictionary = {
-    ParticleType.PION: ([-2,2], [-10,-2], [-10,-2]),#  -10 includes the underflow bin
-    ParticleType.KAON: ([-10,10], [-2,2], [-10,-2]),
-    ParticleType.PROTON: ([-10,10], [-10,10], [-2,2]),
-    ParticleType.INCLUSIVE: ([-10,10], [-10,10], [-10,10]),
-}
-
-associatedHadronMomentumBinRangeDictionary = {
-    AssociatedHadronMomentumBin.PT_1_15: (1, 1.5),
-    AssociatedHadronMomentumBin.PT_15_2: (1.5, 2),
-    AssociatedHadronMomentumBin.PT_2_3: (2, 3),
-    AssociatedHadronMomentumBin.PT_3_4: (3, 4),
-    AssociatedHadronMomentumBin.PT_4_5: (4, 5),
-    AssociatedHadronMomentumBin.PT_5_6: (5, 6),
-    AssociatedHadronMomentumBin.PT_6_10: (6, 10),
-}
 
 
 class Analysis:
@@ -97,10 +54,14 @@ class Analysis:
         Sets the delta-phi and delta-eta ranges for the JetHadron sparse 
         '''
         self.currentRegion = region
-        self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
-        self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[region])
-        if hasattr(self, "numberOfAssociatedHadronsDictionary"):
-            self.fillNumberOfAssociatedHadronsDictionary()
+        if region == Region.BACKGROUND:
+            self.JetHadron.setRegionIsBackground(True)
+        else:
+            self.JetHadron.setRegionIsBackground(False)
+            self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
+            self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[region])
+            if hasattr(self, "numberOfAssociatedHadronsDictionary"):
+                self.fillNumberOfAssociatedHadronsDictionary()
 
     def setAssociatedHadronMomentumBin(self, associatedHadronMomentumBin: AssociatedHadronMomentumBin):
         '''
@@ -246,6 +207,8 @@ class Analysis:
                 save_path += "/"
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
+            if not os.path.exists(f"{save_path}{self.currentAssociatedHadronMomentumBin.name}"):
+                os.makedirs(f"{save_path}{self.currentAssociatedHadronMomentumBin.name}")
 
         y_pion = y[0]
         y_proton = y[1]
@@ -433,10 +396,10 @@ class Analysis:
             "inclusive_kaon": "--",
         }
 
-        plotArrays(x_data_pion, y_data_pion, yerr_data_pion, data_label=data_labels_pion, format_style=format_style_pion, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Pions Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Pion.png")
-        plotArrays(x_data_proton, y_data_proton, yerr_data_proton, data_label=data_labels_proton, format_style=format_style_proton, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Protons Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Proton.png")
-        plotArrays(x_data_kaon, y_data_kaon, yerr_data_kaon, data_label=data_labels_kaon, format_style=format_style_kaon, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Kaons Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Kaon.png")
-        plotArrays(x_data_inclusive, y_data_inclusive, yerr_data_inclusive, data_label=data_labels_inclusive, format_style=format_style_inclusive, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Inclusive Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Inclusive.png")
+        plotArrays(x_data_pion, y_data_pion, yerr_data_pion, data_label=data_labels_pion, format_style=format_style_pion, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Pions Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Pion.png")
+        plotArrays(x_data_proton, y_data_proton, yerr_data_proton, data_label=data_labels_proton, format_style=format_style_proton, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Protons Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Proton.png")
+        plotArrays(x_data_kaon, y_data_kaon, yerr_data_kaon, data_label=data_labels_kaon, format_style=format_style_kaon, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Kaons Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Kaon.png")
+        plotArrays(x_data_inclusive, y_data_inclusive, yerr_data_inclusive, data_label=data_labels_inclusive, format_style=format_style_inclusive, error_bands=None, error_bands_label=None, title=f"TPC nSigma Fit - Inclusive Chi^2/NDF = {chi2OverNDF}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Inclusive.png")
 
         # y_fit_pi = pionFitFunction(None, x_fit, *optimal_params[:3])
         # y_fit_k = kaonFitFunction(None, x_fit, *optimal_params[3:6])
