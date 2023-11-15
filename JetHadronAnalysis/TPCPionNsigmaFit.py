@@ -3,7 +3,7 @@ import numpy as np
 import uncertainties
 import sqlite3
 from JetHadronAnalysis.Types import AnalysisType, ParticleType, Region, AssociatedHadronMomentumBin
-from JetHadronAnalysis.Fitting.TPCnSigmaFitting import piKpInc_generalized_fit, piKpInc_generalized_error, piKpInc_generalized_jac, upiKpInc_generalized_fit, gauss, generalized_gauss, ugauss, ugeneralized_gauss
+from JetHadronAnalysis.Fitting.TPCnSigmaFitting import piKpInc_generalized_fit, Inc_generalized_fit, piKpInc_generalized_error, piKpInc_generalized_jac, upiKpInc_generalized_fit, gauss, generalized_gauss, ugauss, ugeneralized_gauss
 
 import scipy.optimize as opt
 from functools import partial
@@ -24,6 +24,7 @@ class FitTPCPionNsigma:
         self.initial_parameters = None
         self.bounds = None
         self.fittingFunction = piKpInc_generalized_fit
+        self.yieldFittingFunction = Inc_generalized_fit
         self.fittingErrorFunction = piKpInc_generalized_error
         self.pionFittingFunction = gauss
         self.protonFittingFunction = generalized_gauss
@@ -44,23 +45,32 @@ class FitTPCPionNsigma:
     def initializeDefaultParameters(self):
         if self.analysisType==AnalysisType.PP:
             inclusive_p0 = [8,100,12]
+            if self.current_region==Region.BACKGROUND:
+                inclusive_p0 = [0.8, 10, 1.2]
             inclusive_bounds = [[0,0,0],[100000,100000,100000]]
 
             generalized_p0 = [0.1, 0.1]
-            generalized_bounds = [[-6, -6], [6, 6]]
+            generalized_bounds = [[-4, -4], [4, 4]]
             if self.current_associated_hadron_momentum_bin.value==1:
                 p0 = [2.5, 0, -.5, 0.5, 0.5, 0.5, 100,100, 0.11, 10,100, 10, 0.11,100, 100]+inclusive_p0 + generalized_p0
-                bounds = [[-6, -0.1, -6, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [6, 0.1, 6, 100.0, 100.0, 100.0, 100000,100000,10,100000,100000,100000,10,100000,100000]]
+                if self.current_region==Region.BACKGROUND:
+                    p0 = [2.5, 0, -.5, 0.5, 0.5, 0.5, 10,10, 0.11, 1,10, 1, 0.11,10, 10]+inclusive_p0 + generalized_p0
+                bounds = [[-6, -0.05, -6, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [6, 0.05, 6, 100.0, 100.0, 100.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
                 
                 bounds = [bounds[0]+inclusive_bounds[0] + generalized_bounds[0], bounds[1]+inclusive_bounds[1] + generalized_bounds[1]]
-            elif self.current_associated_hadron_momentum_bin.value>1 and self.current_associated_hadron_momentum_bin.value<5:
+
+            elif self.current_associated_hadron_momentum_bin.value>1 and self.current_associated_hadron_momentum_bin.value<4:
                 p0 = [-1.0, 0, -2.5, 0.5, 0.5, 0.5, 100,100, 0.11, 10,100, 10, 0.11,100, 100] + inclusive_p0+ generalized_p0
-                bounds = [[-6, -0.1, -6, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [0, 0.1, 0, 100.0, 100.0, 100.0, 100000,100000,10,100000,100000,100000,10,100000,100000]]
+                if self.current_region==Region.BACKGROUND:
+                    p0 = [-1.0, 0, -2.5, 0.5, 0.5, 0.5, 10,10, 0.11, 1,10, 1, 0.11,10, 10] + inclusive_p0+ generalized_p0
+                bounds = [[-6, -0.05, -6, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [0, 0.05, 0, 100.0, 100.0, 100.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
                 
                 bounds = [bounds[0]+inclusive_bounds[0]+ generalized_bounds[0], bounds[1]+inclusive_bounds[1] + generalized_bounds[1]]
             else:
                 p0 = [-3.5, 0, -2.5, 0.5, 0.5, 0.5, 100,100, 0.11, 10,100, 10, 0.11,100, 100] + inclusive_p0+ generalized_p0
-                bounds = [[-6, -0.1, -6, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [0, 0.1, 0, 100.0, 100.0, 100.0, 100000,100000,10000,100000,100000,100000,10000,100000,100000]]
+                if self.current_region==Region.BACKGROUND:
+                    p0 = [-3.5, 0, -2.5, 0.5, 0.5, 0.5, 10,10, 0.11, 1,10, 1, 0.11,10, 10] + inclusive_p0+ generalized_p0
+                bounds = [[-6, -0.05, -6, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [0, 0.05, 0, 100.0, 100.0, 100.0, 100000,100000,10000,100000,100000,100000,10000,100000,100000]]
                 
                 bounds = [bounds[0]+inclusive_bounds[0] + generalized_bounds[0], bounds[1]+inclusive_bounds[1]+ generalized_bounds[1]]
         else:
@@ -70,12 +80,17 @@ class FitTPCPionNsigma:
             generalized_p0 = [0.5, 0.1]
             generalized_bounds = [[-6, -6], [6, 6]]
             if self.current_associated_hadron_momentum_bin.value==1:
-                p0 = [3.0, 0.0, -2.0,  0.5, 0.5, 0.5, 1000,2000, 100, 100,10000, 100, 100,1000, 1000] + inclusive_p0+ generalized_p0
+                p0 = [3.0, 0.0, -2.0,  1.5, 1.5, 1.5, 1000,2000, 100, 100,10000, 100, 100,1000, 1000] + inclusive_p0+ generalized_p0
+                bounds = [[-5.0, -0.5, -5.0, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [5.0, 0.5, 5.0, 10.0, 10.0, 10.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
+                
+                bounds = [bounds[0]+inclusive_bounds[0] + generalized_bounds[0], bounds[1]+inclusive_bounds[1]+ generalized_bounds[1]]
+            if self.current_associated_hadron_momentum_bin.value>5:
+                p0 = [3.0, 0.0, -2.0,  1.5, 1.5, 1.5, 10,20, 1, 1,100, 1, 1,10, 10] + inclusive_p0+ generalized_p0
                 bounds = [[-5.0, -0.5, -5.0, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [5.0, 0.5, 5.0, 10.0, 10.0, 10.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
                 
                 bounds = [bounds[0]+inclusive_bounds[0] + generalized_bounds[0], bounds[1]+inclusive_bounds[1]+ generalized_bounds[1]]
             else:
-                p0 = [-1.0, 0.0, 1.0,  0.5, 0.5, 0.5, 100,100, 1.1, 10,100, 10, 1.1,100, 100] + inclusive_p0+ generalized_p0
+                p0 = [-1.0, 0.0, 1.0,  1.5, 1.5, 1.5, 100,100, 1.1, 10,100, 10, 1.1,100, 100] + inclusive_p0+ generalized_p0
                 bounds = [[-1.5, -0.5, -1.5, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [1.5, 0.5, 1.5, 10.0, 10.0, 10.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
                 
                 bounds = [bounds[0]+inclusive_bounds[0]+generalized_bounds[0], bounds[1]+inclusive_bounds[1]+generalized_bounds[1]]
@@ -112,7 +127,7 @@ class FitTPCPionNsigma:
 
         return x, y, yerr
 
-    def performFit(self, x:np.ndarray, y:List[np.ndarray], yerr:List[np.ndarray]):
+    def performShapeFit(self, x:np.ndarray, y:List[np.ndarray], yerr:List[np.ndarray]):
         non_zero_masks = [y[i] != 0 for i in range(len(y))]
 
         y = [y[i][non_zero_masks[i]] for i in range(len(y))]
@@ -131,6 +146,31 @@ class FitTPCPionNsigma:
             cursor.execute("REPLACE INTO fit_parameters VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (self.analysisType.name, self.current_region.name, self.current_associated_hadron_momentum_bin.value, reduced_chi2, mupi.n, mup.n, muk.n, sigpi.n, sigp.n, sigk.n, alphap.n, alphak.n, apipi.n, appi.n, akpi.n, apip.n, app.n, akp.n, apik.n, apk.n, akk.n, apiinc.n, apinc.n, akinc.n, mupi.s, mup.s, muk.s, sigpi.s, sigp.s, sigk.s, alphap.s, alphak.s, apipi.s, appi.s, akpi.s, apip.s, app.s, akp.s, apik.s, apk.s, akk.s, apiinc.s, apinc.s, akinc.s))
             self.databaseConnection.commit()
         return final_parameters, covariance
+    
+    def performYieldFit(self, x:np.ndarray, y:np.ndarray, yerr:np.ndarray, optimal_parameters:np.ndarray):
+        non_zero_mask = (y != 0)
+
+        y = y[non_zero_mask]
+
+        yerr = yerr[non_zero_mask] 
+
+        mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = optimal_parameters
+        #breakpoint()
+        initialYieldParameters = apinc, apiinc, akinc
+        final_parameters, covariance = opt.curve_fit(partial(self.yieldFittingFunction, non_zero_mask, mup, mupi, muk, sigp, sigpi, sigk, alphap, alphak), x, y, p0=initialYieldParameters, sigma=yerr, bounds=(self.bounds[0][-5:-2], self.bounds[1][-5:-2]), absolute_sigma=True, maxfev=10000000)
+        # fitting_logger.info(f"Fit parameters: {final_parameters}")
+        # fitting_logger.info(f"Fit covariance: {covariance}")
+        apinc, apiinc, akinc = uncertainties.correlated_values(final_parameters, covariance)
+        y_fit = self.yieldFittingFunction(non_zero_mask, mup, mupi, muk, sigp, sigpi, sigk, alphap, alphak,x, *final_parameters)
+        reduced_chi2 = np.sum((y-y_fit)**2/yerr**2)/(len(x)-len(final_parameters)) 
+
+        if self.databaseConnection is not None:
+            cursor = self.databaseConnection.cursor()
+            cursor.execute("UPDATE fit_parameters SET inclusive_pion_fraction=?, inclusive_proton_fraction=?, inclusive_kaon_fraction=?, inclusive_pion_fraction_error=?, inclusive_proton_fraction_error=?, inclusive_kaon_fraction_error=? WHERE analysis_type=? AND region=? AND momentum_bin=? ", (apiinc.n, apinc.n, akinc.n, apiinc.s, apinc.s, akinc.s, self.analysisType.name, self.current_region.name, self.current_associated_hadron_momentum_bin.value))
+            self.databaseConnection.commit()
+
+        return final_parameters, covariance, reduced_chi2
+
     
     def chi2OverNDF(self, optimal_params, covariance, x, y, yerr, non_zero_masks=None):
         '''
@@ -201,4 +241,4 @@ class FitTPCPionNsigma:
             cursor.execute("REPLACE INTO particle_fractions VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", (self.analysisType.name, self.current_region.name, self.current_associated_hadron_momentum_bin.value, pionFraction.n, protonFraction.n, kaonFraction.n, pionFraction.s, protonFraction.s, kaonFraction.s))
             self.databaseConnection.commit()
 
-        return [pionFraction.n, protonFraction.n, kaonFraction.n], [pionFraction.s, protonFraction.s, kaonFraction.s]
+        return {ParticleType.PION: pionFraction.n, ParticleType.PROTON:protonFraction.n, ParticleType.KAON:kaonFraction.n}, {ParticleType.PION:pionFraction.s, ParticleType.PROTON:protonFraction.s, ParticleType.KAON:kaonFraction.s}

@@ -1,4 +1,5 @@
 from math import pi
+import sqlite3
 from JetHadronAnalysis.Analysis import Analysis, Region, AssociatedHadronMomentumBin
 from JetHadronAnalysis.Types import AnalysisType
 from JetHadronAnalysis.Types import NormalizationMethod as nm
@@ -50,26 +51,8 @@ def test_getParticleFractionsSubRegions(analysis):
 @pytest.mark.parametrize("analysis", [lazy_fixture("analysis_pp"), lazy_fixture("analysis_PbPb")])
 def test_getPerSpeciesAzimuthalCorrelationFunctions(analysis):
     analysis.setAssociatedHadronMomentumBin(AssociatedHadronMomentumBin.PT_2_3)
-    # first get the particle fractions for each region 
-    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
-    near_side_particle_fractions, near_side_particle_fraction_errors, chi2OverNDF = analysis.getPIDFractions(makeIntermediatePlots=True)
-    logging.info(f"{near_side_particle_fractions=}")
-    logging.info(f"{near_side_particle_fraction_errors=}")
+    # get the database connection
 
-    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
-    away_side_particle_fractions, away_side_particle_fraction_errors, chi2OverNDF = analysis.getPIDFractions(makeIntermediatePlots=True)
-    logging.info(f"{away_side_particle_fractions=}")
-    logging.info(f"{away_side_particle_fraction_errors=}")
-
-    analysis.setRegion(Region.BACKGROUND_ETANEG)
-    background_eta_neg_particle_fractions, background_eta_neg_particle_fraction_errors, chi2OverNDF = analysis.getPIDFractions(makeIntermediatePlots=True)
-    logging.info(f"{background_eta_neg_particle_fractions=}")
-    logging.info(f"{background_eta_neg_particle_fraction_errors=}")
-
-    analysis.setRegion(Region.BACKGROUND_ETAPOS)
-    background_eta_pos_particle_fractions, background_eta_pos_particle_fraction_errors, chi2OverNDF = analysis.getPIDFractions(makeIntermediatePlots=True)
-    logging.info(f"{background_eta_pos_particle_fractions=}")
-    logging.info(f"{background_eta_pos_particle_fraction_errors=}")
 
     # now get the azimuthal correlation functions for each region
     analysis.setRegion(Region.NEAR_SIDE_SIGNAL)

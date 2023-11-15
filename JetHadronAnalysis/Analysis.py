@@ -1,18 +1,24 @@
 # © Patrick John Steffanic 2023
 # This file contains the class whose responsibility it is to manage the analysis and its configuration 
 
+import sqlite3
 import numpy as np
 import os
 import uncertainties
 from JetHadronAnalysis.Sparse import TriggerSparse, MixedEventSparse, JetHadronSparse
-from JetHadronAnalysis.Types import AnalysisType, ParticleType, NormalizationMethod, Region, AssociatedHadronMomentumBin, regionDeltaPhiRangeDictionary, regionDeltaEtaRangeDictionary, regionDeltaPhiBinCountsDictionary, speciesTOFRangeDictionary, associatedHadronMomentumBinRangeDictionary
+from JetHadronAnalysis.Types import AnalysisType, ParticleType, NormalizationMethod, Region, TriggerJetMomentumBin, AssociatedHadronMomentumBin, ReactionPlaneBin, regionDeltaPhiRangeDictionary, regionDeltaEtaRangeDictionary, regionDeltaPhiBinCountsDictionary, speciesTOFRangeDictionary, triggerJetMomentumBinRangeDictionary, associatedHadronMomentumBinRangeDictionary, eventPlaneAngleBinRangeDictionary
 from JetHadronAnalysis.Background import BackgroundFunction
 from JetHadronAnalysis.TPCPionNsigmaFit import FitTPCPionNsigma
+from JetHadronAnalysis.RPFFit import RPFFit
+from JetHadronAnalysis.Fitting.RPF import resolution_parameters
+
 from ROOT import TFile, TH1D # type: ignore
 from enum import Enum
 from math import pi
 
 from JetHadronAnalysis.Plotting import plotArrays
+from JetHadronAnalysis.PIDDB import getParticleFractionByMomentum, getParticleFractionForMomentumBin
+from JetHadronAnalysis.RPFDB import getParameterByTriggerAndHadronMomentumForParticleSpecies, getParameters, getParameterErrors
 
 
 class Analysis:
@@ -29,9 +35,18 @@ class Analysis:
 
         self.currentRegion = Region.INCLUSIVE
 
+        self.currentTriggerJetMomentumBin = TriggerJetMomentumBin.PT_20_40
+
         self.currentAssociatedHadronMomentumBin = AssociatedHadronMomentumBin.PT_1_15
 
         self.current_species=ParticleType.INCLUSIVE
+
+        # make some dictionaries to keep track of the number of triger jets and associated hadrons in each region
+        self.numberOfTriggerJets = {}
+        self.numberOfAssociatedHadrons = {}
+
+        if self.analysisType != AnalysisType.PP:
+            self.reactionPlaneAngle = ReactionPlaneBin.INCLUSIVE
 
         for rootFileName in rootFileNames:
             self.fillSparsesFromFile(rootFileName)
@@ -63,6 +78,15 @@ class Analysis:
             if hasattr(self, "numberOfAssociatedHadronsDictionary"):
                 self.fillNumberOfAssociatedHadronsDictionary()
 
+    def setTriggerJetMomentumBin(self, triggerJetMomentumBin: TriggerJetMomentumBin):
+        '''
+        Sets the trigger jet momentum bin for the JetHadron sparse
+        '''
+        self.currentTriggerJetMomentumBin = triggerJetMomentumBin
+        self.JetHadron.setTriggerJetMomentumRange(*triggerJetMomentumBinRangeDictionary[triggerJetMomentumBin])
+        if hasattr(self, "numberOfAssociatedHadronsDictionary"):
+            self.fillNumberOfAssociatedHadronsDictionary()
+
     def setAssociatedHadronMomentumBin(self, associatedHadronMomentumBin: AssociatedHadronMomentumBin):
         '''
         Sets the associated hadron momentum bin for the JetHadron sparse
@@ -84,6 +108,15 @@ class Analysis:
             self.JetHadron.setPionTOFnSigma(*speciesTOFRangeDictionary[species][0])
             self.JetHadron.setKaonTOFnSigma(*speciesTOFRangeDictionary[species][1])
             self.JetHadron.setProtonTOFnSigma(*speciesTOFRangeDictionary[species][2])
+
+    def setReactionPlaneAngleBin(self, reactionPlaneAngle: ReactionPlaneBin):
+        '''
+        Sets the reaction plane angle bin for the JetHadron sparse
+        '''
+        self.reactionPlaneAngle = reactionPlaneAngle
+        self.JetHadron.setEventPlaneAngleRange(*eventPlaneAngleBinRangeDictionary[reactionPlaneAngle])
+        if hasattr(self, "numberOfAssociatedHadronsDictionary"):
+            self.fillNumberOfAssociatedHadronsDictionary()
 
     def getDifferentialCorrelationFunction(self, per_trigger_normalized=False):
         '''
@@ -131,32 +164,165 @@ class Analysis:
         acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction.Add(backgroundFunction)
         return acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction
 
+    def getAzimuthalCorrelationFunctionforParticleType(self, species: ParticleType, acceptanceCorrectedAzimuthalCorrelationFunction: TH1D, loadFractionsFromDB=False):
+        '''
+        Gets the particle fractions and scales the acceptance corrected azimuthal correlation function by the particle fraction for the specified species
+        '''
+
+        particle_fractions, particle_fraction_errors, chi2OverNDF_shape, Chi2OverNDF_yield = self.getPIDFractions(loadFractionsFromDB=loadFractionsFromDB)
+        
+        # now get the per species azimuthal correlation functions for each region by scaling
+        species_azimuthal_correlation_function = acceptanceCorrectedAzimuthalCorrelationFunction.Clone()
+        species_azimuthal_correlation_function.Scale(particle_fractions[species])
+        error_band = acceptanceCorrectedAzimuthalCorrelationFunction.Clone()
+        error_band.Scale(particle_fraction_errors[species])
+        # convert errorbands into numpy arrays of bin contents
+        sys_errors = np.array([error_band.GetBinContent(i) for i in range(1, error_band.GetNbinsX()+1)])
+        # reset the errors for species_azimuthal_correlation_function to add the statistical errors and systematic errors in quadrature
+        for i in range(1, species_azimuthal_correlation_function.GetNbinsX()+1):
+            species_azimuthal_correlation_function.SetBinError(i, np.sqrt(species_azimuthal_correlation_function.GetBinError(i)**2 + sys_errors[i-1]**2))
+        
+
+        return species_azimuthal_correlation_function
+        
+    def getYieldFromAzimuthalCorrelationFunction(self, azimuthalCorrelationFunction: TH1D):
+        '''
+        Returns the yield from the azimuthal correlation function
+        '''
+        # scale by  the bin width
+        # but first clone it 
+        azimuthalCorrelationFunction = azimuthalCorrelationFunction.Clone()
+        azimuthalCorrelationFunction.Scale(self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI))
+        yield_ = azimuthalCorrelationFunction.Integral()
+        error_ = np.sqrt(np.sum([azimuthalCorrelationFunction.GetBinError(i)**2 for i in range(1, azimuthalCorrelationFunction.GetNbinsX()+1)]))
+        return yield_, error_
+
     def getNormalizedDifferentialMixedEventCorrelationFunction(self, normMethod: NormalizationMethod, **kwargs):
         '''
         Returns the differential mixed event correlation function
         '''
-        mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+        if "TOF" in kwargs:
+            if kwargs['TOF']:
+                self.MixedEvent.sethasTOF(True)
+                mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+            else:
+                mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
         mixedEventCorrelationFunction.Scale(1 / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_PHI) / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_ETA))
 
         normalization_factor = self.computeMixedEventNormalizationFactor(mixedEventCorrelationFunction, normMethod, **kwargs)
 
-        self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[self.currentRegion])
-        self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[self.currentRegion])
-        mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
-        self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
-        self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+        if kwargs.get("customRegion", None) is not None:
+            customRegion = kwargs.get("customRegion")
+            self.MixedEvent.setDeltaPhiRange(*customRegion["DeltaPhi"])
+            self.MixedEvent.setDeltaEtaRange(*customRegion["DeltaEta"])
+            mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+            self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
+            self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+        else:
+            if self.currentRegion == Region.BACKGROUND:
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETANEG])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETANEG])
+                mixedEventCorrelationFunction_etaneg = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETAPOS])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETAPOS])
+                mixedEventCorrelationFunction_etapos = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+                mixedEventCorrelationFunction = mixedEventCorrelationFunction_etaneg.Clone()
+                mixedEventCorrelationFunction.Add(mixedEventCorrelationFunction_etapos)
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+            else:
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[self.currentRegion])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[self.currentRegion])
+                mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
         mixedEventCorrelationFunction.Scale(1 / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_PHI) / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_ETA))
         mixedEventCorrelationFunction.Scale(1 / normalization_factor)
         return mixedEventCorrelationFunction
     
-    def getPIDFractions(self, makeIntermediatePlots=True):
+    def getRPInclusiveBackgroundCorrelationFunctionUsingRPF(self, inPlaneCorrelationFunction: TH1D, midPlaneCorrelationFunction: TH1D, outPlaneCorrelationFunction: TH1D, loadFunctionFromDB=False):
         '''
+        Returns the background correlation function using the RPF method
+
+        Check if the background function has already been computed and stored in the database
+        If not, compute it and store it in the database
+
+        Returns:
+            backgroundCorrelationFunction (TH1D): The background correlation function with the same binning as the in-plane, mid-plane, and out-of-plane correlation functions
+        '''
+        # create a fitter instance
+        fitter = RPFFit(self.analysisType, self.currentTriggerJetMomentumBin, self.currentAssociatedHadronMomentumBin, self.current_species)
+
+        if loadFunctionFromDB:
+            print("Loading RPF background from DB")
+            # get the background function from the database
+            optimal_params, covariance, reduced_chi2 = self.getRPFParamsAndErrorFromDB()
+        else:
+            fitter.setDefaultParameters()
+
+            # prepare the data for fitting
+            x, y, yerr = RPFFit.prepareData(inPlaneCorrelationFunction, midPlaneCorrelationFunction, outPlaneCorrelationFunction)
+
+            # fit and extract the optimal fit params
+            optimal_params, covariance, reduced_chi2 = fitter.performFit(x, y, yerr)
+            
+        # build the background function with the same binning as the correlation functions
+        x_background = np.array([inPlaneCorrelationFunction.GetBinCenter(i) for i in range(1, inPlaneCorrelationFunction.GetNbinsX()+1)])
+        backgroundCorrelationFunction = TH1D("backgroundCorrelationFunction", "backgroundCorrelationFunction", len(x_background), x_background[0], x_background[-1])
+        backgroundContent = fitter.fittingFunction(None, *resolution_parameters[self.analysisType].values(), x_background, *optimal_params)
+        backgroundError = fitter.fittingErrorFunction(None, *resolution_parameters[self.analysisType].values(), x_background, *optimal_params, pcov=covariance)
+
+        inPlaneContent = backgroundContent[:len(x_background)]
+        midPlaneContent = backgroundContent[len(x_background):2*len(x_background)]
+        outPlaneContent = backgroundContent[2*len(x_background):]
+        inclusiveContent = inPlaneContent + midPlaneContent + outPlaneContent
+
+        inPlaneError = backgroundError[:len(x_background)]
+        midPlaneError = backgroundError[len(x_background):2*len(x_background)]
+        outPlaneError = backgroundError[2*len(x_background):]
+        inclusiveError = np.sqrt(inPlaneError**2 + midPlaneError**2 + outPlaneError**2)
+        # fill the background function with the optimal params
+        for i in range(len(x_background)):
+            backgroundCorrelationFunction.SetBinContent(i+1, inclusiveContent[i])
+            backgroundCorrelationFunction.SetBinError(i+1, inclusiveError[i])
+        return backgroundCorrelationFunction
+
+
+
+    def getRPFParamsAndErrorFromDB(self):
+        # get a db connection
+        conn = sqlite3.connect("RPF.db")
+        dbCursor = conn.cursor()
+        # get the optimal paams and their errors from the database
+        optimal_params = getParameters(self.analysisType, self.currentTriggerJetMomentumBin, self.currentAssociatedHadronMomentumBin, self.current_species, dbCursor)
+        # get the optimal params errors from the database
+        param_errors, covariance = getParameterErrors(self.analysisType, self.currentTriggerJetMomentumBin, self.currentAssociatedHadronMomentumBin, self.current_species, dbCursor)
+        # close the connection
+        conn.close()
+        reduced_chi2 = optimal_params[-1]
+        # convert the optimal params and their errors to numpy arrays
+        optimal_params = np.array(optimal_params[:-1])
+        return optimal_params, covariance, reduced_chi2
+
+
+    def getPIDFractions(self, makeIntermediatePlots=True, loadFractionsFromDB=False):
+        '''
+        First checks if the PID fractions have already been computed and stored in the database
+        If not, computes them and stores them in the database
         Prepares the projections for each enhanced species
         Converts them into arrays for fitting
         Fits and Extracts the optimal fit params
         Computes the PID fractions
         Returns the PID fractions
         '''
+        if loadFractionsFromDB:
+            print("Loading particle fractions from database")
+            # get the particle fractions from the database
+            particle_fractions, particle_fraction_errors = self.getParticleFractionsFromDB()
+            return particle_fractions, particle_fraction_errors, None
+        # set the region to inclusive to fit the shape parameters first saving the current region to reset it later
+        currentRegion = self.currentRegion
+        self.setRegion(Region.INCLUSIVE)
         # get the projections
         pionEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PION)
         protonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PROTON)
@@ -169,19 +335,58 @@ class Analysis:
         fitter = FitTPCPionNsigma(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin)
         # initialize the default parameters for the analysis type and current associated hadron momentum bin
         fitter.initializeDefaultParameters()
-        optimal_params, covariance = fitter.performFit(x, y, yerr)
+        optimal_params, covariance = fitter.performShapeFit(x, y, yerr)
 
-        chi2OverNDF = fitter.chi2OverNDF(optimal_params, covariance, x, y, yerr)
-
+        chi2OverNDF_shape = fitter.chi2OverNDF(optimal_params, covariance, x, y, yerr)
         if makeIntermediatePlots:
             self.plotTPCPionNsigmaFit(x, y, yerr, optimal_params, covariance, fitter.fittingFunction, fitter.fittingErrorFunction, fitter.pionFittingFunction, fitter.kaonFittingFunction, fitter.protonFittingFunction, fitter.chi2OverNDF, "TPCnSigmaFitPlots")
+        # now set the region back to what it was before so we can fit the inclusive yield
+        self.setRegion(currentRegion)
+        # get the inclusive yield
+
+        pionEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PION)
+        protonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PROTON)
+        kaonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.KAON)
+        inclusiveEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.INCLUSIVE)
+
+        x, y, yerr = FitTPCPionNsigma.prepareData(pionEnhancedTPCnSigma, protonEnhancedTPCnSigma, kaonEnhancedTPCnSigma, inclusiveEnhancedTPCnSigma)
+
+        x_inc = x
+        y_inc = y[3]
+        yerr_inc = yerr[3]
+
+        optimal_inclusive_yield_parameters, covariance_inclusive_yield, reducedChi2_yield  = fitter.performYieldFit(x_inc, y_inc, yerr_inc, optimal_params)
+
+        mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = optimal_params
+        apinc, apiinc, akinc = optimal_inclusive_yield_parameters
+        optimal_params = mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak
+        covariance[-5:-2, -5:-2] = covariance_inclusive_yield # overwrite the covariance matrix with the covariance matrix from the inclusive yield fit
+
 
         if  not hasattr(self, "numberOfAssociatedHadronsDictionary"):
             self.fillNumberOfAssociatedHadronsDictionary()
+        
+        
         # compute the PID fractions
-        pid_fractions, pid_fraction_errors = fitter.computeAveragePIDFractions(optimal_params, covariance, self.numberOfAssociatedHadronsDictionary)
+        pid_fractions, pid_fraction_errors = fitter.computeAveragePIDFractions(optimal_params, covariance, self.numberOfAssociatedHadronsBySpecies)
 
-        return pid_fractions, pid_fraction_errors, chi2OverNDF
+        return pid_fractions, pid_fraction_errors, chi2OverNDF_shape, reducedChi2_yield
+
+    def getParticleFractionsFromDB(self):
+        '''
+        Gets the particle fractions from the database
+        '''
+        conn = sqlite3.connect("PID.db")
+        dbCursor = conn.cursor()
+        particle_fractions = {}
+        particle_fraction_errors = {}
+        for species in ParticleType:
+            if species is ParticleType.OTHER or species is ParticleType.INCLUSIVE:
+                continue
+
+            particle_fractions[species], particle_fraction_errors[species] = getParticleFractionForMomentumBin(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin, species, dbCursor)[0]
+        conn.close()
+        return particle_fractions, particle_fraction_errors
 
     def getEnhancedTPCnSigmaProjection(self, species: ParticleType):
         '''
@@ -410,7 +615,7 @@ class Analysis:
         Returns the normalization factor for the mixed event correlation function
         '''
         if normMethod == NormalizationMethod.SLIDING_WINDOW:
-            return self.computeSlidingWindowNormalizationFactor(mixedEventCorrelationFunction=mixedEventCorrelationFunction, **kwargs)
+            return self.computeSlidingWindowNormalizationFactor(mixedEventCorrelationFunction=mixedEventCorrelationFunction, windowSize=kwargs.get("windowSize", pi))
         elif normMethod == NormalizationMethod.MAX:
             return self.computeMaxNormalizationFactor(mixedEventCorrelationFunction=mixedEventCorrelationFunction)
         else:
@@ -518,23 +723,27 @@ class Analysis:
         '''
         Returns a dictionary of the number of associated hadrons in current associated hadron momentum bin
         '''
-        self.numberOfAssociatedHadronsDictionary = {}
+        self.numberOfAssociatedHadronsBySpecies = {}
         for species in ParticleType:
             self.setParticleSelectionForJetHadron(species)
-            self.numberOfAssociatedHadronsDictionary[species] = self.getNumberOfAssociatedParticles()
+            self.numberOfAssociatedHadronsBySpecies[species] = self.getNumberOfAssociatedParticles()
         self.setParticleSelectionForJetHadron(self.current_species)
 
     def getNumberOfAssociatedParticles(self):
         '''
         Returns the number of associated particles
         '''
-        return self.JetHadron.getNumberOfAssociatedParticles()
+        if repr(self.JetHadron) not in self.numberOfAssociatedHadrons:
+            self.numberOfAssociatedHadrons[repr(self.JetHadron)] = self.JetHadron.getNumberOfAssociatedParticles()
+        return self.numberOfAssociatedHadrons[repr(self.JetHadron)]
 
     def getNumberOfTriggerJets(self):
         '''
         Returns the number of trigger jets
         '''
-        return self.Trigger.getNumberOfTriggerJets()
+        if repr(self.Trigger) not in self.numberOfTriggerJets:
+            self.numberOfTriggerJets[repr(self.Trigger)] = self.Trigger.getNumberOfTriggerJets()
+        return self.numberOfTriggerJets[repr(self.Trigger)]
 
 
 

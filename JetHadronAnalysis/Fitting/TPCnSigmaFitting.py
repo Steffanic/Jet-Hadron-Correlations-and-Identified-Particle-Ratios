@@ -32,6 +32,18 @@ def piKpInc_generalized_fit(non_zero_masks, x, mup, mupi, muk, sigp, sigpi, sigk
 
     return np.hstack([two_generalized_gaussians_and_one_gaussian(x[non_zero_masks[0]], mup, mupi, muk, sigp, sigpi, sigk, appi, apipi, akpi, alphap, alphak), two_generalized_gaussians_and_one_gaussian(x[non_zero_masks[1]], mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, alphap, alphak), two_generalized_gaussians_and_one_gaussian(x[non_zero_masks[2]], mup, mupi, muk, sigp, sigpi, sigk, apk, apik, akk, alphap, alphak), two_generalized_gaussians_and_one_gaussian(x[non_zero_masks[3]], mup, mupi, muk, sigp, sigpi, sigk, apinc, apiinc, akinc, alphap, alphak)])
 
+def Inc_generalized_fit(non_zero_mask,  mup, mupi, muk, sigp, sigpi, sigk, alphap, alphak, x, apinc, apiinc, akinc):
+    """
+    Generalized fit function for piKpInc
+    """
+    if non_zero_mask is None:
+        warnings.warn("No non_zero_masks passed to generalized_fit. Setting to np.ones_like(x)")
+        non_zero_mask = np.ones_like(x, dtype=bool)
+
+
+
+    return two_generalized_gaussians_and_one_gaussian(x[non_zero_mask], mup, mupi, muk, sigp, sigpi, sigk, apinc, apiinc, akinc, alphap, alphak)
+
 def upiKpInc_generalized_fit(non_zero_masks, x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak):
     """
     Generalized fit function for piKpInc

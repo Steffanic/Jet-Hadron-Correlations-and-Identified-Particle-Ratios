@@ -24,6 +24,10 @@ class Region(Enum):
     BACKGROUND =5
     INCLUSIVE = 6
 
+class TriggerJetMomentumBin(Enum):
+    PT_20_40 = 1
+    PT_40_60 = 2
+
 class AssociatedHadronMomentumBin(Enum):
     PT_1_15 = 1
     PT_15_2 = 2
@@ -32,6 +36,12 @@ class AssociatedHadronMomentumBin(Enum):
     PT_4_5 = 5
     PT_5_6 = 6
     PT_6_10 = 7
+
+class ReactionPlaneBin(Enum):
+    IN_PLANE = 1
+    MID_PLANE = 2
+    OUT_PLANE = 3
+    INCLUSIVE = 4
 
 class OtherTOFRangeTags(Enum):
     P_HI = 1
@@ -70,6 +80,11 @@ speciesTOFRangeDictionary = {
     ParticleType.INCLUSIVE: ([-10,10], [-10,10], [-10,10]),
 }
 
+triggerJetMomentumBinRangeDictionary = {
+    TriggerJetMomentumBin.PT_20_40: (20, 40),
+    TriggerJetMomentumBin.PT_40_60: (40, 60)
+}
+
 associatedHadronMomentumBinRangeDictionary = {
     AssociatedHadronMomentumBin.PT_1_15: (1, 1.5),
     AssociatedHadronMomentumBin.PT_15_2: (1.5, 2),
@@ -78,6 +93,13 @@ associatedHadronMomentumBinRangeDictionary = {
     AssociatedHadronMomentumBin.PT_4_5: (4, 5),
     AssociatedHadronMomentumBin.PT_5_6: (5, 6),
     AssociatedHadronMomentumBin.PT_6_10: (6, 10),
+}
+
+eventPlaneAngleBinRangeDictionary = {
+    ReactionPlaneBin.IN_PLANE: (0, pi / 6),
+    ReactionPlaneBin.MID_PLANE: (pi / 6, pi / 3),
+    ReactionPlaneBin.OUT_PLANE: (pi / 3, pi / 2),
+    ReactionPlaneBin.INCLUSIVE: (0, pi / 2)
 }
 
 # Tuples are (min_pi, max_pi), (min_k, max_k), (min_p, max_p)

@@ -2,52 +2,75 @@
 # This file contains the class whose responsibility it is to manage the state of the sparses.
 # It also contains the enums for the axes in each different sparse
 
+from multiprocessing import Pool
+from functools import partial
+import time
 import warnings
 from JetHadronAnalysis.Types import AnalysisType, regionDeltaEtaRangeDictionary, regionDeltaPhiRangeDictionary, Region, OtherTOFRangeDictionary, OtherTOFRangeTags
 from math import pi
 from enum import Enum
 
-def triggerSparseAxesEnumFactory(analysisType: AnalysisType): 
-    class TriggerAxes(Enum):
-        if analysisType != AnalysisType.PP:
-            EVENT_PLANE_ANGLE = 2
-        EVENT_ACTIVITY = 0
-        TRIGGER_JET_PT = 1
-        Z_VERTEX = 2  if analysisType == AnalysisType.PP else 3
+class TriggerAxesPP(Enum):
+    EVENT_ACTIVITY = 0
+    TRIGGER_JET_PT = 1
+    Z_VERTEX = 2
 
-    return TriggerAxes
+class TriggerAxesPbPb(Enum):
+    EVENT_PLANE_ANGLE = 2
+    EVENT_ACTIVITY = 0
+    TRIGGER_JET_PT = 1
+    Z_VERTEX = 3
 
-def mixedEventSparseAxesEnumFactory(analysisType: AnalysisType):
-    class MixedEventAxes(Enum):
-        if analysisType != AnalysisType.PP:
-            EVENT_PLANE_ANGLE = 5
-        EVENT_ACTIVITY = 0
-        TRIGGER_JET_PT = 1
-        ASSOCIATED_HADRON_PT = 2
-        DELTA_ETA = 3
-        DELTA_PHI = 4
-        Z_VERTEX = 5  if analysisType == AnalysisType.PP else 6
+class MixedEventAxesPP(Enum):
+    EVENT_ACTIVITY = 0
+    TRIGGER_JET_PT = 1
+    ASSOCIATED_HADRON_PT = 2
+    DELTA_ETA = 3
+    DELTA_PHI = 4
+    Z_VERTEX = 5 
+    TOF = 6
 
-    return MixedEventAxes
+class MixedEventAxesPbPb(Enum):
+    EVENT_ACTIVITY = 0
+    EVENT_PLANE_ANGLE = 5
+    TRIGGER_JET_PT = 1
+    ASSOCIATED_HADRON_PT = 2
+    DELTA_ETA = 3
+    DELTA_PHI = 4
+    Z_VERTEX = 6
+    TOF = 7
 
-def jetHadronSparseAxesEnumFactory(analysisType: AnalysisType):
-    class JetHadronAxes(Enum):
-        if analysisType != AnalysisType.PP:
-            EVENT_PLANE_ANGLE = 5
-        EVENT_ACTIVITY = 0
-        TRIGGER_JET_PT = 1
-        ASSOCIATED_HADRON_PT = 2
-        DELTA_ETA = 3
-        DELTA_PHI = 4
-        Z_VERTEX = 5  if analysisType == AnalysisType.PP else 6
-        ASSOCIATED_HADRON_ETA = 6  if analysisType == AnalysisType.PP else 7
-        PION_TPC_N_SIGMA = 7  if analysisType == AnalysisType.PP else 8
-        PION_TOF_N_SIGMA = 8  if analysisType == AnalysisType.PP else 9
-        PROTON_TOF_N_SIGMA = 9  if analysisType == AnalysisType.PP else 10
-        KAON_TOF_N_SIGMA = 10  if analysisType == AnalysisType.PP else 11
+class JetHadronAxesPP(Enum):
+    EVENT_ACTIVITY = 0
+    TRIGGER_JET_PT = 1
+    ASSOCIATED_HADRON_PT = 2
+    DELTA_ETA = 3
+    DELTA_PHI = 4
+    Z_VERTEX = 5 
+    ASSOCIATED_HADRON_ETA = 6
+    PION_TPC_N_SIGMA = 7 
+    PION_TOF_N_SIGMA = 8 
+    PROTON_TOF_N_SIGMA = 9 
+    KAON_TOF_N_SIGMA = 10 
+    TOF = 11
 
-    return JetHadronAxes
+class JetHadronAxesPbPb(Enum):
+    EVENT_PLANE_ANGLE = 5
+    EVENT_ACTIVITY = 0
+    TRIGGER_JET_PT = 1
+    ASSOCIATED_HADRON_PT = 2
+    DELTA_ETA = 3
+    DELTA_PHI = 4
+    Z_VERTEX = 6
+    ASSOCIATED_HADRON_ETA = 7
+    PION_TPC_N_SIGMA = 8
+    PION_TOF_N_SIGMA = 9
+    PROTON_TOF_N_SIGMA = 10
+    KAON_TOF_N_SIGMA = 11
+    TOF = 12 
 
+def getClonedProjection(projectionAxes, sparse):
+    return sparse.Projection(*projectionAxes).Clone()
 
 class Sparse:
     '''
@@ -68,7 +91,7 @@ class Sparse:
     def getSparseList(self):
         return self.sparseList
     
-    def getProjection(self, *projectionAxes):
+    def getProjection(self, *projectionAxes, use_mp=False):
         '''
         return a projection along the projection axes provided by combining the projections from each sparse, axis ordering should be consistent, e.g. x,y,z regaredless of number of axes
         '''
@@ -83,13 +106,22 @@ class Sparse:
             # For some reason the implementation of ROOT's THnSparse::Projection method for two axes is reversed order, (y_axis, x_axis) instead of (x_axis, y_axis), which is pretty dumb.
             projectionAxes = projectionAxes[::-1]
         # When we clone the projection, we pass the representation of the sparse as the name of the projection, so that it is uniquely identified in ROOT's memory. It's super hacky and dumb that I have to do that...
-        projection = self.sparseList[0].Projection(*projectionAxes).Clone(repr(self)+"_".join([str(axis) for axis in projectionAxes]))
-        for sparse_ind in range(self.getNumberOfSparses()-1):
-            addition_success = projection.Add(self.sparseList[sparse_ind].Projection(*projectionAxes).Clone(repr(self)+"_".join([str(axis) for axis in projectionAxes])))
-            if not addition_success:
-                raise RuntimeError(f"Adding projection onto axes {[axis.name for axis in projectionAxes]} from sparse {sparse_ind} in {self.__class__.__name__} was not succesful")
-            
-        return projection
+        if not use_mp:
+            projection = self.sparseList[0].Projection(*projectionAxes).Clone(repr(self)+"_".join([str(axis) for axis in projectionAxes]))
+            for sparse_ind in range(self.getNumberOfSparses()-1):
+                addition_success = projection.Add(self.sparseList[sparse_ind].Projection(*projectionAxes).Clone(repr(self)+"_".join([str(axis) for axis in projectionAxes])))
+                if not addition_success:
+                    raise RuntimeError(f"Adding projection onto axes {[axis.name for axis in projectionAxes]} from sparse {sparse_ind} in {self.__class__.__name__} was not succesful")
+            return projection
+        else:
+            with Pool() as p:
+                projections = p.map(partial(getClonedProjection, projectionAxes), self.sparseList)
+            projection = projections[0]
+            for proj in projections[1:]:
+                addition_success = projection.Add(proj)
+                if not addition_success:
+                    raise RuntimeError(f"Adding projection onto axes {[axis.name for axis in projectionAxes]} in {self.__class__.__name__} was not succesful")
+            return projection
     
     def getBinWidth(self, axis):
         return self.sparseList[0].GetAxis(axis.value).GetBinWidth(1) # here we get the firtst bin because in ROOT, bins are 1-ordered, not 0-ordered, which is pretty dumb
@@ -106,7 +138,7 @@ class TriggerSparse(Sparse):
 
     def __init__(self, analysisType: AnalysisType):
         super().__init__(analysisType)
-        self.Axes = triggerSparseAxesEnumFactory(self.analysisType)
+        self.Axes = TriggerAxesPP if analysisType == AnalysisType.PP else TriggerAxesPbPb
 
         self.minTriggerJetMomentum = 0
         self.maxTriggerJetMomentum = 200
@@ -172,7 +204,7 @@ class MixedEventSparse(Sparse):
 
     def __init__(self, analysisType: AnalysisType):
         super().__init__(analysisType)
-        self.Axes = mixedEventSparseAxesEnumFactory(self.analysisType)
+        self.Axes = MixedEventAxesPP if analysisType == AnalysisType.PP else MixedEventAxesPbPb
 
         self.minTriggerJetMomentum = 0
         self.maxTriggerJetMomentum = 200
@@ -194,6 +226,8 @@ class MixedEventSparse(Sparse):
 
         self.minDeltaEta = -1.4
         self.maxDeltaEta = 1.4
+
+        self.hasTOF = False
 
     def setTriggerJetMomentumRange(self, minTriggerJetMomentum, maxTriggerJetMomentum):
         self.minTriggerJetMomentum = minTriggerJetMomentum
@@ -245,6 +279,11 @@ class MixedEventSparse(Sparse):
             # set the pT and event plane angle ranges
             self.sparseList[sparse_ind].GetAxis(self.Axes.DELTA_ETA.value).SetRangeUser(minDeltaEta, maxDeltaEta)
 
+    def sethasTOF(self, hasTOF:bool):
+        self.hasTOF = hasTOF
+        for sparse_ind in range(self.getNumberOfSparses()):
+            self.sparseList[sparse_ind].GetAxis(self.Axes.TOF.value).SetRangeUser(1, 2) if hasTOF else self.sparseList[sparse_ind].GetAxis(self.Axes.TOF.value).SetRangeUser(0, 1)
+
     def __repr__(self) -> str:
         repr_str = "Mixed Event Sparse:\n"
         repr_str += "Trigger Jet Momentum Range: " + str(self.minTriggerJetMomentum) + " - " + str(self.maxTriggerJetMomentum) + "\n"
@@ -264,7 +303,7 @@ class JetHadronSparse(Sparse):
 
     def __init__(self, analysisType: AnalysisType):
         super().__init__(analysisType)
-        self.Axes = jetHadronSparseAxesEnumFactory(self.analysisType)
+        self.Axes = JetHadronAxesPP if analysisType == AnalysisType.PP else JetHadronAxesPbPb
 
         self.minTriggerJetMomentum = 0
         self.maxTriggerJetMomentum = 200
