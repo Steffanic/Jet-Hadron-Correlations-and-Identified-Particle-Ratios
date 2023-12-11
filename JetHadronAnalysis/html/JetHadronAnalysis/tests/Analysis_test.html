@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>JetHadronAnalysis.tests.Analysis_test API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>JetHadronAnalysis.tests.Analysis_test</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import pytest
+from pytest_lazyfixture import lazy_fixture
+from math import pi
+from JetHadronAnalysis.Analysis import Analysis, Region
+from JetHadronAnalysis.Types import AnalysisType, ParticleType, NormalizationMethod
+
+
+@pytest.fixture
+def analysis_pp():
+    return Analysis(AnalysisType.PP, [&#34;/mnt/d/pp/17p.root&#34;])
+
+@pytest.fixture
+def analysis_PbPb():
+    return Analysis(AnalysisType.SEMICENTRAL, [&#34;/mnt/d/18q/296510.root&#34;])
+
+@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_fillSparseFromFile(analysis):
+    assert analysis.JetHadron.getNumberOfSparses() == 1
+    assert analysis.Trigger.getNumberOfSparses() == 1
+    assert analysis.MixedEvent.getNumberOfSparses() == 1
+
+@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_setRegion(analysis):
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    assert analysis.JetHadron.minDeltaPhi == - pi/2
+    assert analysis.JetHadron.maxDeltaPhi == pi/2
+    assert analysis.JetHadron.minDeltaEta == - 0.6
+    assert analysis.JetHadron.maxDeltaEta == 0.6
+    # assert analysis.MixedEvent.minDeltaPhi == - pi/2
+    # assert analysis.MixedEvent.maxDeltaPhi == pi/2
+    # assert analysis.MixedEvent.minDeltaEta == - 0.6
+    # assert analysis.MixedEvent.maxDeltaEta == 0.6
+    
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
+    assert analysis.JetHadron.minDeltaPhi == pi/2
+    assert analysis.JetHadron.maxDeltaPhi == 3 *pi/2
+    assert analysis.JetHadron.minDeltaEta == - 1.2
+    assert analysis.JetHadron.maxDeltaEta == 1.2
+    # assert analysis.MixedEvent.minDeltaPhi == pi/2
+    # assert analysis.MixedEvent.maxDeltaPhi == 3*pi/2
+    # assert analysis.MixedEvent.minDeltaEta == - 1.2
+    # assert analysis.MixedEvent.maxDeltaEta == 1.2
+
+    analysis.setRegion(Region.INCLUSIVE)
+    assert analysis.JetHadron.minDeltaPhi == - pi/2
+    assert analysis.JetHadron.maxDeltaPhi == 3 *pi/2
+    assert analysis.JetHadron.minDeltaEta == - 1.4
+    assert analysis.JetHadron.maxDeltaEta == 1.4
+    # assert analysis.MixedEvent.minDeltaPhi == - pi/2
+    # assert analysis.MixedEvent.maxDeltaPhi == 3*pi/2
+    # assert analysis.MixedEvent.minDeltaEta == - 1.4
+    # assert analysis.MixedEvent.maxDeltaEta == 1.4
+
+    analysis.setRegion(Region.BACKGROUND_ETAPOS)
+    assert analysis.JetHadron.minDeltaPhi == - pi/2
+    assert analysis.JetHadron.maxDeltaPhi ==  pi/2
+    assert analysis.JetHadron.minDeltaEta == 0.8
+    assert analysis.JetHadron.maxDeltaEta == 1.2
+    # assert analysis.MixedEvent.minDeltaPhi == - pi/2
+    # assert analysis.MixedEvent.maxDeltaPhi == pi/2
+    # assert analysis.MixedEvent.minDeltaEta == 0.8
+    # assert analysis.MixedEvent.maxDeltaEta == 1.2
+
+    analysis.setRegion(Region.BACKGROUND_ETANEG)
+    assert analysis.JetHadron.minDeltaPhi == - pi/2
+    assert analysis.JetHadron.maxDeltaPhi ==  pi/2
+    assert analysis.JetHadron.minDeltaEta == - 1.2
+    assert analysis.JetHadron.maxDeltaEta == - 0.8
+    # assert analysis.MixedEvent.minDeltaPhi == - pi/2
+    # assert analysis.MixedEvent.maxDeltaPhi == pi/2
+    # assert analysis.MixedEvent.minDeltaEta == - 1.2
+    # assert analysis.MixedEvent.maxDeltaEta == - 0.8
+
+
+@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_setRegionThenSetInclusiveRegion(analysis):
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    analysis.setRegion(Region.INCLUSIVE)
+    assert analysis.JetHadron.minDeltaPhi == - pi/2
+    assert analysis.JetHadron.maxDeltaPhi == 3 *pi/2
+    assert analysis.JetHadron.minDeltaEta == - 1.4
+    assert analysis.JetHadron.maxDeltaEta == 1.4
+    # assert analysis.MixedEvent.minDeltaPhi == - pi/2
+    # assert analysis.MixedEvent.maxDeltaPhi == 3*pi/2
+    # assert analysis.MixedEvent.minDeltaEta == - 1.4
+    # assert analysis.MixedEvent.maxDeltaEta == 1.4
+
+    
+
+@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_getDifferentialCorrelationFunction(analysis):
+    correlationFunction = analysis.getDifferentialCorrelationFunction()
+    assert correlationFunction.GetNbinsX() == 72
+
+@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_getDifferentialCorrelationFunctionInNearSide(analysis):
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    correlationFunction = analysis.getDifferentialCorrelationFunction()
+    assert correlationFunction.GetNbinsX() == 36
+
+@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_getDifferentialCorrelationFunctionInAwaySide(analysis):
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
+    correlationFunction = analysis.getDifferentialCorrelationFunction()
+    assert correlationFunction.GetNbinsX() == 36
+
+@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_getDifferentialCorrelationFunctionForPions(analysis):
+    analysis.setParticleSelectionForJetHadron(ParticleType.PION)
+    correlationFunction = analysis.getDifferentialCorrelationFunction()
+    assert correlationFunction.GetNbinsX() == 72
+
+@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_getNormalizedDifferentialMixedEventCorrelationFunction(analysis):
+    analysis.setRegion(Region.INCLUSIVE)
+    correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW)
+    assert correlationFunction.GetNbinsX() == 72
+
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi/2)
+    assert correlationFunction.GetNbinsX() == 36
+
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
+    correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi/2)
+    assert correlationFunction.GetNbinsX() == 36
+    
+    analysis.setRegion(Region.INCLUSIVE)
+    correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.MAX)
+    assert correlationFunction.GetNbinsX() == 72
+
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.MAX)
+    assert correlationFunction.GetNbinsX() == 36
+
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
+    correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.MAX)
+    assert correlationFunction.GetNbinsX() == 36
+
+@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_getNormalizedDifferentialMixedEventCorrelationFunctionFailsOnWindowSizeTooLarge(analysis):
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    with pytest.raises(AssertionError):
+        analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi)
+
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
+    with pytest.raises(AssertionError):
+        analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi)
+
+    analysis.setRegion(Region.INCLUSIVE)
+    with pytest.raises(AssertionError):
+        analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=2*pi)
+
+@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_getAcceptanceCorrectedDifferentialCorrelationFunction(analysis: Analysis):
+    analysis.setRegion(Region.INCLUSIVE)
+    differentialCorrelationFunction = analysis.getDifferentialCorrelationFunction()
+    normalizedMixedEventCorrelationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW)
+    correlationFunction = analysis.getAcceptanceCorrectedDifferentialCorrelationFunction(differentialCorrelationFunction, normalizedMixedEventCorrelationFunction)
+    assert correlationFunction.GetNbinsX() == 72
+
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    differentialCorrelationFunction = analysis.getDifferentialCorrelationFunction()
+    normalizedMixedEventCorrelationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi/2)
+    correlationFunction = analysis.getAcceptanceCorrectedDifferentialCorrelationFunction(differentialCorrelationFunction, normalizedMixedEventCorrelationFunction)
+    assert correlationFunction.GetNbinsX() == 36
+
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
+    differentialCorrelationFunction = analysis.getDifferentialCorrelationFunction()
+    normalizedMixedEventCorrelationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi/2)
+    correlationFunction = analysis.getAcceptanceCorrectedDifferentialCorrelationFunction(differentialCorrelationFunction, normalizedMixedEventCorrelationFunction)
+    assert correlationFunction.GetNbinsX() == 36
+
+
+@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_number_of_associated_particles_is_less_than_inclusive(analysis):
+    analysis.setRegion(Region.INCLUSIVE)
+    analysis.setParticleSelectionForJetHadron(ParticleType.INCLUSIVE)
+    number_of_inclusive_particles = analysis.getNumberOfAssociatedParticles()
+
+    analysis.setParticleSelectionForJetHadron(ParticleType.PION)
+    number_of_pions = analysis.getNumberOfAssociatedParticles()
+
+    assert number_of_pions &lt; number_of_inclusive_particles
+
+    analysis.setParticleSelectionForJetHadron(ParticleType.KAON)
+    number_of_kaons = analysis.getNumberOfAssociatedParticles()
+
+    assert number_of_kaons &lt; number_of_inclusive_particles
+
+    analysis.setParticleSelectionForJetHadron(ParticleType.PROTON)
+    number_of_protons = analysis.getNumberOfAssociatedParticles()
+
+    assert number_of_protons &lt; number_of_inclusive_particles</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="JetHadronAnalysis.tests.Analysis_test.analysis_PbPb"><code class="name flex">
+<span>def <span class="ident">analysis_PbPb</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.fixture
+def analysis_PbPb():
+    return Analysis(AnalysisType.SEMICENTRAL, [&#34;/mnt/d/18q/296510.root&#34;])</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.tests.Analysis_test.analysis_pp"><code class="name flex">
+<span>def <span class="ident">analysis_pp</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.fixture
+def analysis_pp():
+    return Analysis(AnalysisType.PP, [&#34;/mnt/d/pp/17p.root&#34;])</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.tests.Analysis_test.test_fillSparseFromFile"><code class="name flex">
+<span>def <span class="ident">test_fillSparseFromFile</span></span>(<span>analysis)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_fillSparseFromFile(analysis):
+    assert analysis.JetHadron.getNumberOfSparses() == 1
+    assert analysis.Trigger.getNumberOfSparses() == 1
+    assert analysis.MixedEvent.getNumberOfSparses() == 1</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.tests.Analysis_test.test_getAcceptanceCorrectedDifferentialCorrelationFunction"><code class="name flex">
+<span>def <span class="ident">test_getAcceptanceCorrectedDifferentialCorrelationFunction</span></span>(<span>analysis: <a title="JetHadronAnalysis.Analysis.Analysis" href="../Analysis.html#JetHadronAnalysis.Analysis.Analysis">Analysis</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_getAcceptanceCorrectedDifferentialCorrelationFunction(analysis: Analysis):
+    analysis.setRegion(Region.INCLUSIVE)
+    differentialCorrelationFunction = analysis.getDifferentialCorrelationFunction()
+    normalizedMixedEventCorrelationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW)
+    correlationFunction = analysis.getAcceptanceCorrectedDifferentialCorrelationFunction(differentialCorrelationFunction, normalizedMixedEventCorrelationFunction)
+    assert correlationFunction.GetNbinsX() == 72
+
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    differentialCorrelationFunction = analysis.getDifferentialCorrelationFunction()
+    normalizedMixedEventCorrelationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi/2)
+    correlationFunction = analysis.getAcceptanceCorrectedDifferentialCorrelationFunction(differentialCorrelationFunction, normalizedMixedEventCorrelationFunction)
+    assert correlationFunction.GetNbinsX() == 36
+
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
+    differentialCorrelationFunction = analysis.getDifferentialCorrelationFunction()
+    normalizedMixedEventCorrelationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi/2)
+    correlationFunction = analysis.getAcceptanceCorrectedDifferentialCorrelationFunction(differentialCorrelationFunction, normalizedMixedEventCorrelationFunction)
+    assert correlationFunction.GetNbinsX() == 36</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.tests.Analysis_test.test_getDifferentialCorrelationFunction"><code class="name flex">
+<span>def <span class="ident">test_getDifferentialCorrelationFunction</span></span>(<span>analysis)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_getDifferentialCorrelationFunction(analysis):
+    correlationFunction = analysis.getDifferentialCorrelationFunction()
+    assert correlationFunction.GetNbinsX() == 72</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.tests.Analysis_test.test_getDifferentialCorrelationFunctionForPions"><code class="name flex">
+<span>def <span class="ident">test_getDifferentialCorrelationFunctionForPions</span></span>(<span>analysis)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_getDifferentialCorrelationFunctionForPions(analysis):
+    analysis.setParticleSelectionForJetHadron(ParticleType.PION)
+    correlationFunction = analysis.getDifferentialCorrelationFunction()
+    assert correlationFunction.GetNbinsX() == 72</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.tests.Analysis_test.test_getDifferentialCorrelationFunctionInAwaySide"><code class="name flex">
+<span>def <span class="ident">test_getDifferentialCorrelationFunctionInAwaySide</span></span>(<span>analysis)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_getDifferentialCorrelationFunctionInAwaySide(analysis):
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
+    correlationFunction = analysis.getDifferentialCorrelationFunction()
+    assert correlationFunction.GetNbinsX() == 36</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.tests.Analysis_test.test_getDifferentialCorrelationFunctionInNearSide"><code class="name flex">
+<span>def <span class="ident">test_getDifferentialCorrelationFunctionInNearSide</span></span>(<span>analysis)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_getDifferentialCorrelationFunctionInNearSide(analysis):
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    correlationFunction = analysis.getDifferentialCorrelationFunction()
+    assert correlationFunction.GetNbinsX() == 36</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.tests.Analysis_test.test_getNormalizedDifferentialMixedEventCorrelationFunction"><code class="name flex">
+<span>def <span class="ident">test_getNormalizedDifferentialMixedEventCorrelationFunction</span></span>(<span>analysis)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_getNormalizedDifferentialMixedEventCorrelationFunction(analysis):
+    analysis.setRegion(Region.INCLUSIVE)
+    correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW)
+    assert correlationFunction.GetNbinsX() == 72
+
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi/2)
+    assert correlationFunction.GetNbinsX() == 36
+
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
+    correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi/2)
+    assert correlationFunction.GetNbinsX() == 36
+    
+    analysis.setRegion(Region.INCLUSIVE)
+    correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.MAX)
+    assert correlationFunction.GetNbinsX() == 72
+
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.MAX)
+    assert correlationFunction.GetNbinsX() == 36
+
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
+    correlationFunction = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.MAX)
+    assert correlationFunction.GetNbinsX() == 36</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.tests.Analysis_test.test_getNormalizedDifferentialMixedEventCorrelationFunctionFailsOnWindowSizeTooLarge"><code class="name flex">
+<span>def <span class="ident">test_getNormalizedDifferentialMixedEventCorrelationFunctionFailsOnWindowSizeTooLarge</span></span>(<span>analysis)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_getNormalizedDifferentialMixedEventCorrelationFunctionFailsOnWindowSizeTooLarge(analysis):
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    with pytest.raises(AssertionError):
+        analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi)
+
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
+    with pytest.raises(AssertionError):
+        analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=pi)
+
+    analysis.setRegion(Region.INCLUSIVE)
+    with pytest.raises(AssertionError):
+        analysis.getNormalizedDifferentialMixedEventCorrelationFunction(NormalizationMethod.SLIDING_WINDOW, windowSize=2*pi)</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.tests.Analysis_test.test_number_of_associated_particles_is_less_than_inclusive"><code class="name flex">
+<span>def <span class="ident">test_number_of_associated_particles_is_less_than_inclusive</span></span>(<span>analysis)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_number_of_associated_particles_is_less_than_inclusive(analysis):
+    analysis.setRegion(Region.INCLUSIVE)
+    analysis.setParticleSelectionForJetHadron(ParticleType.INCLUSIVE)
+    number_of_inclusive_particles = analysis.getNumberOfAssociatedParticles()
+
+    analysis.setParticleSelectionForJetHadron(ParticleType.PION)
+    number_of_pions = analysis.getNumberOfAssociatedParticles()
+
+    assert number_of_pions &lt; number_of_inclusive_particles
+
+    analysis.setParticleSelectionForJetHadron(ParticleType.KAON)
+    number_of_kaons = analysis.getNumberOfAssociatedParticles()
+
+    assert number_of_kaons &lt; number_of_inclusive_particles
+
+    analysis.setParticleSelectionForJetHadron(ParticleType.PROTON)
+    number_of_protons = analysis.getNumberOfAssociatedParticles()
+
+    assert number_of_protons &lt; number_of_inclusive_particles</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.tests.Analysis_test.test_setRegion"><code class="name flex">
+<span>def <span class="ident">test_setRegion</span></span>(<span>analysis)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_setRegion(analysis):
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    assert analysis.JetHadron.minDeltaPhi == - pi/2
+    assert analysis.JetHadron.maxDeltaPhi == pi/2
+    assert analysis.JetHadron.minDeltaEta == - 0.6
+    assert analysis.JetHadron.maxDeltaEta == 0.6
+    # assert analysis.MixedEvent.minDeltaPhi == - pi/2
+    # assert analysis.MixedEvent.maxDeltaPhi == pi/2
+    # assert analysis.MixedEvent.minDeltaEta == - 0.6
+    # assert analysis.MixedEvent.maxDeltaEta == 0.6
+    
+    analysis.setRegion(Region.AWAY_SIDE_SIGNAL)
+    assert analysis.JetHadron.minDeltaPhi == pi/2
+    assert analysis.JetHadron.maxDeltaPhi == 3 *pi/2
+    assert analysis.JetHadron.minDeltaEta == - 1.2
+    assert analysis.JetHadron.maxDeltaEta == 1.2
+    # assert analysis.MixedEvent.minDeltaPhi == pi/2
+    # assert analysis.MixedEvent.maxDeltaPhi == 3*pi/2
+    # assert analysis.MixedEvent.minDeltaEta == - 1.2
+    # assert analysis.MixedEvent.maxDeltaEta == 1.2
+
+    analysis.setRegion(Region.INCLUSIVE)
+    assert analysis.JetHadron.minDeltaPhi == - pi/2
+    assert analysis.JetHadron.maxDeltaPhi == 3 *pi/2
+    assert analysis.JetHadron.minDeltaEta == - 1.4
+    assert analysis.JetHadron.maxDeltaEta == 1.4
+    # assert analysis.MixedEvent.minDeltaPhi == - pi/2
+    # assert analysis.MixedEvent.maxDeltaPhi == 3*pi/2
+    # assert analysis.MixedEvent.minDeltaEta == - 1.4
+    # assert analysis.MixedEvent.maxDeltaEta == 1.4
+
+    analysis.setRegion(Region.BACKGROUND_ETAPOS)
+    assert analysis.JetHadron.minDeltaPhi == - pi/2
+    assert analysis.JetHadron.maxDeltaPhi ==  pi/2
+    assert analysis.JetHadron.minDeltaEta == 0.8
+    assert analysis.JetHadron.maxDeltaEta == 1.2
+    # assert analysis.MixedEvent.minDeltaPhi == - pi/2
+    # assert analysis.MixedEvent.maxDeltaPhi == pi/2
+    # assert analysis.MixedEvent.minDeltaEta == 0.8
+    # assert analysis.MixedEvent.maxDeltaEta == 1.2
+
+    analysis.setRegion(Region.BACKGROUND_ETANEG)
+    assert analysis.JetHadron.minDeltaPhi == - pi/2
+    assert analysis.JetHadron.maxDeltaPhi ==  pi/2
+    assert analysis.JetHadron.minDeltaEta == - 1.2
+    assert analysis.JetHadron.maxDeltaEta == - 0.8
+    # assert analysis.MixedEvent.minDeltaPhi == - pi/2
+    # assert analysis.MixedEvent.maxDeltaPhi == pi/2
+    # assert analysis.MixedEvent.minDeltaEta == - 1.2
+    # assert analysis.MixedEvent.maxDeltaEta == - 0.8</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.tests.Analysis_test.test_setRegionThenSetInclusiveRegion"><code class="name flex">
+<span>def <span class="ident">test_setRegionThenSetInclusiveRegion</span></span>(<span>analysis)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.mark.parametrize(&#34;analysis&#34;, [lazy_fixture(&#34;analysis_pp&#34;), lazy_fixture(&#34;analysis_PbPb&#34;)])
+def test_setRegionThenSetInclusiveRegion(analysis):
+    analysis.setRegion(Region.NEAR_SIDE_SIGNAL)
+    analysis.setRegion(Region.INCLUSIVE)
+    assert analysis.JetHadron.minDeltaPhi == - pi/2
+    assert analysis.JetHadron.maxDeltaPhi == 3 *pi/2
+    assert analysis.JetHadron.minDeltaEta == - 1.4
+    assert analysis.JetHadron.maxDeltaEta == 1.4
+    # assert analysis.MixedEvent.minDeltaPhi == - pi/2
+    # assert analysis.MixedEvent.maxDeltaPhi == 3*pi/2
+    # assert analysis.MixedEvent.minDeltaEta == - 1.4
+    # assert analysis.MixedEvent.maxDeltaEta == 1.4</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="JetHadronAnalysis.tests" href="index.html">JetHadronAnalysis.tests</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="JetHadronAnalysis.tests.Analysis_test.analysis_PbPb" href="#JetHadronAnalysis.tests.Analysis_test.analysis_PbPb">analysis_PbPb</a></code></li>
+<li><code><a title="JetHadronAnalysis.tests.Analysis_test.analysis_pp" href="#JetHadronAnalysis.tests.Analysis_test.analysis_pp">analysis_pp</a></code></li>
+<li><code><a title="JetHadronAnalysis.tests.Analysis_test.test_fillSparseFromFile" href="#JetHadronAnalysis.tests.Analysis_test.test_fillSparseFromFile">test_fillSparseFromFile</a></code></li>
+<li><code><a title="JetHadronAnalysis.tests.Analysis_test.test_getAcceptanceCorrectedDifferentialCorrelationFunction" href="#JetHadronAnalysis.tests.Analysis_test.test_getAcceptanceCorrectedDifferentialCorrelationFunction">test_getAcceptanceCorrectedDifferentialCorrelationFunction</a></code></li>
+<li><code><a title="JetHadronAnalysis.tests.Analysis_test.test_getDifferentialCorrelationFunction" href="#JetHadronAnalysis.tests.Analysis_test.test_getDifferentialCorrelationFunction">test_getDifferentialCorrelationFunction</a></code></li>
+<li><code><a title="JetHadronAnalysis.tests.Analysis_test.test_getDifferentialCorrelationFunctionForPions" href="#JetHadronAnalysis.tests.Analysis_test.test_getDifferentialCorrelationFunctionForPions">test_getDifferentialCorrelationFunctionForPions</a></code></li>
+<li><code><a title="JetHadronAnalysis.tests.Analysis_test.test_getDifferentialCorrelationFunctionInAwaySide" href="#JetHadronAnalysis.tests.Analysis_test.test_getDifferentialCorrelationFunctionInAwaySide">test_getDifferentialCorrelationFunctionInAwaySide</a></code></li>
+<li><code><a title="JetHadronAnalysis.tests.Analysis_test.test_getDifferentialCorrelationFunctionInNearSide" href="#JetHadronAnalysis.tests.Analysis_test.test_getDifferentialCorrelationFunctionInNearSide">test_getDifferentialCorrelationFunctionInNearSide</a></code></li>
+<li><code><a title="JetHadronAnalysis.tests.Analysis_test.test_getNormalizedDifferentialMixedEventCorrelationFunction" href="#JetHadronAnalysis.tests.Analysis_test.test_getNormalizedDifferentialMixedEventCorrelationFunction">test_getNormalizedDifferentialMixedEventCorrelationFunction</a></code></li>
+<li><code><a title="JetHadronAnalysis.tests.Analysis_test.test_getNormalizedDifferentialMixedEventCorrelationFunctionFailsOnWindowSizeTooLarge" href="#JetHadronAnalysis.tests.Analysis_test.test_getNormalizedDifferentialMixedEventCorrelationFunctionFailsOnWindowSizeTooLarge">test_getNormalizedDifferentialMixedEventCorrelationFunctionFailsOnWindowSizeTooLarge</a></code></li>
+<li><code><a title="JetHadronAnalysis.tests.Analysis_test.test_number_of_associated_particles_is_less_than_inclusive" href="#JetHadronAnalysis.tests.Analysis_test.test_number_of_associated_particles_is_less_than_inclusive">test_number_of_associated_particles_is_less_than_inclusive</a></code></li>
+<li><code><a title="JetHadronAnalysis.tests.Analysis_test.test_setRegion" href="#JetHadronAnalysis.tests.Analysis_test.test_setRegion">test_setRegion</a></code></li>
+<li><code><a title="JetHadronAnalysis.tests.Analysis_test.test_setRegionThenSetInclusiveRegion" href="#JetHadronAnalysis.tests.Analysis_test.test_setRegionThenSetInclusiveRegion">test_setRegionThenSetInclusiveRegion</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

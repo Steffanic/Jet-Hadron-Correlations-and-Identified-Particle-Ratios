@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>JetHadronAnalysis.RPFFit API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>JetHadronAnalysis.RPFFit</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from functools import partial
+import sqlite3
+import pickle
+from typing import List
+import scipy.optimize as opt
+import numpy as np
+import uncertainties
+from ROOT import TH1D #type:ignore
+from JetHadronAnalysis.Types import AnalysisType, AssociatedHadronMomentumBin, TriggerJetMomentumBin, ParticleType
+from JetHadronAnalysis.Fitting.RPF import simultaneous_fit, simultaneous_err, initial_parameter_defaults, bounds, resolution_parameters
+
+class RPFFit:
+    def __init__(self, analysisType:AnalysisType, currentTriggerJetMomentumBin:TriggerJetMomentumBin, currentAssociatedHadronMomentumBin:AssociatedHadronMomentumBin, currentParticleSelection: ParticleType):
+        self.analysisType = analysisType
+        self.currentTriggerJetMomentumBin = currentTriggerJetMomentumBin
+        self.currentAssociatedHadronMomentumBin = currentAssociatedHadronMomentumBin
+        self.currentParticleSelection = currentParticleSelection
+
+        self.initialParameters = None 
+        self.bounds = bounds 
+        self.fittingFunction = simultaneous_fit 
+        self.fittingErrorFunction = simultaneous_err
+
+        self.databaseConnection = None 
+        self.initializeDatabase()
+
+
+    def initializeDatabase(self):
+        &#39;&#39;&#39;
+        establish connection to the parameter and particle fraction database named RPF.db
+        &#39;&#39;&#39;
+        self.databaseConnection = sqlite3.connect(&#34;RPF.db&#34;)
+        cursor = self.databaseConnection.cursor()
+        cursor.execute(&#34;CREATE TABLE IF NOT EXISTS fit_parameters(analysis_type TEXT, trigger_momentum_bin INTEGER, associated_momentum_bin INTEGER, particle_species TEXT, reduced_chi2 REAL, background_level REAL, v2 REAL, v3 REAL, v4 REAL, va2 REAL, va4 REAL, background_level_error REAL, v2_error REAL, v3_error REAL, v4_error REAL, va2_error REAL, va4_error REAL, covariance_matrix BLOB, PRIMARY KEY(analysis_type, trigger_momentum_bin, associated_momentum_bin, particle_species))&#34;)
+        self.databaseConnection.commit()
+
+    def setInitialParameters(self, initialParameters):
+        self.initialParameters = initialParameters
+
+    def setBounds(self, bounds): 
+        self.bounds = bounds
+
+    def setDefaultParameters(self):
+        self.initialParameters = initial_parameter_defaults[self.analysisType,self.currentTriggerJetMomentumBin,self.currentAssociatedHadronMomentumBin]
+
+    @classmethod
+    def prepareData(cls, inPlaneBackgroundAzimuthalCorrelationFunction:TH1D, midPlaneBackgroundAzimuthalCorrelationFunction:TH1D, outOfPlaneBackgroundAzimuthalCorrelationFunction:TH1D):
+        &#39;&#39;&#39;
+        prepare data for fitting
+
+        Args:
+            inPlaneBackgroundAzimuthalCorrelationFunction (TH1D): Azimuthal correlation function for in-plane background
+            midPlaneBackgroundAzimuthalCorrelationFunction (TH1D): Azimuthal correlation function for mid-plane background
+            outOfPlaneBackgroundAzimuthalCorrelationFunction (TH1D): Azimuthal correlation function for out-of-plane background
+        Returns:
+            x (np.ndarray): numpy array of x values for fitting, common x-axis for each reaction plane bin
+            y (List[np.narray]): list of numpy arrays of y values for fitting, y-values from each reaction plane bin
+            yerr (List[np.ndarray]): list of numpy arrays of y errors for fitting, y-errors from each reaction plane bin
+        &#39;&#39;&#39;
+        x = np.array([inPlaneBackgroundAzimuthalCorrelationFunction.GetBinCenter(i) for i in range(1, inPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)])
+        y = [
+                np.array([inPlaneBackgroundAzimuthalCorrelationFunction.GetBinContent(i) for i in range(1, inPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)]),
+                np.array([midPlaneBackgroundAzimuthalCorrelationFunction.GetBinContent(i) for i in range(1, midPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)]),
+                np.array([outOfPlaneBackgroundAzimuthalCorrelationFunction.GetBinContent(i) for i in range(1, outOfPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)])
+            ]
+        yerr = [
+                np.array([inPlaneBackgroundAzimuthalCorrelationFunction.GetBinError(i) for i in range(1, inPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)]),
+                np.array([midPlaneBackgroundAzimuthalCorrelationFunction.GetBinError(i) for i in range(1, midPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)]),
+                np.array([outOfPlaneBackgroundAzimuthalCorrelationFunction.GetBinError(i) for i in range(1, outOfPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)])
+            ]
+        return x, y, yerr
+    
+    def chi2OverNDF(self, optimal_params, covariance, x, y, yerr, non_zero_masks=None):
+        &#39;&#39;&#39;
+        Computes the chi2/ndf of the fit
+        &#39;&#39;&#39;
+        if non_zero_masks is None:
+            non_zero_masks = [y[i] != 0 for i in range(len(y))]
+
+            y = np.hstack([y[i][non_zero_masks[i]] for i in range(len(y))])
+
+            yerr = np.hstack([yerr[i][non_zero_masks[i]] for i in range(len(yerr))])
+        y_fit = self.fittingFunction(non_zero_masks, *resolution_parameters[self.analysisType].values(), x,  *optimal_params)
+        chi2 = np.sum((y-y_fit)**2/yerr**2)
+        ndf = len(x)*3-len(optimal_params) # here we multiply by four because we have four different ys that are fitting simultaneously
+        return chi2/ndf
+    
+    def performFit(self, x:np.ndarray, y:List[np.ndarray], yerr:List[np.ndarray]):
+        &#39;&#39;&#39;
+        performs fit using scipy.optimize.curve_fit removing points with y=yerr=0
+
+        Args:
+            x (np.ndarray): numpy array of x values for fitting, common x-axis for each reaction plane bin
+            y (List[np.narray]): numpy array of y values for fitting, y-values from each reaction plane bin are concatenated using np.hstack
+            yerr (List[np.ndarray]): numpy array of y errors for fitting, y-errors from each reaction plane bin are concatenated using np.hstack
+        Returns:
+            optimalParameters (np.ndarray): numpy array of optimal parameters from fit
+            optimalParameterCovariance (np.ndarray): numpy array of optimal parameter covariance errors from fit
+            reducedChi2 (float): reduced chi2 from fit
+        &#39;&#39;&#39;
+        non_zero_masks = [y[i] != 0 for i in range(len(y))]
+        y = [y[i][non_zero_masks[i]] for i in range(len(y))]
+        yerr = [yerr[i][non_zero_masks[i]] for i in range(len(yerr))]
+        optimalParameters, covarianceMatrix = opt.curve_fit(partial(self.fittingFunction, non_zero_masks, *resolution_parameters[self.analysisType].values()), x, np.hstack(y), sigma=np.hstack(yerr), p0=self.initialParameters, bounds=self.bounds)#, jac=partial(self.fittingErrorFunction, non_zero_masks, *resolution_parameters[self.analysisType].values()))
+
+        reducedChi2 = self.chi2OverNDF(optimalParameters, covarianceMatrix, x, np.hstack(y), np.hstack(yerr), non_zero_masks)
+
+        B, v2, v3, v4, va2, va4 = uncertainties.correlated_values(optimalParameters, covarianceMatrix)
+
+        cov_pickled = pickle.dumps(covarianceMatrix, pickle.HIGHEST_PROTOCOL)
+        cov_pickled_binary = sqlite3.Binary(cov_pickled)
+
+
+        if self.databaseConnection is not None:
+            cursor = self.databaseConnection.cursor()
+            cursor.execute(&#34;REPLACE INTO fit_parameters VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&#34;, (self.analysisType.name, self.currentTriggerJetMomentumBin.value,  self.currentAssociatedHadronMomentumBin.value, self.currentParticleSelection.name, reducedChi2, B.n, v2.n, v3.n, v4.n, va2.n, va4.n, B.s, v2.s, v3.s, v4.s, va2.s, va4.s, cov_pickled_binary))
+            self.databaseConnection.commit()
+            
+        return optimalParameters, covarianceMatrix, reducedChi2</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="JetHadronAnalysis.RPFFit.RPFFit"><code class="flex name class">
+<span>class <span class="ident">RPFFit</span></span>
+<span>(</span><span>analysisType: <a title="JetHadronAnalysis.Types.AnalysisType" href="Types.html#JetHadronAnalysis.Types.AnalysisType">AnalysisType</a>, currentTriggerJetMomentumBin: <a title="JetHadronAnalysis.Types.TriggerJetMomentumBin" href="Types.html#JetHadronAnalysis.Types.TriggerJetMomentumBin">TriggerJetMomentumBin</a>, currentAssociatedHadronMomentumBin: <a title="JetHadronAnalysis.Types.AssociatedHadronMomentumBin" href="Types.html#JetHadronAnalysis.Types.AssociatedHadronMomentumBin">AssociatedHadronMomentumBin</a>, currentParticleSelection: <a title="JetHadronAnalysis.Types.ParticleType" href="Types.html#JetHadronAnalysis.Types.ParticleType">ParticleType</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RPFFit:
+    def __init__(self, analysisType:AnalysisType, currentTriggerJetMomentumBin:TriggerJetMomentumBin, currentAssociatedHadronMomentumBin:AssociatedHadronMomentumBin, currentParticleSelection: ParticleType):
+        self.analysisType = analysisType
+        self.currentTriggerJetMomentumBin = currentTriggerJetMomentumBin
+        self.currentAssociatedHadronMomentumBin = currentAssociatedHadronMomentumBin
+        self.currentParticleSelection = currentParticleSelection
+
+        self.initialParameters = None 
+        self.bounds = bounds 
+        self.fittingFunction = simultaneous_fit 
+        self.fittingErrorFunction = simultaneous_err
+
+        self.databaseConnection = None 
+        self.initializeDatabase()
+
+
+    def initializeDatabase(self):
+        &#39;&#39;&#39;
+        establish connection to the parameter and particle fraction database named RPF.db
+        &#39;&#39;&#39;
+        self.databaseConnection = sqlite3.connect(&#34;RPF.db&#34;)
+        cursor = self.databaseConnection.cursor()
+        cursor.execute(&#34;CREATE TABLE IF NOT EXISTS fit_parameters(analysis_type TEXT, trigger_momentum_bin INTEGER, associated_momentum_bin INTEGER, particle_species TEXT, reduced_chi2 REAL, background_level REAL, v2 REAL, v3 REAL, v4 REAL, va2 REAL, va4 REAL, background_level_error REAL, v2_error REAL, v3_error REAL, v4_error REAL, va2_error REAL, va4_error REAL, covariance_matrix BLOB, PRIMARY KEY(analysis_type, trigger_momentum_bin, associated_momentum_bin, particle_species))&#34;)
+        self.databaseConnection.commit()
+
+    def setInitialParameters(self, initialParameters):
+        self.initialParameters = initialParameters
+
+    def setBounds(self, bounds): 
+        self.bounds = bounds
+
+    def setDefaultParameters(self):
+        self.initialParameters = initial_parameter_defaults[self.analysisType,self.currentTriggerJetMomentumBin,self.currentAssociatedHadronMomentumBin]
+
+    @classmethod
+    def prepareData(cls, inPlaneBackgroundAzimuthalCorrelationFunction:TH1D, midPlaneBackgroundAzimuthalCorrelationFunction:TH1D, outOfPlaneBackgroundAzimuthalCorrelationFunction:TH1D):
+        &#39;&#39;&#39;
+        prepare data for fitting
+
+        Args:
+            inPlaneBackgroundAzimuthalCorrelationFunction (TH1D): Azimuthal correlation function for in-plane background
+            midPlaneBackgroundAzimuthalCorrelationFunction (TH1D): Azimuthal correlation function for mid-plane background
+            outOfPlaneBackgroundAzimuthalCorrelationFunction (TH1D): Azimuthal correlation function for out-of-plane background
+        Returns:
+            x (np.ndarray): numpy array of x values for fitting, common x-axis for each reaction plane bin
+            y (List[np.narray]): list of numpy arrays of y values for fitting, y-values from each reaction plane bin
+            yerr (List[np.ndarray]): list of numpy arrays of y errors for fitting, y-errors from each reaction plane bin
+        &#39;&#39;&#39;
+        x = np.array([inPlaneBackgroundAzimuthalCorrelationFunction.GetBinCenter(i) for i in range(1, inPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)])
+        y = [
+                np.array([inPlaneBackgroundAzimuthalCorrelationFunction.GetBinContent(i) for i in range(1, inPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)]),
+                np.array([midPlaneBackgroundAzimuthalCorrelationFunction.GetBinContent(i) for i in range(1, midPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)]),
+                np.array([outOfPlaneBackgroundAzimuthalCorrelationFunction.GetBinContent(i) for i in range(1, outOfPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)])
+            ]
+        yerr = [
+                np.array([inPlaneBackgroundAzimuthalCorrelationFunction.GetBinError(i) for i in range(1, inPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)]),
+                np.array([midPlaneBackgroundAzimuthalCorrelationFunction.GetBinError(i) for i in range(1, midPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)]),
+                np.array([outOfPlaneBackgroundAzimuthalCorrelationFunction.GetBinError(i) for i in range(1, outOfPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)])
+            ]
+        return x, y, yerr
+    
+    def chi2OverNDF(self, optimal_params, covariance, x, y, yerr, non_zero_masks=None):
+        &#39;&#39;&#39;
+        Computes the chi2/ndf of the fit
+        &#39;&#39;&#39;
+        if non_zero_masks is None:
+            non_zero_masks = [y[i] != 0 for i in range(len(y))]
+
+            y = np.hstack([y[i][non_zero_masks[i]] for i in range(len(y))])
+
+            yerr = np.hstack([yerr[i][non_zero_masks[i]] for i in range(len(yerr))])
+        y_fit = self.fittingFunction(non_zero_masks, *resolution_parameters[self.analysisType].values(), x,  *optimal_params)
+        chi2 = np.sum((y-y_fit)**2/yerr**2)
+        ndf = len(x)*3-len(optimal_params) # here we multiply by four because we have four different ys that are fitting simultaneously
+        return chi2/ndf
+    
+    def performFit(self, x:np.ndarray, y:List[np.ndarray], yerr:List[np.ndarray]):
+        &#39;&#39;&#39;
+        performs fit using scipy.optimize.curve_fit removing points with y=yerr=0
+
+        Args:
+            x (np.ndarray): numpy array of x values for fitting, common x-axis for each reaction plane bin
+            y (List[np.narray]): numpy array of y values for fitting, y-values from each reaction plane bin are concatenated using np.hstack
+            yerr (List[np.ndarray]): numpy array of y errors for fitting, y-errors from each reaction plane bin are concatenated using np.hstack
+        Returns:
+            optimalParameters (np.ndarray): numpy array of optimal parameters from fit
+            optimalParameterCovariance (np.ndarray): numpy array of optimal parameter covariance errors from fit
+            reducedChi2 (float): reduced chi2 from fit
+        &#39;&#39;&#39;
+        non_zero_masks = [y[i] != 0 for i in range(len(y))]
+        y = [y[i][non_zero_masks[i]] for i in range(len(y))]
+        yerr = [yerr[i][non_zero_masks[i]] for i in range(len(yerr))]
+        optimalParameters, covarianceMatrix = opt.curve_fit(partial(self.fittingFunction, non_zero_masks, *resolution_parameters[self.analysisType].values()), x, np.hstack(y), sigma=np.hstack(yerr), p0=self.initialParameters, bounds=self.bounds)#, jac=partial(self.fittingErrorFunction, non_zero_masks, *resolution_parameters[self.analysisType].values()))
+
+        reducedChi2 = self.chi2OverNDF(optimalParameters, covarianceMatrix, x, np.hstack(y), np.hstack(yerr), non_zero_masks)
+
+        B, v2, v3, v4, va2, va4 = uncertainties.correlated_values(optimalParameters, covarianceMatrix)
+
+        cov_pickled = pickle.dumps(covarianceMatrix, pickle.HIGHEST_PROTOCOL)
+        cov_pickled_binary = sqlite3.Binary(cov_pickled)
+
+
+        if self.databaseConnection is not None:
+            cursor = self.databaseConnection.cursor()
+            cursor.execute(&#34;REPLACE INTO fit_parameters VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&#34;, (self.analysisType.name, self.currentTriggerJetMomentumBin.value,  self.currentAssociatedHadronMomentumBin.value, self.currentParticleSelection.name, reducedChi2, B.n, v2.n, v3.n, v4.n, va2.n, va4.n, B.s, v2.s, v3.s, v4.s, va2.s, va4.s, cov_pickled_binary))
+            self.databaseConnection.commit()
+            
+        return optimalParameters, covarianceMatrix, reducedChi2</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="JetHadronAnalysis.RPFFit.RPFFit.prepareData"><code class="name flex">
+<span>def <span class="ident">prepareData</span></span>(<span>inPlaneBackgroundAzimuthalCorrelationFunction: cppyy.gbl.TH1D, midPlaneBackgroundAzimuthalCorrelationFunction: cppyy.gbl.TH1D, outOfPlaneBackgroundAzimuthalCorrelationFunction: cppyy.gbl.TH1D)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>prepare data for fitting</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>inPlaneBackgroundAzimuthalCorrelationFunction</code></strong> :&ensp;<code>TH1D</code></dt>
+<dd>Azimuthal correlation function for in-plane background</dd>
+<dt><strong><code>midPlaneBackgroundAzimuthalCorrelationFunction</code></strong> :&ensp;<code>TH1D</code></dt>
+<dd>Azimuthal correlation function for mid-plane background</dd>
+<dt><strong><code>outOfPlaneBackgroundAzimuthalCorrelationFunction</code></strong> :&ensp;<code>TH1D</code></dt>
+<dd>Azimuthal correlation function for out-of-plane background</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>x (np.ndarray): numpy array of x values for fitting, common x-axis for each reaction plane bin
+y (List[np.narray]): list of numpy arrays of y values for fitting, y-values from each reaction plane bin
+yerr (List[np.ndarray]): list of numpy arrays of y errors for fitting, y-errors from each reaction plane bin</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def prepareData(cls, inPlaneBackgroundAzimuthalCorrelationFunction:TH1D, midPlaneBackgroundAzimuthalCorrelationFunction:TH1D, outOfPlaneBackgroundAzimuthalCorrelationFunction:TH1D):
+    &#39;&#39;&#39;
+    prepare data for fitting
+
+    Args:
+        inPlaneBackgroundAzimuthalCorrelationFunction (TH1D): Azimuthal correlation function for in-plane background
+        midPlaneBackgroundAzimuthalCorrelationFunction (TH1D): Azimuthal correlation function for mid-plane background
+        outOfPlaneBackgroundAzimuthalCorrelationFunction (TH1D): Azimuthal correlation function for out-of-plane background
+    Returns:
+        x (np.ndarray): numpy array of x values for fitting, common x-axis for each reaction plane bin
+        y (List[np.narray]): list of numpy arrays of y values for fitting, y-values from each reaction plane bin
+        yerr (List[np.ndarray]): list of numpy arrays of y errors for fitting, y-errors from each reaction plane bin
+    &#39;&#39;&#39;
+    x = np.array([inPlaneBackgroundAzimuthalCorrelationFunction.GetBinCenter(i) for i in range(1, inPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)])
+    y = [
+            np.array([inPlaneBackgroundAzimuthalCorrelationFunction.GetBinContent(i) for i in range(1, inPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)]),
+            np.array([midPlaneBackgroundAzimuthalCorrelationFunction.GetBinContent(i) for i in range(1, midPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)]),
+            np.array([outOfPlaneBackgroundAzimuthalCorrelationFunction.GetBinContent(i) for i in range(1, outOfPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)])
+        ]
+    yerr = [
+            np.array([inPlaneBackgroundAzimuthalCorrelationFunction.GetBinError(i) for i in range(1, inPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)]),
+            np.array([midPlaneBackgroundAzimuthalCorrelationFunction.GetBinError(i) for i in range(1, midPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)]),
+            np.array([outOfPlaneBackgroundAzimuthalCorrelationFunction.GetBinError(i) for i in range(1, outOfPlaneBackgroundAzimuthalCorrelationFunction.GetNbinsX()+1)])
+        ]
+    return x, y, yerr</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="JetHadronAnalysis.RPFFit.RPFFit.chi2OverNDF"><code class="name flex">
+<span>def <span class="ident">chi2OverNDF</span></span>(<span>self, optimal_params, covariance, x, y, yerr, non_zero_masks=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Computes the chi2/ndf of the fit</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def chi2OverNDF(self, optimal_params, covariance, x, y, yerr, non_zero_masks=None):
+    &#39;&#39;&#39;
+    Computes the chi2/ndf of the fit
+    &#39;&#39;&#39;
+    if non_zero_masks is None:
+        non_zero_masks = [y[i] != 0 for i in range(len(y))]
+
+        y = np.hstack([y[i][non_zero_masks[i]] for i in range(len(y))])
+
+        yerr = np.hstack([yerr[i][non_zero_masks[i]] for i in range(len(yerr))])
+    y_fit = self.fittingFunction(non_zero_masks, *resolution_parameters[self.analysisType].values(), x,  *optimal_params)
+    chi2 = np.sum((y-y_fit)**2/yerr**2)
+    ndf = len(x)*3-len(optimal_params) # here we multiply by four because we have four different ys that are fitting simultaneously
+    return chi2/ndf</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.RPFFit.RPFFit.initializeDatabase"><code class="name flex">
+<span>def <span class="ident">initializeDatabase</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>establish connection to the parameter and particle fraction database named RPF.db</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def initializeDatabase(self):
+    &#39;&#39;&#39;
+    establish connection to the parameter and particle fraction database named RPF.db
+    &#39;&#39;&#39;
+    self.databaseConnection = sqlite3.connect(&#34;RPF.db&#34;)
+    cursor = self.databaseConnection.cursor()
+    cursor.execute(&#34;CREATE TABLE IF NOT EXISTS fit_parameters(analysis_type TEXT, trigger_momentum_bin INTEGER, associated_momentum_bin INTEGER, particle_species TEXT, reduced_chi2 REAL, background_level REAL, v2 REAL, v3 REAL, v4 REAL, va2 REAL, va4 REAL, background_level_error REAL, v2_error REAL, v3_error REAL, v4_error REAL, va2_error REAL, va4_error REAL, covariance_matrix BLOB, PRIMARY KEY(analysis_type, trigger_momentum_bin, associated_momentum_bin, particle_species))&#34;)
+    self.databaseConnection.commit()</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.RPFFit.RPFFit.performFit"><code class="name flex">
+<span>def <span class="ident">performFit</span></span>(<span>self, x: numpy.ndarray, y: List[numpy.ndarray], yerr: List[numpy.ndarray])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>performs fit using scipy.optimize.curve_fit removing points with y=yerr=0</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>numpy array of x values for fitting, common x-axis for each reaction plane bin</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>List[np.narray]</code></dt>
+<dd>numpy array of y values for fitting, y-values from each reaction plane bin are concatenated using np.hstack</dd>
+<dt><strong><code>yerr</code></strong> :&ensp;<code>List[np.ndarray]</code></dt>
+<dd>numpy array of y errors for fitting, y-errors from each reaction plane bin are concatenated using np.hstack</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>optimalParameters (np.ndarray): numpy array of optimal parameters from fit
+optimalParameterCovariance (np.ndarray): numpy array of optimal parameter covariance errors from fit
+reducedChi2 (float): reduced chi2 from fit</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def performFit(self, x:np.ndarray, y:List[np.ndarray], yerr:List[np.ndarray]):
+    &#39;&#39;&#39;
+    performs fit using scipy.optimize.curve_fit removing points with y=yerr=0
+
+    Args:
+        x (np.ndarray): numpy array of x values for fitting, common x-axis for each reaction plane bin
+        y (List[np.narray]): numpy array of y values for fitting, y-values from each reaction plane bin are concatenated using np.hstack
+        yerr (List[np.ndarray]): numpy array of y errors for fitting, y-errors from each reaction plane bin are concatenated using np.hstack
+    Returns:
+        optimalParameters (np.ndarray): numpy array of optimal parameters from fit
+        optimalParameterCovariance (np.ndarray): numpy array of optimal parameter covariance errors from fit
+        reducedChi2 (float): reduced chi2 from fit
+    &#39;&#39;&#39;
+    non_zero_masks = [y[i] != 0 for i in range(len(y))]
+    y = [y[i][non_zero_masks[i]] for i in range(len(y))]
+    yerr = [yerr[i][non_zero_masks[i]] for i in range(len(yerr))]
+    optimalParameters, covarianceMatrix = opt.curve_fit(partial(self.fittingFunction, non_zero_masks, *resolution_parameters[self.analysisType].values()), x, np.hstack(y), sigma=np.hstack(yerr), p0=self.initialParameters, bounds=self.bounds)#, jac=partial(self.fittingErrorFunction, non_zero_masks, *resolution_parameters[self.analysisType].values()))
+
+    reducedChi2 = self.chi2OverNDF(optimalParameters, covarianceMatrix, x, np.hstack(y), np.hstack(yerr), non_zero_masks)
+
+    B, v2, v3, v4, va2, va4 = uncertainties.correlated_values(optimalParameters, covarianceMatrix)
+
+    cov_pickled = pickle.dumps(covarianceMatrix, pickle.HIGHEST_PROTOCOL)
+    cov_pickled_binary = sqlite3.Binary(cov_pickled)
+
+
+    if self.databaseConnection is not None:
+        cursor = self.databaseConnection.cursor()
+        cursor.execute(&#34;REPLACE INTO fit_parameters VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&#34;, (self.analysisType.name, self.currentTriggerJetMomentumBin.value,  self.currentAssociatedHadronMomentumBin.value, self.currentParticleSelection.name, reducedChi2, B.n, v2.n, v3.n, v4.n, va2.n, va4.n, B.s, v2.s, v3.s, v4.s, va2.s, va4.s, cov_pickled_binary))
+        self.databaseConnection.commit()
+        
+    return optimalParameters, covarianceMatrix, reducedChi2</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.RPFFit.RPFFit.setBounds"><code class="name flex">
+<span>def <span class="ident">setBounds</span></span>(<span>self, bounds)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setBounds(self, bounds): 
+    self.bounds = bounds</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.RPFFit.RPFFit.setDefaultParameters"><code class="name flex">
+<span>def <span class="ident">setDefaultParameters</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setDefaultParameters(self):
+    self.initialParameters = initial_parameter_defaults[self.analysisType,self.currentTriggerJetMomentumBin,self.currentAssociatedHadronMomentumBin]</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.RPFFit.RPFFit.setInitialParameters"><code class="name flex">
+<span>def <span class="ident">setInitialParameters</span></span>(<span>self, initialParameters)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setInitialParameters(self, initialParameters):
+    self.initialParameters = initialParameters</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="JetHadronAnalysis" href="index.html">JetHadronAnalysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="JetHadronAnalysis.RPFFit.RPFFit" href="#JetHadronAnalysis.RPFFit.RPFFit">RPFFit</a></code></h4>
+<ul class="">
+<li><code><a title="JetHadronAnalysis.RPFFit.RPFFit.chi2OverNDF" href="#JetHadronAnalysis.RPFFit.RPFFit.chi2OverNDF">chi2OverNDF</a></code></li>
+<li><code><a title="JetHadronAnalysis.RPFFit.RPFFit.initializeDatabase" href="#JetHadronAnalysis.RPFFit.RPFFit.initializeDatabase">initializeDatabase</a></code></li>
+<li><code><a title="JetHadronAnalysis.RPFFit.RPFFit.performFit" href="#JetHadronAnalysis.RPFFit.RPFFit.performFit">performFit</a></code></li>
+<li><code><a title="JetHadronAnalysis.RPFFit.RPFFit.prepareData" href="#JetHadronAnalysis.RPFFit.RPFFit.prepareData">prepareData</a></code></li>
+<li><code><a title="JetHadronAnalysis.RPFFit.RPFFit.setBounds" href="#JetHadronAnalysis.RPFFit.RPFFit.setBounds">setBounds</a></code></li>
+<li><code><a title="JetHadronAnalysis.RPFFit.RPFFit.setDefaultParameters" href="#JetHadronAnalysis.RPFFit.RPFFit.setDefaultParameters">setDefaultParameters</a></code></li>
+<li><code><a title="JetHadronAnalysis.RPFFit.RPFFit.setInitialParameters" href="#JetHadronAnalysis.RPFFit.RPFFit.setInitialParameters">setInitialParameters</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

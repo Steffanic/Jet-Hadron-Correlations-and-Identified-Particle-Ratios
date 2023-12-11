@@ -1,0 +1,2563 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>JetHadronAnalysis.Analysis API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>JetHadronAnalysis.Analysis</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python"># © Patrick John Steffanic 2023
+# This file contains the class whose responsibility it is to manage the analysis and its configuration 
+
+import sqlite3
+import numpy as np
+import os
+import uncertainties
+from JetHadronAnalysis.Sparse import TriggerSparse, MixedEventSparse, JetHadronSparse
+from JetHadronAnalysis.Types import AnalysisType, ParticleType, NormalizationMethod, Region, TriggerJetMomentumBin, AssociatedHadronMomentumBin, ReactionPlaneBin, regionDeltaPhiRangeDictionary, regionDeltaEtaRangeDictionary, regionDeltaPhiBinCountsDictionary, speciesTOFRangeDictionary, triggerJetMomentumBinRangeDictionary, associatedHadronMomentumBinRangeDictionary, eventPlaneAngleBinRangeDictionary
+from JetHadronAnalysis.Background import BackgroundFunction
+from JetHadronAnalysis.TPCPionNsigmaFit import FitTPCPionNsigma
+from JetHadronAnalysis.RPFFit import RPFFit
+from JetHadronAnalysis.Fitting.RPF import resolution_parameters
+
+from ROOT import TFile, TH1D # type: ignore
+from enum import Enum
+from math import pi
+
+from JetHadronAnalysis.Plotting import plotArrays
+from JetHadronAnalysis.PIDDB import getParticleFractionByMomentum, getParticleFractionForMomentumBin
+from JetHadronAnalysis.RPFDB import getParameterByTriggerAndHadronMomentumForParticleSpecies, getParameters, getParameterErrors
+
+
+class Analysis:
+    &#39;&#39;&#39;
+    This class is responsible for managing the analysis and its configuration. 
+    &#39;&#39;&#39;
+
+    def __init__(self, analysisType: AnalysisType, rootFileNames: list):
+        self.analysisType = analysisType
+
+        self.JetHadron = JetHadronSparse(analysisType)
+        self.Trigger = TriggerSparse(analysisType)
+        self.MixedEvent = MixedEventSparse(analysisType)
+
+        self.currentRegion = Region.INCLUSIVE
+
+        self.currentTriggerJetMomentumBin = TriggerJetMomentumBin.PT_20_40
+
+        self.currentAssociatedHadronMomentumBin = AssociatedHadronMomentumBin.PT_1_15
+
+        self.current_species=ParticleType.INCLUSIVE
+
+        # make some dictionaries to keep track of the number of triger jets and associated hadrons in each region
+        self.numberOfTriggerJets = {}
+        self.numberOfAssociatedHadrons = {}
+
+        if self.analysisType != AnalysisType.PP:
+            self.reactionPlaneAngle = ReactionPlaneBin.INCLUSIVE
+
+        for rootFileName in rootFileNames:
+            self.fillSparsesFromFile(rootFileName)
+
+
+    def fillSparsesFromFile(self, rootFileName: str):
+        &#39;&#39;&#39;
+        This function opens the root file and appends the sparse data to the appropriate Sparse object then closes the file
+        &#39;&#39;&#39;
+        file = TFile(rootFileName)
+        rootFileListName = f&#34;AliAnalysisTaskJetH_tracks_caloClusters_biased&#34; if self.analysisType == AnalysisType.PP else f&#34;AliAnalysisTaskJetH_tracks_caloClusters_dEdxtrackBias5R2{&#39;SemiCentral&#39; if self.analysisType == AnalysisType.SEMICENTRAL else &#39;Central&#39;}q&#34;
+        rootFileList = file.Get(rootFileListName)
+        self.JetHadron.addSparse(rootFileList.FindObject(&#34;fhnJH&#34;))
+        self.Trigger.addSparse(rootFileList.FindObject(&#34;fhnTrigger&#34;))
+        self.MixedEvent.addSparse(rootFileList.FindObject(&#34;fhnMixedEvents&#34;))
+        file.Close()
+
+    def setRegion(self, region: Region):
+        &#39;&#39;&#39;
+        Sets the delta-phi and delta-eta ranges for the JetHadron sparse 
+        &#39;&#39;&#39;
+        self.currentRegion = region
+        if region == Region.BACKGROUND:
+            self.JetHadron.setRegionIsBackground(True)
+        else:
+            self.JetHadron.setRegionIsBackground(False)
+            self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
+            self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[region])
+            if hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+                self.fillNumberOfAssociatedHadronsDictionary()
+
+    def setTriggerJetMomentumBin(self, triggerJetMomentumBin: TriggerJetMomentumBin):
+        &#39;&#39;&#39;
+        Sets the trigger jet momentum bin for the JetHadron sparse
+        &#39;&#39;&#39;
+        self.currentTriggerJetMomentumBin = triggerJetMomentumBin
+        self.JetHadron.setTriggerJetMomentumRange(*triggerJetMomentumBinRangeDictionary[triggerJetMomentumBin])
+        if hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+            self.fillNumberOfAssociatedHadronsDictionary()
+
+    def setAssociatedHadronMomentumBin(self, associatedHadronMomentumBin: AssociatedHadronMomentumBin):
+        &#39;&#39;&#39;
+        Sets the associated hadron momentum bin for the JetHadron sparse
+        &#39;&#39;&#39;
+        self.currentAssociatedHadronMomentumBin = associatedHadronMomentumBin
+        self.JetHadron.setAssociatedHadronMomentumRange(*associatedHadronMomentumBinRangeDictionary[associatedHadronMomentumBin])
+        if hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+            self.fillNumberOfAssociatedHadronsDictionary()
+
+    def setParticleSelectionForJetHadron(self, species: ParticleType):
+        &#39;&#39;&#39;
+        Sets the pion, kaon, and proton TOF ranges to get the particle type specified in JetHadron sparse
+        &#39;&#39;&#39;
+        self.current_species = species
+        if species == ParticleType.OTHER:
+            self.JetHadron.setParticleTypeIsOther(True)
+        else:
+            self.JetHadron.setParticleTypeIsOther(False)
+            self.JetHadron.setPionTOFnSigma(*speciesTOFRangeDictionary[species][0])
+            self.JetHadron.setKaonTOFnSigma(*speciesTOFRangeDictionary[species][1])
+            self.JetHadron.setProtonTOFnSigma(*speciesTOFRangeDictionary[species][2])
+
+    def setReactionPlaneAngleBin(self, reactionPlaneAngle: ReactionPlaneBin):
+        &#39;&#39;&#39;
+        Sets the reaction plane angle bin for the JetHadron sparse
+        &#39;&#39;&#39;
+        self.reactionPlaneAngle = reactionPlaneAngle
+        self.JetHadron.setEventPlaneAngleRange(*eventPlaneAngleBinRangeDictionary[reactionPlaneAngle])
+        if hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+            self.fillNumberOfAssociatedHadronsDictionary()
+
+    def getDifferentialCorrelationFunction(self, per_trigger_normalized=False):
+        &#39;&#39;&#39;
+        Returns the differential correlation function
+        &#39;&#39;&#39;
+        correlationFunction = self.JetHadron.getProjection(self.JetHadron.Axes.DELTA_PHI, self.JetHadron.Axes.DELTA_ETA)
+        correlationFunction.Scale(1 / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI) / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_ETA))
+        if per_trigger_normalized:
+            correlationFunction.Scale(1 / self.getNumberOfTriggerJets())
+        return correlationFunction
+    
+    def getAcceptanceCorrectedDifferentialCorrelationFunction(self, differentialCorrelationFunction, acceptanceCorrection):
+        &#39;&#39;&#39;
+        Returns the acceptance corrected differential correlation function
+        This is the raw differential correlation function divided by the normalized mixed event correlation function
+        &#39;&#39;&#39;
+        acceptanceCorrectedDifferentialCorrelationFunction = differentialCorrelationFunction.Clone()
+        acceptanceCorrection = acceptanceCorrection.Clone()
+        # Set the x and y bin ranges in the acceptance correction to match the raw correlation function
+        acceptanceCorrection.GetXaxis().SetRangeUser(differentialCorrelationFunction.GetXaxis().GetXmin(), differentialCorrelationFunction.GetXaxis().GetXmax())
+        acceptanceCorrection.GetYaxis().SetRangeUser(differentialCorrelationFunction.GetYaxis().GetXmin(), differentialCorrelationFunction.GetYaxis().GetXmax())
+        acceptanceCorrectedDifferentialCorrelationFunction.Divide(acceptanceCorrection)
+        return acceptanceCorrectedDifferentialCorrelationFunction
+    
+    def getAcceptanceCorrectedDifferentialAzimuthalCorrelationFunction(self, acceptanceCorrectedDifferentialCorrelationFunction):
+        &#39;&#39;&#39;
+        Returns the acceptance corrected differential azimuthal correlation function
+        This is the acceptance corrected differential correlation function integrated over delta-eta
+        &#39;&#39;&#39;
+        acceptanceCorrectedDifferentialAzimuthalCorrelationFunction = acceptanceCorrectedDifferentialCorrelationFunction.ProjectionX()
+        acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Scale(self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_ETA))
+        # scale by the number of bins in delta-eta over which the correlation function was integrated
+        number_of_delta_eta_bins = acceptanceCorrectedDifferentialCorrelationFunction.GetYaxis().GetNbins()
+        acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Scale(1 / number_of_delta_eta_bins)
+        return acceptanceCorrectedDifferentialAzimuthalCorrelationFunction
+
+    def getAcceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction(self, acceptanceCorrectedDifferentialAzimuthalCorrelationFunction: TH1D, backgroundFunction:TH1D):
+        &#39;&#39;&#39;
+        Returns the acceptance corrected background subtracted differential correlation function
+        This is the acceptance corrected differential correlation function minus the background function
+        &#39;&#39;&#39;
+        acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction = acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Clone()
+        backgroundFunction = backgroundFunction.Clone()
+        backgroundFunction.Scale(-1)
+        acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction.Add(backgroundFunction)
+        return acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction
+
+    def getAzimuthalCorrelationFunctionforParticleType(self, species: ParticleType, acceptanceCorrectedAzimuthalCorrelationFunction: TH1D, loadFractionsFromDB=False):
+        &#39;&#39;&#39;
+        Gets the particle fractions and scales the acceptance corrected azimuthal correlation function by the particle fraction for the specified species
+        &#39;&#39;&#39;
+
+        particle_fractions, particle_fraction_errors, chi2OverNDF_shape, Chi2OverNDF_yield = self.getPIDFractions(loadFractionsFromDB=loadFractionsFromDB)
+        
+        # now get the per species azimuthal correlation functions for each region by scaling
+        species_azimuthal_correlation_function = acceptanceCorrectedAzimuthalCorrelationFunction.Clone()
+        species_azimuthal_correlation_function.Scale(particle_fractions[species])
+        error_band = acceptanceCorrectedAzimuthalCorrelationFunction.Clone()
+        error_band.Scale(particle_fraction_errors[species])
+        # convert errorbands into numpy arrays of bin contents
+        sys_errors = np.array([error_band.GetBinContent(i) for i in range(1, error_band.GetNbinsX()+1)])
+        # reset the errors for species_azimuthal_correlation_function to add the statistical errors and systematic errors in quadrature
+        for i in range(1, species_azimuthal_correlation_function.GetNbinsX()+1):
+            species_azimuthal_correlation_function.SetBinError(i, np.sqrt(species_azimuthal_correlation_function.GetBinError(i)**2 + sys_errors[i-1]**2))
+        
+
+        return species_azimuthal_correlation_function
+        
+    def getYieldFromAzimuthalCorrelationFunction(self, azimuthalCorrelationFunction: TH1D):
+        &#39;&#39;&#39;
+        Returns the yield from the azimuthal correlation function
+        &#39;&#39;&#39;
+        # scale by  the bin width
+        # but first clone it 
+        azimuthalCorrelationFunction = azimuthalCorrelationFunction.Clone()
+        azimuthalCorrelationFunction.Scale(self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI))
+        yield_ = azimuthalCorrelationFunction.Integral()
+        error_ = np.sqrt(np.sum([azimuthalCorrelationFunction.GetBinError(i)**2 for i in range(1, azimuthalCorrelationFunction.GetNbinsX()+1)]))
+        return yield_, error_
+
+    def getNormalizedDifferentialMixedEventCorrelationFunction(self, normMethod: NormalizationMethod, **kwargs):
+        &#39;&#39;&#39;
+        Returns the differential mixed event correlation function
+        &#39;&#39;&#39;
+        if &#34;TOF&#34; in kwargs:
+            if kwargs[&#39;TOF&#39;]:
+                self.MixedEvent.sethasTOF(True)
+                mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+            else:
+                mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+        mixedEventCorrelationFunction.Scale(1 / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_PHI) / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_ETA))
+
+        normalization_factor = self.computeMixedEventNormalizationFactor(mixedEventCorrelationFunction, normMethod, **kwargs)
+
+        if kwargs.get(&#34;customRegion&#34;, None) is not None:
+            customRegion = kwargs.get(&#34;customRegion&#34;)
+            self.MixedEvent.setDeltaPhiRange(*customRegion[&#34;DeltaPhi&#34;])
+            self.MixedEvent.setDeltaEtaRange(*customRegion[&#34;DeltaEta&#34;])
+            mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+            self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
+            self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+        else:
+            if self.currentRegion == Region.BACKGROUND:
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETANEG])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETANEG])
+                mixedEventCorrelationFunction_etaneg = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETAPOS])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETAPOS])
+                mixedEventCorrelationFunction_etapos = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+                mixedEventCorrelationFunction = mixedEventCorrelationFunction_etaneg.Clone()
+                mixedEventCorrelationFunction.Add(mixedEventCorrelationFunction_etapos)
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+            else:
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[self.currentRegion])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[self.currentRegion])
+                mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+        mixedEventCorrelationFunction.Scale(1 / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_PHI) / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_ETA))
+        mixedEventCorrelationFunction.Scale(1 / normalization_factor)
+        return mixedEventCorrelationFunction
+    
+    def getRPInclusiveBackgroundCorrelationFunctionUsingRPF(self, inPlaneCorrelationFunction: TH1D, midPlaneCorrelationFunction: TH1D, outPlaneCorrelationFunction: TH1D, loadFunctionFromDB=False):
+        &#39;&#39;&#39;
+        Returns the background correlation function using the RPF method
+
+        Check if the background function has already been computed and stored in the database
+        If not, compute it and store it in the database
+
+        Returns:
+            backgroundCorrelationFunction (TH1D): The background correlation function with the same binning as the in-plane, mid-plane, and out-of-plane correlation functions
+        &#39;&#39;&#39;
+        # create a fitter instance
+        fitter = RPFFit(self.analysisType, self.currentTriggerJetMomentumBin, self.currentAssociatedHadronMomentumBin, self.current_species)
+
+        if loadFunctionFromDB:
+            print(&#34;Loading RPF background from DB&#34;)
+            # get the background function from the database
+            optimal_params, covariance, reduced_chi2 = self.getRPFParamsAndErrorFromDB()
+        else:
+            fitter.setDefaultParameters()
+
+            # prepare the data for fitting
+            x, y, yerr = RPFFit.prepareData(inPlaneCorrelationFunction, midPlaneCorrelationFunction, outPlaneCorrelationFunction)
+
+            # fit and extract the optimal fit params
+            optimal_params, covariance, reduced_chi2 = fitter.performFit(x, y, yerr)
+            
+        # build the background function with the same binning as the correlation functions
+        x_background = np.array([inPlaneCorrelationFunction.GetBinCenter(i) for i in range(1, inPlaneCorrelationFunction.GetNbinsX()+1)])
+        backgroundCorrelationFunction = TH1D(&#34;backgroundCorrelationFunction&#34;, &#34;backgroundCorrelationFunction&#34;, len(x_background), x_background[0], x_background[-1])
+        backgroundContent = fitter.fittingFunction(None, *resolution_parameters[self.analysisType].values(), x_background, *optimal_params)
+        backgroundError = fitter.fittingErrorFunction(None, *resolution_parameters[self.analysisType].values(), x_background, *optimal_params, pcov=covariance)
+
+        inPlaneContent = backgroundContent[:len(x_background)]
+        midPlaneContent = backgroundContent[len(x_background):2*len(x_background)]
+        outPlaneContent = backgroundContent[2*len(x_background):]
+        inclusiveContent = inPlaneContent + midPlaneContent + outPlaneContent
+
+        inPlaneError = backgroundError[:len(x_background)]
+        midPlaneError = backgroundError[len(x_background):2*len(x_background)]
+        outPlaneError = backgroundError[2*len(x_background):]
+        inclusiveError = np.sqrt(inPlaneError**2 + midPlaneError**2 + outPlaneError**2)
+        # fill the background function with the optimal params
+        for i in range(len(x_background)):
+            backgroundCorrelationFunction.SetBinContent(i+1, inclusiveContent[i])
+            backgroundCorrelationFunction.SetBinError(i+1, inclusiveError[i])
+        return backgroundCorrelationFunction
+
+
+
+    def getRPFParamsAndErrorFromDB(self):
+        # get a db connection
+        conn = sqlite3.connect(&#34;RPF.db&#34;)
+        dbCursor = conn.cursor()
+        # get the optimal paams and their errors from the database
+        optimal_params = getParameters(self.analysisType, self.currentTriggerJetMomentumBin, self.currentAssociatedHadronMomentumBin, self.current_species, dbCursor)
+        # get the optimal params errors from the database
+        param_errors, covariance = getParameterErrors(self.analysisType, self.currentTriggerJetMomentumBin, self.currentAssociatedHadronMomentumBin, self.current_species, dbCursor)
+        # close the connection
+        conn.close()
+        reduced_chi2 = optimal_params[-1]
+        # convert the optimal params and their errors to numpy arrays
+        optimal_params = np.array(optimal_params[:-1])
+        return optimal_params, covariance, reduced_chi2
+
+
+    def getPIDFractions(self, makeIntermediatePlots=True, loadFractionsFromDB=False):
+        &#39;&#39;&#39;
+        First checks if the PID fractions have already been computed and stored in the database
+        If not, computes them and stores them in the database
+        Prepares the projections for each enhanced species
+        Converts them into arrays for fitting
+        Fits and Extracts the optimal fit params
+        Computes the PID fractions
+        Returns the PID fractions
+        &#39;&#39;&#39;
+        if loadFractionsFromDB:
+            print(&#34;Loading particle fractions from database&#34;)
+            # get the particle fractions from the database
+            particle_fractions, particle_fraction_errors = self.getParticleFractionsFromDB()
+            return particle_fractions, particle_fraction_errors, None
+        # set the region to inclusive to fit the shape parameters first saving the current region to reset it later
+        currentRegion = self.currentRegion
+        self.setRegion(Region.INCLUSIVE)
+        # get the projections
+        pionEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PION)
+        protonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PROTON)
+        kaonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.KAON)
+        inclusiveEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.INCLUSIVE)
+        # convert to arrays using FitTPCPionNsigma.prepareData 
+        x, y, yerr = FitTPCPionNsigma.prepareData(pionEnhancedTPCnSigma, protonEnhancedTPCnSigma, kaonEnhancedTPCnSigma, inclusiveEnhancedTPCnSigma)
+        # fit and extract the optimal fit params
+        # start by creating the fitter instance
+        fitter = FitTPCPionNsigma(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin)
+        # initialize the default parameters for the analysis type and current associated hadron momentum bin
+        fitter.initializeDefaultParameters()
+        optimal_params, covariance = fitter.performShapeFit(x, y, yerr)
+
+        chi2OverNDF_shape = fitter.chi2OverNDF(optimal_params, covariance, x, y, yerr)
+        if makeIntermediatePlots:
+            self.plotTPCPionNsigmaFit(x, y, yerr, optimal_params, covariance, fitter.fittingFunction, fitter.fittingErrorFunction, fitter.pionFittingFunction, fitter.kaonFittingFunction, fitter.protonFittingFunction, fitter.chi2OverNDF, &#34;TPCnSigmaFitPlots&#34;)
+        # now set the region back to what it was before so we can fit the inclusive yield
+        self.setRegion(currentRegion)
+        # get the inclusive yield
+
+        pionEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PION)
+        protonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PROTON)
+        kaonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.KAON)
+        inclusiveEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.INCLUSIVE)
+
+        x, y, yerr = FitTPCPionNsigma.prepareData(pionEnhancedTPCnSigma, protonEnhancedTPCnSigma, kaonEnhancedTPCnSigma, inclusiveEnhancedTPCnSigma)
+
+        x_inc = x
+        y_inc = y[3]
+        yerr_inc = yerr[3]
+
+        optimal_inclusive_yield_parameters, covariance_inclusive_yield, reducedChi2_yield  = fitter.performYieldFit(x_inc, y_inc, yerr_inc, optimal_params)
+
+        mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = optimal_params
+        apinc, apiinc, akinc = optimal_inclusive_yield_parameters
+        optimal_params = mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak
+        covariance[-5:-2, -5:-2] = covariance_inclusive_yield # overwrite the covariance matrix with the covariance matrix from the inclusive yield fit
+
+
+        if  not hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+            self.fillNumberOfAssociatedHadronsDictionary()
+        
+        
+        # compute the PID fractions
+        pid_fractions, pid_fraction_errors = fitter.computeAveragePIDFractions(optimal_params, covariance, self.numberOfAssociatedHadronsBySpecies)
+
+        return pid_fractions, pid_fraction_errors, chi2OverNDF_shape, reducedChi2_yield
+
+    def getParticleFractionsFromDB(self):
+        &#39;&#39;&#39;
+        Gets the particle fractions from the database
+        &#39;&#39;&#39;
+        conn = sqlite3.connect(&#34;PID.db&#34;)
+        dbCursor = conn.cursor()
+        particle_fractions = {}
+        particle_fraction_errors = {}
+        for species in ParticleType:
+            if species is ParticleType.OTHER or species is ParticleType.INCLUSIVE:
+                continue
+
+            particle_fractions[species], particle_fraction_errors[species] = getParticleFractionForMomentumBin(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin, species, dbCursor)[0]
+        conn.close()
+        return particle_fractions, particle_fraction_errors
+
+    def getEnhancedTPCnSigmaProjection(self, species: ParticleType):
+        &#39;&#39;&#39;
+        Sets the particle type for the jet hadron sparse and returns the projection onto the TPC nsigma axis, then resets the particle type
+        &#39;&#39;&#39;
+        self.setParticleSelectionForJetHadron(species)
+        projection = self.getTPCPionNsigma()
+        self.setParticleSelectionForJetHadron(self.current_species)
+        return projection
+
+
+    def getTPCPionNsigma(self):
+        &#39;&#39;&#39;
+        Returns the projection onto the TPC pion nsigma axis
+        &#39;&#39;&#39;
+        return self.JetHadron.getProjection(self.JetHadron.Axes.PION_TPC_N_SIGMA)
+        
+
+    def plotTPCPionNsigmaFit(self, x, y, yerr, optimal_params, covariance, fitFunction, fitErrorFunction, pionFitFunction, kaonFitFunction, protonFitFunction, chi2OverNDFFunction, save_path=None):
+
+        if save_path is not None:
+            if save_path[-1] != &#34;/&#34;:
+                save_path += &#34;/&#34;
+            if not os.path.exists(save_path):
+                os.makedirs(save_path)
+            if not os.path.exists(f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}&#34;):
+                os.makedirs(f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}&#34;)
+
+        y_pion = y[0]
+        y_proton = y[1]
+        y_kaon = y[2]
+        y_inclusive = y[3]
+
+        y_err_pion = yerr[0]
+        y_err_proton = yerr[1]
+        y_err_kaon = yerr[2]
+        y_err_inclusive = yerr[3]
+
+        x_fit = np.linspace(x[0], x[-1], 100)
+        y_fit = fitFunction(None, x_fit, *optimal_params)
+        y_fit_err = fitErrorFunction(None, x_fit, *optimal_params, pcov=covariance)
+        y_fit_pion = y_fit[:len(x_fit)]
+        y_fit_proton = y_fit[len(x_fit):2*len(x_fit)]
+        y_fit_kaon = y_fit[2*len(x_fit):3*len(x_fit)]
+        y_fit_inclusive = y_fit[3*len(x_fit):]
+        y_fit_err_pion = y_fit_err[:len(x_fit)]
+        y_fit_err_proton = y_fit_err[len(x_fit):2*len(x_fit)]
+        y_fit_err_kaon = y_fit_err[2*len(x_fit):3*len(x_fit)]
+        y_fit_err_inclusive = y_fit_err[3*len(x_fit):]
+
+        chi2OverNDF = chi2OverNDFFunction(optimal_params, covariance, x, y, yerr)
+
+        mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = optimal_params
+        y_fit_pion_pion = pionFitFunction(x=x_fit, mu=mupi, sig=sigpi, a=apipi)
+        y_fit_pion_proton = protonFitFunction(x_fit, mup, sigp, appi, alphap)
+        y_fit_pion_kaon = kaonFitFunction(x_fit, muk, sigk, akpi, alphak)
+
+        y_fit_proton_pion = pionFitFunction(x_fit, mupi, sigpi, apip)
+        y_fit_proton_proton = protonFitFunction(x_fit, mup, sigp, app, alphap)
+        y_fit_proton_kaon = kaonFitFunction(x_fit, muk, sigk, akp, alphak)
+
+        y_fit_kaon_pion = pionFitFunction(x_fit, mupi, sigpi, apik)
+        y_fit_kaon_proton = protonFitFunction(x_fit, mup, sigp, apk, alphap)
+        y_fit_kaon_kaon = kaonFitFunction(x_fit, muk, sigk, akk, alphak)
+
+        y_fit_inclusive_pion = pionFitFunction(x_fit, mupi, sigpi, apiinc)
+        y_fit_inclusive_proton = protonFitFunction(x_fit, mup, sigp, apinc, alphap)
+        y_fit_inclusive_kaon = kaonFitFunction(x_fit, muk, sigk, akinc, alphak)
+
+
+        x_data_pion = {
+            &#34;raw_pion&#34;: x,
+            &#34;pion_total&#34;: x_fit,
+            &#34;pion_pion&#34;: x_fit,
+            &#34;pion_proton&#34;: x_fit,
+            &#34;pion_kaon&#34;: x_fit,
+        }
+        x_data_proton = {
+            &#34;raw_proton&#34;: x,
+            &#34;proton_total&#34;: x_fit,
+            &#34;proton_pion&#34;: x_fit,
+            &#34;proton_proton&#34;: x_fit,
+            &#34;proton_kaon&#34;: x_fit,
+        }
+        x_data_kaon = {
+            &#34;raw_kaon&#34;: x,
+            &#34;kaon_total&#34;: x_fit,
+            &#34;kaon_pion&#34;: x_fit,
+            &#34;kaon_proton&#34;: x_fit,
+            &#34;kaon_kaon&#34;: x_fit,
+        }
+        x_data_inclusive = {
+            &#34;raw_inclusive&#34;: x,
+            &#34;inclusive_total&#34;: x_fit,
+            &#34;inclusive_pion&#34;: x_fit,
+            &#34;inclusive_proton&#34;: x_fit,
+            &#34;inclusive_kaon&#34;: x_fit,
+        }
+        y_data_pion = {
+            &#34;raw_pion&#34;: y_pion,
+            &#34;pion_total&#34;: y_fit_pion,
+            &#34;pion_pion&#34;: y_fit_pion_pion,
+            &#34;pion_proton&#34;: y_fit_pion_proton,
+            &#34;pion_kaon&#34;: y_fit_pion_kaon,
+        }
+        y_data_proton = {
+            &#34;raw_proton&#34;: y_proton,
+            &#34;proton_total&#34;: y_fit_proton,
+            &#34;proton_pion&#34;: y_fit_proton_pion,
+            &#34;proton_proton&#34;: y_fit_proton_proton,
+            &#34;proton_kaon&#34;: y_fit_proton_kaon,
+        }
+        y_data_kaon = {
+            &#34;raw_kaon&#34;: y_kaon,
+            &#34;kaon_total&#34;: y_fit_kaon,
+            &#34;kaon_pion&#34;: y_fit_kaon_pion,
+            &#34;kaon_proton&#34;: y_fit_kaon_proton,
+            &#34;kaon_kaon&#34;: y_fit_kaon_kaon,
+        }
+        y_data_inclusive = {
+            &#34;raw_inclusive&#34;: y_inclusive,
+            &#34;inclusive_total&#34;: y_fit_inclusive,
+            &#34;inclusive_pion&#34;: y_fit_inclusive_pion,
+            &#34;inclusive_proton&#34;: y_fit_inclusive_proton,
+            &#34;inclusive_kaon&#34;: y_fit_inclusive_kaon,
+        }
+
+        yerr_data_pion = {
+            &#34;raw_pion&#34;: y_err_pion,
+            &#34;pion_total&#34;: y_fit_err_pion,
+            &#34;pion_pion&#34;: None,
+            &#34;pion_proton&#34;: None,
+            &#34;pion_kaon&#34;: None,
+        }
+        yerr_data_proton = {
+            &#34;raw_proton&#34;: y_err_proton,
+            &#34;proton_total&#34;: y_fit_err_proton,
+            &#34;proton_pion&#34;: None,
+            &#34;proton_proton&#34;: None,
+            &#34;proton_kaon&#34;: None,
+        }
+        yerr_data_kaon = {
+            &#34;raw_kaon&#34;: y_err_kaon,
+            &#34;kaon_total&#34;: y_fit_err_kaon,
+            &#34;kaon_pion&#34;: None,
+            &#34;kaon_proton&#34;: None,
+            &#34;kaon_kaon&#34;: None,
+        }
+        yerr_data_inclusive = {
+            &#34;raw_inclusive&#34;: y_err_inclusive,
+            &#34;inclusive_total&#34;: y_fit_err_inclusive,
+            &#34;inclusive_pion&#34;: None,
+            &#34;inclusive_proton&#34;: None,
+            &#34;inclusive_kaon&#34;: None,
+        }
+        
+        data_labels_pion = {
+            &#34;raw_pion&#34;: &#34;Enhanced Pion&#34;,
+            &#34;pion_total&#34;: &#34;Pion Fit&#34;,
+            &#34;pion_pion&#34;: &#34;Pion Component&#34;,
+            &#34;pion_proton&#34;: &#34;Proton Component&#34;,
+            &#34;pion_kaon&#34;: &#34;Kaon Component&#34;,
+        }
+        data_labels_proton = {
+            &#34;raw_proton&#34;: &#34;Enhanced Proton&#34;,
+            &#34;proton_total&#34;: &#34;Proton Fit&#34;,
+            &#34;proton_pion&#34;: &#34;Pion Component&#34;,
+            &#34;proton_proton&#34;: &#34;Proton Component&#34;,
+            &#34;proton_kaon&#34;: &#34;Kaon Component&#34;,
+        }
+        data_labels_kaon = {
+            &#34;raw_kaon&#34;: &#34;Enhanced Kaon&#34;,
+            &#34;kaon_total&#34;: &#34;Kaon Fit&#34;,
+            &#34;kaon_pion&#34;: &#34;Pion Component&#34;,
+            &#34;kaon_proton&#34;: &#34;Proton Component&#34;,
+            &#34;kaon_kaon&#34;: &#34;Kaon Component&#34;,
+        }
+        data_labels_inclusive = {
+            &#34;raw_inclusive&#34;: &#34;Enhanced Inclusive&#34;,
+            &#34;inclusive_total&#34;: &#34;Inclusive Fit&#34;,
+            &#34;inclusive_pion&#34;: &#34;Pion Component&#34;,
+            &#34;inclusive_proton&#34;: &#34;Proton Component&#34;,
+            &#34;inclusive_kaon&#34;: &#34;Kaon Component&#34;,
+        }
+
+        format_style_pion = {
+            &#34;raw_pion&#34;: &#34;o&#34;,
+            &#34;pion_total&#34;: &#34;-&#34;,
+            &#34;pion_pion&#34;: &#34;--&#34;,
+            &#34;pion_proton&#34;: &#34;--&#34;,
+            &#34;pion_kaon&#34;: &#34;--&#34;,
+        }
+        format_style_proton = {
+            &#34;raw_proton&#34;: &#34;o&#34;,
+            &#34;proton_total&#34;: &#34;-&#34;,
+            &#34;proton_pion&#34;: &#34;--&#34;,
+            &#34;proton_proton&#34;: &#34;--&#34;,
+            &#34;proton_kaon&#34;: &#34;--&#34;,
+        }
+        format_style_kaon = {
+            &#34;raw_kaon&#34;: &#34;o&#34;,
+            &#34;kaon_total&#34;: &#34;-&#34;,
+            &#34;kaon_pion&#34;: &#34;--&#34;,
+            &#34;kaon_proton&#34;: &#34;--&#34;,
+            &#34;kaon_kaon&#34;: &#34;--&#34;,
+        }
+        format_style_inclusive = {
+            &#34;raw_inclusive&#34;: &#34;o&#34;,
+            &#34;inclusive_total&#34;: &#34;-&#34;,
+            &#34;inclusive_pion&#34;: &#34;--&#34;,
+            &#34;inclusive_proton&#34;: &#34;--&#34;,
+            &#34;inclusive_kaon&#34;: &#34;--&#34;,
+        }
+
+        plotArrays(x_data_pion, y_data_pion, yerr_data_pion, data_label=data_labels_pion, format_style=format_style_pion, error_bands=None, error_bands_label=None, title=f&#34;TPC nSigma Fit - Pions Chi^2/NDF = {chi2OverNDF}&#34;, xtitle=&#34;TPC nSigma&#34;, ytitle=&#34;Counts&#34;, output_path=f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Pion.png&#34;)
+        plotArrays(x_data_proton, y_data_proton, yerr_data_proton, data_label=data_labels_proton, format_style=format_style_proton, error_bands=None, error_bands_label=None, title=f&#34;TPC nSigma Fit - Protons Chi^2/NDF = {chi2OverNDF}&#34;, xtitle=&#34;TPC nSigma&#34;, ytitle=&#34;Counts&#34;, output_path=f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Proton.png&#34;)
+        plotArrays(x_data_kaon, y_data_kaon, yerr_data_kaon, data_label=data_labels_kaon, format_style=format_style_kaon, error_bands=None, error_bands_label=None, title=f&#34;TPC nSigma Fit - Kaons Chi^2/NDF = {chi2OverNDF}&#34;, xtitle=&#34;TPC nSigma&#34;, ytitle=&#34;Counts&#34;, output_path=f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Kaon.png&#34;)
+        plotArrays(x_data_inclusive, y_data_inclusive, yerr_data_inclusive, data_label=data_labels_inclusive, format_style=format_style_inclusive, error_bands=None, error_bands_label=None, title=f&#34;TPC nSigma Fit - Inclusive Chi^2/NDF = {chi2OverNDF}&#34;, xtitle=&#34;TPC nSigma&#34;, ytitle=&#34;Counts&#34;, output_path=f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Inclusive.png&#34;)
+
+        # y_fit_pi = pionFitFunction(None, x_fit, *optimal_params[:3])
+        # y_fit_k = kaonFitFunction(None, x_fit, *optimal_params[3:6])
+        # y_fit_p = protonFitFunction(None, x_fit, *optimal_params[6:9])
+
+    def computeMixedEventNormalizationFactor(self, mixedEventCorrelationFunction, normMethod: NormalizationMethod, **kwargs):
+        &#39;&#39;&#39;
+        Returns the normalization factor for the mixed event correlation function
+        &#39;&#39;&#39;
+        if normMethod == NormalizationMethod.SLIDING_WINDOW:
+            return self.computeSlidingWindowNormalizationFactor(mixedEventCorrelationFunction=mixedEventCorrelationFunction, windowSize=kwargs.get(&#34;windowSize&#34;, pi))
+        elif normMethod == NormalizationMethod.MAX:
+            return self.computeMaxNormalizationFactor(mixedEventCorrelationFunction=mixedEventCorrelationFunction)
+        else:
+            raise NotImplementedError(&#34;Normalization method not yet implemented&#34;)
+        
+    def computeSlidingWindowNormalizationFactor(self, mixedEventCorrelationFunction, windowSize: float = pi, deltaEtaRestriction: float = 0.3):
+        &#39;&#39;&#39;
+        Returns the normalization factor for the mixed event correlation function using the sliding window method after projection onto delta-phi for |delta-eta| &lt; etaRestriction
+        &#39;&#39;&#39;
+        # make a clone to avoid modifying the original
+        mixedEventCorrelationFunction = mixedEventCorrelationFunction.Clone()
+        # restrict delta-eta range
+        mixedEventCorrelationFunction.GetYaxis().SetRangeUser(-deltaEtaRestriction, deltaEtaRestriction)
+        # calculate the number of delta-eta bins in the range 
+        deltaEtaBinCount = mixedEventCorrelationFunction.GetYaxis().FindBin(deltaEtaRestriction) - mixedEventCorrelationFunction.GetYaxis().FindBin(-deltaEtaRestriction)
+        # project onto delta-phi
+        mixedEventAzimuthalCorrelationFunction = mixedEventCorrelationFunction.ProjectionX()
+        # divide by the number of delta-eta bins to get the average
+        mixedEventAzimuthalCorrelationFunction.Scale(1 / deltaEtaBinCount)
+        # calculate the number of delta-phi bins in the window
+        windowBinCount = int(windowSize // self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_PHI))
+        maxWindowAverage = 0
+        # slide the window across the mixed event correlation function
+        assert windowBinCount &lt; mixedEventAzimuthalCorrelationFunction.GetNbinsX(), f&#34;Window size is too large, must be less than {mixedEventAzimuthalCorrelationFunction.GetNbinsX()}, got {windowBinCount}&#34;
+        for i in range(mixedEventAzimuthalCorrelationFunction.GetNbinsX() - windowBinCount):
+            # calculate the average in the window
+            windowAverage = mixedEventAzimuthalCorrelationFunction.Integral(i, i + windowBinCount) / windowBinCount
+            # keep track of the maximum average
+            if windowAverage &gt; maxWindowAverage:
+                maxWindowAverage = windowAverage
+        return maxWindowAverage
+    
+    def computeMaxNormalizationFactor(self, mixedEventCorrelationFunction, deltaEtaRestriction: float = 0.3):
+        &#39;&#39;&#39;
+        Returns the normalization factor for the mixed event correlation function using the maximum value within the restricted delta-eta range
+        &#39;&#39;&#39;
+        # make a clone to avoid modifying the original
+        mixedEventCorrelationFunction = mixedEventCorrelationFunction.Clone()
+        # restrict delta-eta range
+        mixedEventCorrelationFunction.GetYaxis().SetRangeUser(-deltaEtaRestriction, deltaEtaRestriction)
+        # calculate the number of delta-eta bins in the range
+        deltaEtaBinCount = mixedEventCorrelationFunction.GetYaxis().FindBin(deltaEtaRestriction) - mixedEventCorrelationFunction.GetYaxis().FindBin(-deltaEtaRestriction)
+        # project onto delta-phi
+        mixedEventAzimuthalCorrelationFunction = mixedEventCorrelationFunction.ProjectionX()
+        # divide by the number of delta-eta bins to get the average
+        mixedEventAzimuthalCorrelationFunction.Scale(1 / deltaEtaBinCount)
+        # return the maximum value
+        return mixedEventAzimuthalCorrelationFunction.GetMaximum()
+
+    def getBackgroundCorrelationFunction(self, per_trigger_normalized=False):
+        &#39;&#39;&#39;
+        Returns the background correlation function
+        &#39;&#39;&#39;
+        # get the positive eta and negative eta background regions of the Jet Hadron correlation function and add them together
+        self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETANEG])
+        self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETANEG])
+
+        backgroundCorrelationFunction_etaneg = self.JetHadron.getProjection(self.JetHadron.Axes.DELTA_PHI, self.JetHadron.Axes.DELTA_ETA)
+
+        nbins_delta_eta_neg = backgroundCorrelationFunction_etaneg.GetYaxis().GetNbins()
+        backgroundCorrelationFunction_etaneg = backgroundCorrelationFunction_etaneg.ProjectionX()
+        backgroundCorrelationFunction_etaneg.Scale(1 / nbins_delta_eta_neg)
+
+        self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETAPOS])
+        self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETAPOS])
+
+        backgroundCorrelationFunction_etapos = self.JetHadron.getProjection(self.JetHadron.Axes.DELTA_PHI, self.JetHadron.Axes.DELTA_ETA)
+
+        nbins_delta_eta_pos = backgroundCorrelationFunction_etapos.GetYaxis().GetNbins()
+        backgroundCorrelationFunction_etapos = backgroundCorrelationFunction_etapos.ProjectionX()
+        backgroundCorrelationFunction_etapos.Scale(1 / nbins_delta_eta_pos)
+
+        backgroundCorrelationFunction = backgroundCorrelationFunction_etaneg.Clone()
+        backgroundCorrelationFunction.Add(backgroundCorrelationFunction_etapos)
+        # divide by the delta-phi bin width and the delta-eta bin width to get the average
+        backgroundCorrelationFunction.Scale(1 / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI))
+        if per_trigger_normalized:
+            backgroundCorrelationFunction.Scale(1 / self.getNumberOfTriggerJets())
+        # set the delta-phi and delta-eta ranges back to the previous values
+        self.setRegion(self.currentRegion)
+        return backgroundCorrelationFunction
+    
+    def getAzimuthalBackgroundFunction(self, backgroundCorrelationFunction: TH1D):
+        &#39;&#39;&#39;
+        Returns the background function. In proton-proton collisions this is a pedestal function estimated as the average value in the background region.
+        &#39;&#39;&#39;
+        # pass backgroundCorrelationFunction to the BackgroundFunction constructor
+        backgroundFunction = BackgroundFunction(backgroundCorrelationFunction, self.analysisType)
+        # make a TH1D of the background function
+        backgroundFunctionHistogram = TH1D(&#34;backgroundFunctionHistogram&#34;, &#34;backgroundFunctionHistogram&#34;, regionDeltaPhiBinCountsDictionary[self.currentRegion], regionDeltaPhiRangeDictionary[self.currentRegion][0], regionDeltaPhiRangeDictionary[self.currentRegion][1])
+        # fill the histogram with the background function values
+        for deltaPhiBin in range(1, backgroundFunctionHistogram.GetNbinsX() + 1):
+            backgroundFunctionHistogram.SetBinContent(
+                deltaPhiBin,
+                backgroundFunction(backgroundFunctionHistogram.GetBinCenter(deltaPhiBin))
+                )
+            backgroundFunctionHistogram.SetBinError(
+                deltaPhiBin, 
+                backgroundFunction.error(backgroundFunctionHistogram.GetBinCenter(deltaPhiBin))
+                )
+
+        return backgroundFunctionHistogram
+
+    def fillNumberOfAssociatedHadronsDictionary(self):
+        &#39;&#39;&#39;
+        Returns a dictionary of the number of associated hadrons in current associated hadron momentum bin
+        &#39;&#39;&#39;
+        self.numberOfAssociatedHadronsBySpecies = {}
+        for species in ParticleType:
+            self.setParticleSelectionForJetHadron(species)
+            self.numberOfAssociatedHadronsBySpecies[species] = self.getNumberOfAssociatedParticles()
+        self.setParticleSelectionForJetHadron(self.current_species)
+
+    def getNumberOfAssociatedParticles(self):
+        &#39;&#39;&#39;
+        Returns the number of associated particles
+        &#39;&#39;&#39;
+        if repr(self.JetHadron) not in self.numberOfAssociatedHadrons:
+            self.numberOfAssociatedHadrons[repr(self.JetHadron)] = self.JetHadron.getNumberOfAssociatedParticles()
+        return self.numberOfAssociatedHadrons[repr(self.JetHadron)]
+
+    def getNumberOfTriggerJets(self):
+        &#39;&#39;&#39;
+        Returns the number of trigger jets
+        &#39;&#39;&#39;
+        if repr(self.Trigger) not in self.numberOfTriggerJets:
+            self.numberOfTriggerJets[repr(self.Trigger)] = self.Trigger.getNumberOfTriggerJets()
+        return self.numberOfTriggerJets[repr(self.Trigger)]</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="JetHadronAnalysis.Analysis.Analysis"><code class="flex name class">
+<span>class <span class="ident">Analysis</span></span>
+<span>(</span><span>analysisType: <a title="JetHadronAnalysis.Types.AnalysisType" href="Types.html#JetHadronAnalysis.Types.AnalysisType">AnalysisType</a>, rootFileNames: list)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This class is responsible for managing the analysis and its configuration.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Analysis:
+    &#39;&#39;&#39;
+    This class is responsible for managing the analysis and its configuration. 
+    &#39;&#39;&#39;
+
+    def __init__(self, analysisType: AnalysisType, rootFileNames: list):
+        self.analysisType = analysisType
+
+        self.JetHadron = JetHadronSparse(analysisType)
+        self.Trigger = TriggerSparse(analysisType)
+        self.MixedEvent = MixedEventSparse(analysisType)
+
+        self.currentRegion = Region.INCLUSIVE
+
+        self.currentTriggerJetMomentumBin = TriggerJetMomentumBin.PT_20_40
+
+        self.currentAssociatedHadronMomentumBin = AssociatedHadronMomentumBin.PT_1_15
+
+        self.current_species=ParticleType.INCLUSIVE
+
+        # make some dictionaries to keep track of the number of triger jets and associated hadrons in each region
+        self.numberOfTriggerJets = {}
+        self.numberOfAssociatedHadrons = {}
+
+        if self.analysisType != AnalysisType.PP:
+            self.reactionPlaneAngle = ReactionPlaneBin.INCLUSIVE
+
+        for rootFileName in rootFileNames:
+            self.fillSparsesFromFile(rootFileName)
+
+
+    def fillSparsesFromFile(self, rootFileName: str):
+        &#39;&#39;&#39;
+        This function opens the root file and appends the sparse data to the appropriate Sparse object then closes the file
+        &#39;&#39;&#39;
+        file = TFile(rootFileName)
+        rootFileListName = f&#34;AliAnalysisTaskJetH_tracks_caloClusters_biased&#34; if self.analysisType == AnalysisType.PP else f&#34;AliAnalysisTaskJetH_tracks_caloClusters_dEdxtrackBias5R2{&#39;SemiCentral&#39; if self.analysisType == AnalysisType.SEMICENTRAL else &#39;Central&#39;}q&#34;
+        rootFileList = file.Get(rootFileListName)
+        self.JetHadron.addSparse(rootFileList.FindObject(&#34;fhnJH&#34;))
+        self.Trigger.addSparse(rootFileList.FindObject(&#34;fhnTrigger&#34;))
+        self.MixedEvent.addSparse(rootFileList.FindObject(&#34;fhnMixedEvents&#34;))
+        file.Close()
+
+    def setRegion(self, region: Region):
+        &#39;&#39;&#39;
+        Sets the delta-phi and delta-eta ranges for the JetHadron sparse 
+        &#39;&#39;&#39;
+        self.currentRegion = region
+        if region == Region.BACKGROUND:
+            self.JetHadron.setRegionIsBackground(True)
+        else:
+            self.JetHadron.setRegionIsBackground(False)
+            self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
+            self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[region])
+            if hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+                self.fillNumberOfAssociatedHadronsDictionary()
+
+    def setTriggerJetMomentumBin(self, triggerJetMomentumBin: TriggerJetMomentumBin):
+        &#39;&#39;&#39;
+        Sets the trigger jet momentum bin for the JetHadron sparse
+        &#39;&#39;&#39;
+        self.currentTriggerJetMomentumBin = triggerJetMomentumBin
+        self.JetHadron.setTriggerJetMomentumRange(*triggerJetMomentumBinRangeDictionary[triggerJetMomentumBin])
+        if hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+            self.fillNumberOfAssociatedHadronsDictionary()
+
+    def setAssociatedHadronMomentumBin(self, associatedHadronMomentumBin: AssociatedHadronMomentumBin):
+        &#39;&#39;&#39;
+        Sets the associated hadron momentum bin for the JetHadron sparse
+        &#39;&#39;&#39;
+        self.currentAssociatedHadronMomentumBin = associatedHadronMomentumBin
+        self.JetHadron.setAssociatedHadronMomentumRange(*associatedHadronMomentumBinRangeDictionary[associatedHadronMomentumBin])
+        if hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+            self.fillNumberOfAssociatedHadronsDictionary()
+
+    def setParticleSelectionForJetHadron(self, species: ParticleType):
+        &#39;&#39;&#39;
+        Sets the pion, kaon, and proton TOF ranges to get the particle type specified in JetHadron sparse
+        &#39;&#39;&#39;
+        self.current_species = species
+        if species == ParticleType.OTHER:
+            self.JetHadron.setParticleTypeIsOther(True)
+        else:
+            self.JetHadron.setParticleTypeIsOther(False)
+            self.JetHadron.setPionTOFnSigma(*speciesTOFRangeDictionary[species][0])
+            self.JetHadron.setKaonTOFnSigma(*speciesTOFRangeDictionary[species][1])
+            self.JetHadron.setProtonTOFnSigma(*speciesTOFRangeDictionary[species][2])
+
+    def setReactionPlaneAngleBin(self, reactionPlaneAngle: ReactionPlaneBin):
+        &#39;&#39;&#39;
+        Sets the reaction plane angle bin for the JetHadron sparse
+        &#39;&#39;&#39;
+        self.reactionPlaneAngle = reactionPlaneAngle
+        self.JetHadron.setEventPlaneAngleRange(*eventPlaneAngleBinRangeDictionary[reactionPlaneAngle])
+        if hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+            self.fillNumberOfAssociatedHadronsDictionary()
+
+    def getDifferentialCorrelationFunction(self, per_trigger_normalized=False):
+        &#39;&#39;&#39;
+        Returns the differential correlation function
+        &#39;&#39;&#39;
+        correlationFunction = self.JetHadron.getProjection(self.JetHadron.Axes.DELTA_PHI, self.JetHadron.Axes.DELTA_ETA)
+        correlationFunction.Scale(1 / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI) / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_ETA))
+        if per_trigger_normalized:
+            correlationFunction.Scale(1 / self.getNumberOfTriggerJets())
+        return correlationFunction
+    
+    def getAcceptanceCorrectedDifferentialCorrelationFunction(self, differentialCorrelationFunction, acceptanceCorrection):
+        &#39;&#39;&#39;
+        Returns the acceptance corrected differential correlation function
+        This is the raw differential correlation function divided by the normalized mixed event correlation function
+        &#39;&#39;&#39;
+        acceptanceCorrectedDifferentialCorrelationFunction = differentialCorrelationFunction.Clone()
+        acceptanceCorrection = acceptanceCorrection.Clone()
+        # Set the x and y bin ranges in the acceptance correction to match the raw correlation function
+        acceptanceCorrection.GetXaxis().SetRangeUser(differentialCorrelationFunction.GetXaxis().GetXmin(), differentialCorrelationFunction.GetXaxis().GetXmax())
+        acceptanceCorrection.GetYaxis().SetRangeUser(differentialCorrelationFunction.GetYaxis().GetXmin(), differentialCorrelationFunction.GetYaxis().GetXmax())
+        acceptanceCorrectedDifferentialCorrelationFunction.Divide(acceptanceCorrection)
+        return acceptanceCorrectedDifferentialCorrelationFunction
+    
+    def getAcceptanceCorrectedDifferentialAzimuthalCorrelationFunction(self, acceptanceCorrectedDifferentialCorrelationFunction):
+        &#39;&#39;&#39;
+        Returns the acceptance corrected differential azimuthal correlation function
+        This is the acceptance corrected differential correlation function integrated over delta-eta
+        &#39;&#39;&#39;
+        acceptanceCorrectedDifferentialAzimuthalCorrelationFunction = acceptanceCorrectedDifferentialCorrelationFunction.ProjectionX()
+        acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Scale(self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_ETA))
+        # scale by the number of bins in delta-eta over which the correlation function was integrated
+        number_of_delta_eta_bins = acceptanceCorrectedDifferentialCorrelationFunction.GetYaxis().GetNbins()
+        acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Scale(1 / number_of_delta_eta_bins)
+        return acceptanceCorrectedDifferentialAzimuthalCorrelationFunction
+
+    def getAcceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction(self, acceptanceCorrectedDifferentialAzimuthalCorrelationFunction: TH1D, backgroundFunction:TH1D):
+        &#39;&#39;&#39;
+        Returns the acceptance corrected background subtracted differential correlation function
+        This is the acceptance corrected differential correlation function minus the background function
+        &#39;&#39;&#39;
+        acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction = acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Clone()
+        backgroundFunction = backgroundFunction.Clone()
+        backgroundFunction.Scale(-1)
+        acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction.Add(backgroundFunction)
+        return acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction
+
+    def getAzimuthalCorrelationFunctionforParticleType(self, species: ParticleType, acceptanceCorrectedAzimuthalCorrelationFunction: TH1D, loadFractionsFromDB=False):
+        &#39;&#39;&#39;
+        Gets the particle fractions and scales the acceptance corrected azimuthal correlation function by the particle fraction for the specified species
+        &#39;&#39;&#39;
+
+        particle_fractions, particle_fraction_errors, chi2OverNDF_shape, Chi2OverNDF_yield = self.getPIDFractions(loadFractionsFromDB=loadFractionsFromDB)
+        
+        # now get the per species azimuthal correlation functions for each region by scaling
+        species_azimuthal_correlation_function = acceptanceCorrectedAzimuthalCorrelationFunction.Clone()
+        species_azimuthal_correlation_function.Scale(particle_fractions[species])
+        error_band = acceptanceCorrectedAzimuthalCorrelationFunction.Clone()
+        error_band.Scale(particle_fraction_errors[species])
+        # convert errorbands into numpy arrays of bin contents
+        sys_errors = np.array([error_band.GetBinContent(i) for i in range(1, error_band.GetNbinsX()+1)])
+        # reset the errors for species_azimuthal_correlation_function to add the statistical errors and systematic errors in quadrature
+        for i in range(1, species_azimuthal_correlation_function.GetNbinsX()+1):
+            species_azimuthal_correlation_function.SetBinError(i, np.sqrt(species_azimuthal_correlation_function.GetBinError(i)**2 + sys_errors[i-1]**2))
+        
+
+        return species_azimuthal_correlation_function
+        
+    def getYieldFromAzimuthalCorrelationFunction(self, azimuthalCorrelationFunction: TH1D):
+        &#39;&#39;&#39;
+        Returns the yield from the azimuthal correlation function
+        &#39;&#39;&#39;
+        # scale by  the bin width
+        # but first clone it 
+        azimuthalCorrelationFunction = azimuthalCorrelationFunction.Clone()
+        azimuthalCorrelationFunction.Scale(self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI))
+        yield_ = azimuthalCorrelationFunction.Integral()
+        error_ = np.sqrt(np.sum([azimuthalCorrelationFunction.GetBinError(i)**2 for i in range(1, azimuthalCorrelationFunction.GetNbinsX()+1)]))
+        return yield_, error_
+
+    def getNormalizedDifferentialMixedEventCorrelationFunction(self, normMethod: NormalizationMethod, **kwargs):
+        &#39;&#39;&#39;
+        Returns the differential mixed event correlation function
+        &#39;&#39;&#39;
+        if &#34;TOF&#34; in kwargs:
+            if kwargs[&#39;TOF&#39;]:
+                self.MixedEvent.sethasTOF(True)
+                mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+            else:
+                mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+        mixedEventCorrelationFunction.Scale(1 / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_PHI) / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_ETA))
+
+        normalization_factor = self.computeMixedEventNormalizationFactor(mixedEventCorrelationFunction, normMethod, **kwargs)
+
+        if kwargs.get(&#34;customRegion&#34;, None) is not None:
+            customRegion = kwargs.get(&#34;customRegion&#34;)
+            self.MixedEvent.setDeltaPhiRange(*customRegion[&#34;DeltaPhi&#34;])
+            self.MixedEvent.setDeltaEtaRange(*customRegion[&#34;DeltaEta&#34;])
+            mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+            self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
+            self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+        else:
+            if self.currentRegion == Region.BACKGROUND:
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETANEG])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETANEG])
+                mixedEventCorrelationFunction_etaneg = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETAPOS])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETAPOS])
+                mixedEventCorrelationFunction_etapos = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+                mixedEventCorrelationFunction = mixedEventCorrelationFunction_etaneg.Clone()
+                mixedEventCorrelationFunction.Add(mixedEventCorrelationFunction_etapos)
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+            else:
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[self.currentRegion])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[self.currentRegion])
+                mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+                self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
+                self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+        mixedEventCorrelationFunction.Scale(1 / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_PHI) / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_ETA))
+        mixedEventCorrelationFunction.Scale(1 / normalization_factor)
+        return mixedEventCorrelationFunction
+    
+    def getRPInclusiveBackgroundCorrelationFunctionUsingRPF(self, inPlaneCorrelationFunction: TH1D, midPlaneCorrelationFunction: TH1D, outPlaneCorrelationFunction: TH1D, loadFunctionFromDB=False):
+        &#39;&#39;&#39;
+        Returns the background correlation function using the RPF method
+
+        Check if the background function has already been computed and stored in the database
+        If not, compute it and store it in the database
+
+        Returns:
+            backgroundCorrelationFunction (TH1D): The background correlation function with the same binning as the in-plane, mid-plane, and out-of-plane correlation functions
+        &#39;&#39;&#39;
+        # create a fitter instance
+        fitter = RPFFit(self.analysisType, self.currentTriggerJetMomentumBin, self.currentAssociatedHadronMomentumBin, self.current_species)
+
+        if loadFunctionFromDB:
+            print(&#34;Loading RPF background from DB&#34;)
+            # get the background function from the database
+            optimal_params, covariance, reduced_chi2 = self.getRPFParamsAndErrorFromDB()
+        else:
+            fitter.setDefaultParameters()
+
+            # prepare the data for fitting
+            x, y, yerr = RPFFit.prepareData(inPlaneCorrelationFunction, midPlaneCorrelationFunction, outPlaneCorrelationFunction)
+
+            # fit and extract the optimal fit params
+            optimal_params, covariance, reduced_chi2 = fitter.performFit(x, y, yerr)
+            
+        # build the background function with the same binning as the correlation functions
+        x_background = np.array([inPlaneCorrelationFunction.GetBinCenter(i) for i in range(1, inPlaneCorrelationFunction.GetNbinsX()+1)])
+        backgroundCorrelationFunction = TH1D(&#34;backgroundCorrelationFunction&#34;, &#34;backgroundCorrelationFunction&#34;, len(x_background), x_background[0], x_background[-1])
+        backgroundContent = fitter.fittingFunction(None, *resolution_parameters[self.analysisType].values(), x_background, *optimal_params)
+        backgroundError = fitter.fittingErrorFunction(None, *resolution_parameters[self.analysisType].values(), x_background, *optimal_params, pcov=covariance)
+
+        inPlaneContent = backgroundContent[:len(x_background)]
+        midPlaneContent = backgroundContent[len(x_background):2*len(x_background)]
+        outPlaneContent = backgroundContent[2*len(x_background):]
+        inclusiveContent = inPlaneContent + midPlaneContent + outPlaneContent
+
+        inPlaneError = backgroundError[:len(x_background)]
+        midPlaneError = backgroundError[len(x_background):2*len(x_background)]
+        outPlaneError = backgroundError[2*len(x_background):]
+        inclusiveError = np.sqrt(inPlaneError**2 + midPlaneError**2 + outPlaneError**2)
+        # fill the background function with the optimal params
+        for i in range(len(x_background)):
+            backgroundCorrelationFunction.SetBinContent(i+1, inclusiveContent[i])
+            backgroundCorrelationFunction.SetBinError(i+1, inclusiveError[i])
+        return backgroundCorrelationFunction
+
+
+
+    def getRPFParamsAndErrorFromDB(self):
+        # get a db connection
+        conn = sqlite3.connect(&#34;RPF.db&#34;)
+        dbCursor = conn.cursor()
+        # get the optimal paams and their errors from the database
+        optimal_params = getParameters(self.analysisType, self.currentTriggerJetMomentumBin, self.currentAssociatedHadronMomentumBin, self.current_species, dbCursor)
+        # get the optimal params errors from the database
+        param_errors, covariance = getParameterErrors(self.analysisType, self.currentTriggerJetMomentumBin, self.currentAssociatedHadronMomentumBin, self.current_species, dbCursor)
+        # close the connection
+        conn.close()
+        reduced_chi2 = optimal_params[-1]
+        # convert the optimal params and their errors to numpy arrays
+        optimal_params = np.array(optimal_params[:-1])
+        return optimal_params, covariance, reduced_chi2
+
+
+    def getPIDFractions(self, makeIntermediatePlots=True, loadFractionsFromDB=False):
+        &#39;&#39;&#39;
+        First checks if the PID fractions have already been computed and stored in the database
+        If not, computes them and stores them in the database
+        Prepares the projections for each enhanced species
+        Converts them into arrays for fitting
+        Fits and Extracts the optimal fit params
+        Computes the PID fractions
+        Returns the PID fractions
+        &#39;&#39;&#39;
+        if loadFractionsFromDB:
+            print(&#34;Loading particle fractions from database&#34;)
+            # get the particle fractions from the database
+            particle_fractions, particle_fraction_errors = self.getParticleFractionsFromDB()
+            return particle_fractions, particle_fraction_errors, None
+        # set the region to inclusive to fit the shape parameters first saving the current region to reset it later
+        currentRegion = self.currentRegion
+        self.setRegion(Region.INCLUSIVE)
+        # get the projections
+        pionEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PION)
+        protonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PROTON)
+        kaonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.KAON)
+        inclusiveEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.INCLUSIVE)
+        # convert to arrays using FitTPCPionNsigma.prepareData 
+        x, y, yerr = FitTPCPionNsigma.prepareData(pionEnhancedTPCnSigma, protonEnhancedTPCnSigma, kaonEnhancedTPCnSigma, inclusiveEnhancedTPCnSigma)
+        # fit and extract the optimal fit params
+        # start by creating the fitter instance
+        fitter = FitTPCPionNsigma(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin)
+        # initialize the default parameters for the analysis type and current associated hadron momentum bin
+        fitter.initializeDefaultParameters()
+        optimal_params, covariance = fitter.performShapeFit(x, y, yerr)
+
+        chi2OverNDF_shape = fitter.chi2OverNDF(optimal_params, covariance, x, y, yerr)
+        if makeIntermediatePlots:
+            self.plotTPCPionNsigmaFit(x, y, yerr, optimal_params, covariance, fitter.fittingFunction, fitter.fittingErrorFunction, fitter.pionFittingFunction, fitter.kaonFittingFunction, fitter.protonFittingFunction, fitter.chi2OverNDF, &#34;TPCnSigmaFitPlots&#34;)
+        # now set the region back to what it was before so we can fit the inclusive yield
+        self.setRegion(currentRegion)
+        # get the inclusive yield
+
+        pionEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PION)
+        protonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PROTON)
+        kaonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.KAON)
+        inclusiveEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.INCLUSIVE)
+
+        x, y, yerr = FitTPCPionNsigma.prepareData(pionEnhancedTPCnSigma, protonEnhancedTPCnSigma, kaonEnhancedTPCnSigma, inclusiveEnhancedTPCnSigma)
+
+        x_inc = x
+        y_inc = y[3]
+        yerr_inc = yerr[3]
+
+        optimal_inclusive_yield_parameters, covariance_inclusive_yield, reducedChi2_yield  = fitter.performYieldFit(x_inc, y_inc, yerr_inc, optimal_params)
+
+        mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = optimal_params
+        apinc, apiinc, akinc = optimal_inclusive_yield_parameters
+        optimal_params = mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak
+        covariance[-5:-2, -5:-2] = covariance_inclusive_yield # overwrite the covariance matrix with the covariance matrix from the inclusive yield fit
+
+
+        if  not hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+            self.fillNumberOfAssociatedHadronsDictionary()
+        
+        
+        # compute the PID fractions
+        pid_fractions, pid_fraction_errors = fitter.computeAveragePIDFractions(optimal_params, covariance, self.numberOfAssociatedHadronsBySpecies)
+
+        return pid_fractions, pid_fraction_errors, chi2OverNDF_shape, reducedChi2_yield
+
+    def getParticleFractionsFromDB(self):
+        &#39;&#39;&#39;
+        Gets the particle fractions from the database
+        &#39;&#39;&#39;
+        conn = sqlite3.connect(&#34;PID.db&#34;)
+        dbCursor = conn.cursor()
+        particle_fractions = {}
+        particle_fraction_errors = {}
+        for species in ParticleType:
+            if species is ParticleType.OTHER or species is ParticleType.INCLUSIVE:
+                continue
+
+            particle_fractions[species], particle_fraction_errors[species] = getParticleFractionForMomentumBin(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin, species, dbCursor)[0]
+        conn.close()
+        return particle_fractions, particle_fraction_errors
+
+    def getEnhancedTPCnSigmaProjection(self, species: ParticleType):
+        &#39;&#39;&#39;
+        Sets the particle type for the jet hadron sparse and returns the projection onto the TPC nsigma axis, then resets the particle type
+        &#39;&#39;&#39;
+        self.setParticleSelectionForJetHadron(species)
+        projection = self.getTPCPionNsigma()
+        self.setParticleSelectionForJetHadron(self.current_species)
+        return projection
+
+
+    def getTPCPionNsigma(self):
+        &#39;&#39;&#39;
+        Returns the projection onto the TPC pion nsigma axis
+        &#39;&#39;&#39;
+        return self.JetHadron.getProjection(self.JetHadron.Axes.PION_TPC_N_SIGMA)
+        
+
+    def plotTPCPionNsigmaFit(self, x, y, yerr, optimal_params, covariance, fitFunction, fitErrorFunction, pionFitFunction, kaonFitFunction, protonFitFunction, chi2OverNDFFunction, save_path=None):
+
+        if save_path is not None:
+            if save_path[-1] != &#34;/&#34;:
+                save_path += &#34;/&#34;
+            if not os.path.exists(save_path):
+                os.makedirs(save_path)
+            if not os.path.exists(f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}&#34;):
+                os.makedirs(f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}&#34;)
+
+        y_pion = y[0]
+        y_proton = y[1]
+        y_kaon = y[2]
+        y_inclusive = y[3]
+
+        y_err_pion = yerr[0]
+        y_err_proton = yerr[1]
+        y_err_kaon = yerr[2]
+        y_err_inclusive = yerr[3]
+
+        x_fit = np.linspace(x[0], x[-1], 100)
+        y_fit = fitFunction(None, x_fit, *optimal_params)
+        y_fit_err = fitErrorFunction(None, x_fit, *optimal_params, pcov=covariance)
+        y_fit_pion = y_fit[:len(x_fit)]
+        y_fit_proton = y_fit[len(x_fit):2*len(x_fit)]
+        y_fit_kaon = y_fit[2*len(x_fit):3*len(x_fit)]
+        y_fit_inclusive = y_fit[3*len(x_fit):]
+        y_fit_err_pion = y_fit_err[:len(x_fit)]
+        y_fit_err_proton = y_fit_err[len(x_fit):2*len(x_fit)]
+        y_fit_err_kaon = y_fit_err[2*len(x_fit):3*len(x_fit)]
+        y_fit_err_inclusive = y_fit_err[3*len(x_fit):]
+
+        chi2OverNDF = chi2OverNDFFunction(optimal_params, covariance, x, y, yerr)
+
+        mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = optimal_params
+        y_fit_pion_pion = pionFitFunction(x=x_fit, mu=mupi, sig=sigpi, a=apipi)
+        y_fit_pion_proton = protonFitFunction(x_fit, mup, sigp, appi, alphap)
+        y_fit_pion_kaon = kaonFitFunction(x_fit, muk, sigk, akpi, alphak)
+
+        y_fit_proton_pion = pionFitFunction(x_fit, mupi, sigpi, apip)
+        y_fit_proton_proton = protonFitFunction(x_fit, mup, sigp, app, alphap)
+        y_fit_proton_kaon = kaonFitFunction(x_fit, muk, sigk, akp, alphak)
+
+        y_fit_kaon_pion = pionFitFunction(x_fit, mupi, sigpi, apik)
+        y_fit_kaon_proton = protonFitFunction(x_fit, mup, sigp, apk, alphap)
+        y_fit_kaon_kaon = kaonFitFunction(x_fit, muk, sigk, akk, alphak)
+
+        y_fit_inclusive_pion = pionFitFunction(x_fit, mupi, sigpi, apiinc)
+        y_fit_inclusive_proton = protonFitFunction(x_fit, mup, sigp, apinc, alphap)
+        y_fit_inclusive_kaon = kaonFitFunction(x_fit, muk, sigk, akinc, alphak)
+
+
+        x_data_pion = {
+            &#34;raw_pion&#34;: x,
+            &#34;pion_total&#34;: x_fit,
+            &#34;pion_pion&#34;: x_fit,
+            &#34;pion_proton&#34;: x_fit,
+            &#34;pion_kaon&#34;: x_fit,
+        }
+        x_data_proton = {
+            &#34;raw_proton&#34;: x,
+            &#34;proton_total&#34;: x_fit,
+            &#34;proton_pion&#34;: x_fit,
+            &#34;proton_proton&#34;: x_fit,
+            &#34;proton_kaon&#34;: x_fit,
+        }
+        x_data_kaon = {
+            &#34;raw_kaon&#34;: x,
+            &#34;kaon_total&#34;: x_fit,
+            &#34;kaon_pion&#34;: x_fit,
+            &#34;kaon_proton&#34;: x_fit,
+            &#34;kaon_kaon&#34;: x_fit,
+        }
+        x_data_inclusive = {
+            &#34;raw_inclusive&#34;: x,
+            &#34;inclusive_total&#34;: x_fit,
+            &#34;inclusive_pion&#34;: x_fit,
+            &#34;inclusive_proton&#34;: x_fit,
+            &#34;inclusive_kaon&#34;: x_fit,
+        }
+        y_data_pion = {
+            &#34;raw_pion&#34;: y_pion,
+            &#34;pion_total&#34;: y_fit_pion,
+            &#34;pion_pion&#34;: y_fit_pion_pion,
+            &#34;pion_proton&#34;: y_fit_pion_proton,
+            &#34;pion_kaon&#34;: y_fit_pion_kaon,
+        }
+        y_data_proton = {
+            &#34;raw_proton&#34;: y_proton,
+            &#34;proton_total&#34;: y_fit_proton,
+            &#34;proton_pion&#34;: y_fit_proton_pion,
+            &#34;proton_proton&#34;: y_fit_proton_proton,
+            &#34;proton_kaon&#34;: y_fit_proton_kaon,
+        }
+        y_data_kaon = {
+            &#34;raw_kaon&#34;: y_kaon,
+            &#34;kaon_total&#34;: y_fit_kaon,
+            &#34;kaon_pion&#34;: y_fit_kaon_pion,
+            &#34;kaon_proton&#34;: y_fit_kaon_proton,
+            &#34;kaon_kaon&#34;: y_fit_kaon_kaon,
+        }
+        y_data_inclusive = {
+            &#34;raw_inclusive&#34;: y_inclusive,
+            &#34;inclusive_total&#34;: y_fit_inclusive,
+            &#34;inclusive_pion&#34;: y_fit_inclusive_pion,
+            &#34;inclusive_proton&#34;: y_fit_inclusive_proton,
+            &#34;inclusive_kaon&#34;: y_fit_inclusive_kaon,
+        }
+
+        yerr_data_pion = {
+            &#34;raw_pion&#34;: y_err_pion,
+            &#34;pion_total&#34;: y_fit_err_pion,
+            &#34;pion_pion&#34;: None,
+            &#34;pion_proton&#34;: None,
+            &#34;pion_kaon&#34;: None,
+        }
+        yerr_data_proton = {
+            &#34;raw_proton&#34;: y_err_proton,
+            &#34;proton_total&#34;: y_fit_err_proton,
+            &#34;proton_pion&#34;: None,
+            &#34;proton_proton&#34;: None,
+            &#34;proton_kaon&#34;: None,
+        }
+        yerr_data_kaon = {
+            &#34;raw_kaon&#34;: y_err_kaon,
+            &#34;kaon_total&#34;: y_fit_err_kaon,
+            &#34;kaon_pion&#34;: None,
+            &#34;kaon_proton&#34;: None,
+            &#34;kaon_kaon&#34;: None,
+        }
+        yerr_data_inclusive = {
+            &#34;raw_inclusive&#34;: y_err_inclusive,
+            &#34;inclusive_total&#34;: y_fit_err_inclusive,
+            &#34;inclusive_pion&#34;: None,
+            &#34;inclusive_proton&#34;: None,
+            &#34;inclusive_kaon&#34;: None,
+        }
+        
+        data_labels_pion = {
+            &#34;raw_pion&#34;: &#34;Enhanced Pion&#34;,
+            &#34;pion_total&#34;: &#34;Pion Fit&#34;,
+            &#34;pion_pion&#34;: &#34;Pion Component&#34;,
+            &#34;pion_proton&#34;: &#34;Proton Component&#34;,
+            &#34;pion_kaon&#34;: &#34;Kaon Component&#34;,
+        }
+        data_labels_proton = {
+            &#34;raw_proton&#34;: &#34;Enhanced Proton&#34;,
+            &#34;proton_total&#34;: &#34;Proton Fit&#34;,
+            &#34;proton_pion&#34;: &#34;Pion Component&#34;,
+            &#34;proton_proton&#34;: &#34;Proton Component&#34;,
+            &#34;proton_kaon&#34;: &#34;Kaon Component&#34;,
+        }
+        data_labels_kaon = {
+            &#34;raw_kaon&#34;: &#34;Enhanced Kaon&#34;,
+            &#34;kaon_total&#34;: &#34;Kaon Fit&#34;,
+            &#34;kaon_pion&#34;: &#34;Pion Component&#34;,
+            &#34;kaon_proton&#34;: &#34;Proton Component&#34;,
+            &#34;kaon_kaon&#34;: &#34;Kaon Component&#34;,
+        }
+        data_labels_inclusive = {
+            &#34;raw_inclusive&#34;: &#34;Enhanced Inclusive&#34;,
+            &#34;inclusive_total&#34;: &#34;Inclusive Fit&#34;,
+            &#34;inclusive_pion&#34;: &#34;Pion Component&#34;,
+            &#34;inclusive_proton&#34;: &#34;Proton Component&#34;,
+            &#34;inclusive_kaon&#34;: &#34;Kaon Component&#34;,
+        }
+
+        format_style_pion = {
+            &#34;raw_pion&#34;: &#34;o&#34;,
+            &#34;pion_total&#34;: &#34;-&#34;,
+            &#34;pion_pion&#34;: &#34;--&#34;,
+            &#34;pion_proton&#34;: &#34;--&#34;,
+            &#34;pion_kaon&#34;: &#34;--&#34;,
+        }
+        format_style_proton = {
+            &#34;raw_proton&#34;: &#34;o&#34;,
+            &#34;proton_total&#34;: &#34;-&#34;,
+            &#34;proton_pion&#34;: &#34;--&#34;,
+            &#34;proton_proton&#34;: &#34;--&#34;,
+            &#34;proton_kaon&#34;: &#34;--&#34;,
+        }
+        format_style_kaon = {
+            &#34;raw_kaon&#34;: &#34;o&#34;,
+            &#34;kaon_total&#34;: &#34;-&#34;,
+            &#34;kaon_pion&#34;: &#34;--&#34;,
+            &#34;kaon_proton&#34;: &#34;--&#34;,
+            &#34;kaon_kaon&#34;: &#34;--&#34;,
+        }
+        format_style_inclusive = {
+            &#34;raw_inclusive&#34;: &#34;o&#34;,
+            &#34;inclusive_total&#34;: &#34;-&#34;,
+            &#34;inclusive_pion&#34;: &#34;--&#34;,
+            &#34;inclusive_proton&#34;: &#34;--&#34;,
+            &#34;inclusive_kaon&#34;: &#34;--&#34;,
+        }
+
+        plotArrays(x_data_pion, y_data_pion, yerr_data_pion, data_label=data_labels_pion, format_style=format_style_pion, error_bands=None, error_bands_label=None, title=f&#34;TPC nSigma Fit - Pions Chi^2/NDF = {chi2OverNDF}&#34;, xtitle=&#34;TPC nSigma&#34;, ytitle=&#34;Counts&#34;, output_path=f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Pion.png&#34;)
+        plotArrays(x_data_proton, y_data_proton, yerr_data_proton, data_label=data_labels_proton, format_style=format_style_proton, error_bands=None, error_bands_label=None, title=f&#34;TPC nSigma Fit - Protons Chi^2/NDF = {chi2OverNDF}&#34;, xtitle=&#34;TPC nSigma&#34;, ytitle=&#34;Counts&#34;, output_path=f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Proton.png&#34;)
+        plotArrays(x_data_kaon, y_data_kaon, yerr_data_kaon, data_label=data_labels_kaon, format_style=format_style_kaon, error_bands=None, error_bands_label=None, title=f&#34;TPC nSigma Fit - Kaons Chi^2/NDF = {chi2OverNDF}&#34;, xtitle=&#34;TPC nSigma&#34;, ytitle=&#34;Counts&#34;, output_path=f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Kaon.png&#34;)
+        plotArrays(x_data_inclusive, y_data_inclusive, yerr_data_inclusive, data_label=data_labels_inclusive, format_style=format_style_inclusive, error_bands=None, error_bands_label=None, title=f&#34;TPC nSigma Fit - Inclusive Chi^2/NDF = {chi2OverNDF}&#34;, xtitle=&#34;TPC nSigma&#34;, ytitle=&#34;Counts&#34;, output_path=f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Inclusive.png&#34;)
+
+        # y_fit_pi = pionFitFunction(None, x_fit, *optimal_params[:3])
+        # y_fit_k = kaonFitFunction(None, x_fit, *optimal_params[3:6])
+        # y_fit_p = protonFitFunction(None, x_fit, *optimal_params[6:9])
+
+    def computeMixedEventNormalizationFactor(self, mixedEventCorrelationFunction, normMethod: NormalizationMethod, **kwargs):
+        &#39;&#39;&#39;
+        Returns the normalization factor for the mixed event correlation function
+        &#39;&#39;&#39;
+        if normMethod == NormalizationMethod.SLIDING_WINDOW:
+            return self.computeSlidingWindowNormalizationFactor(mixedEventCorrelationFunction=mixedEventCorrelationFunction, windowSize=kwargs.get(&#34;windowSize&#34;, pi))
+        elif normMethod == NormalizationMethod.MAX:
+            return self.computeMaxNormalizationFactor(mixedEventCorrelationFunction=mixedEventCorrelationFunction)
+        else:
+            raise NotImplementedError(&#34;Normalization method not yet implemented&#34;)
+        
+    def computeSlidingWindowNormalizationFactor(self, mixedEventCorrelationFunction, windowSize: float = pi, deltaEtaRestriction: float = 0.3):
+        &#39;&#39;&#39;
+        Returns the normalization factor for the mixed event correlation function using the sliding window method after projection onto delta-phi for |delta-eta| &lt; etaRestriction
+        &#39;&#39;&#39;
+        # make a clone to avoid modifying the original
+        mixedEventCorrelationFunction = mixedEventCorrelationFunction.Clone()
+        # restrict delta-eta range
+        mixedEventCorrelationFunction.GetYaxis().SetRangeUser(-deltaEtaRestriction, deltaEtaRestriction)
+        # calculate the number of delta-eta bins in the range 
+        deltaEtaBinCount = mixedEventCorrelationFunction.GetYaxis().FindBin(deltaEtaRestriction) - mixedEventCorrelationFunction.GetYaxis().FindBin(-deltaEtaRestriction)
+        # project onto delta-phi
+        mixedEventAzimuthalCorrelationFunction = mixedEventCorrelationFunction.ProjectionX()
+        # divide by the number of delta-eta bins to get the average
+        mixedEventAzimuthalCorrelationFunction.Scale(1 / deltaEtaBinCount)
+        # calculate the number of delta-phi bins in the window
+        windowBinCount = int(windowSize // self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_PHI))
+        maxWindowAverage = 0
+        # slide the window across the mixed event correlation function
+        assert windowBinCount &lt; mixedEventAzimuthalCorrelationFunction.GetNbinsX(), f&#34;Window size is too large, must be less than {mixedEventAzimuthalCorrelationFunction.GetNbinsX()}, got {windowBinCount}&#34;
+        for i in range(mixedEventAzimuthalCorrelationFunction.GetNbinsX() - windowBinCount):
+            # calculate the average in the window
+            windowAverage = mixedEventAzimuthalCorrelationFunction.Integral(i, i + windowBinCount) / windowBinCount
+            # keep track of the maximum average
+            if windowAverage &gt; maxWindowAverage:
+                maxWindowAverage = windowAverage
+        return maxWindowAverage
+    
+    def computeMaxNormalizationFactor(self, mixedEventCorrelationFunction, deltaEtaRestriction: float = 0.3):
+        &#39;&#39;&#39;
+        Returns the normalization factor for the mixed event correlation function using the maximum value within the restricted delta-eta range
+        &#39;&#39;&#39;
+        # make a clone to avoid modifying the original
+        mixedEventCorrelationFunction = mixedEventCorrelationFunction.Clone()
+        # restrict delta-eta range
+        mixedEventCorrelationFunction.GetYaxis().SetRangeUser(-deltaEtaRestriction, deltaEtaRestriction)
+        # calculate the number of delta-eta bins in the range
+        deltaEtaBinCount = mixedEventCorrelationFunction.GetYaxis().FindBin(deltaEtaRestriction) - mixedEventCorrelationFunction.GetYaxis().FindBin(-deltaEtaRestriction)
+        # project onto delta-phi
+        mixedEventAzimuthalCorrelationFunction = mixedEventCorrelationFunction.ProjectionX()
+        # divide by the number of delta-eta bins to get the average
+        mixedEventAzimuthalCorrelationFunction.Scale(1 / deltaEtaBinCount)
+        # return the maximum value
+        return mixedEventAzimuthalCorrelationFunction.GetMaximum()
+
+    def getBackgroundCorrelationFunction(self, per_trigger_normalized=False):
+        &#39;&#39;&#39;
+        Returns the background correlation function
+        &#39;&#39;&#39;
+        # get the positive eta and negative eta background regions of the Jet Hadron correlation function and add them together
+        self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETANEG])
+        self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETANEG])
+
+        backgroundCorrelationFunction_etaneg = self.JetHadron.getProjection(self.JetHadron.Axes.DELTA_PHI, self.JetHadron.Axes.DELTA_ETA)
+
+        nbins_delta_eta_neg = backgroundCorrelationFunction_etaneg.GetYaxis().GetNbins()
+        backgroundCorrelationFunction_etaneg = backgroundCorrelationFunction_etaneg.ProjectionX()
+        backgroundCorrelationFunction_etaneg.Scale(1 / nbins_delta_eta_neg)
+
+        self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETAPOS])
+        self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETAPOS])
+
+        backgroundCorrelationFunction_etapos = self.JetHadron.getProjection(self.JetHadron.Axes.DELTA_PHI, self.JetHadron.Axes.DELTA_ETA)
+
+        nbins_delta_eta_pos = backgroundCorrelationFunction_etapos.GetYaxis().GetNbins()
+        backgroundCorrelationFunction_etapos = backgroundCorrelationFunction_etapos.ProjectionX()
+        backgroundCorrelationFunction_etapos.Scale(1 / nbins_delta_eta_pos)
+
+        backgroundCorrelationFunction = backgroundCorrelationFunction_etaneg.Clone()
+        backgroundCorrelationFunction.Add(backgroundCorrelationFunction_etapos)
+        # divide by the delta-phi bin width and the delta-eta bin width to get the average
+        backgroundCorrelationFunction.Scale(1 / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI))
+        if per_trigger_normalized:
+            backgroundCorrelationFunction.Scale(1 / self.getNumberOfTriggerJets())
+        # set the delta-phi and delta-eta ranges back to the previous values
+        self.setRegion(self.currentRegion)
+        return backgroundCorrelationFunction
+    
+    def getAzimuthalBackgroundFunction(self, backgroundCorrelationFunction: TH1D):
+        &#39;&#39;&#39;
+        Returns the background function. In proton-proton collisions this is a pedestal function estimated as the average value in the background region.
+        &#39;&#39;&#39;
+        # pass backgroundCorrelationFunction to the BackgroundFunction constructor
+        backgroundFunction = BackgroundFunction(backgroundCorrelationFunction, self.analysisType)
+        # make a TH1D of the background function
+        backgroundFunctionHistogram = TH1D(&#34;backgroundFunctionHistogram&#34;, &#34;backgroundFunctionHistogram&#34;, regionDeltaPhiBinCountsDictionary[self.currentRegion], regionDeltaPhiRangeDictionary[self.currentRegion][0], regionDeltaPhiRangeDictionary[self.currentRegion][1])
+        # fill the histogram with the background function values
+        for deltaPhiBin in range(1, backgroundFunctionHistogram.GetNbinsX() + 1):
+            backgroundFunctionHistogram.SetBinContent(
+                deltaPhiBin,
+                backgroundFunction(backgroundFunctionHistogram.GetBinCenter(deltaPhiBin))
+                )
+            backgroundFunctionHistogram.SetBinError(
+                deltaPhiBin, 
+                backgroundFunction.error(backgroundFunctionHistogram.GetBinCenter(deltaPhiBin))
+                )
+
+        return backgroundFunctionHistogram
+
+    def fillNumberOfAssociatedHadronsDictionary(self):
+        &#39;&#39;&#39;
+        Returns a dictionary of the number of associated hadrons in current associated hadron momentum bin
+        &#39;&#39;&#39;
+        self.numberOfAssociatedHadronsBySpecies = {}
+        for species in ParticleType:
+            self.setParticleSelectionForJetHadron(species)
+            self.numberOfAssociatedHadronsBySpecies[species] = self.getNumberOfAssociatedParticles()
+        self.setParticleSelectionForJetHadron(self.current_species)
+
+    def getNumberOfAssociatedParticles(self):
+        &#39;&#39;&#39;
+        Returns the number of associated particles
+        &#39;&#39;&#39;
+        if repr(self.JetHadron) not in self.numberOfAssociatedHadrons:
+            self.numberOfAssociatedHadrons[repr(self.JetHadron)] = self.JetHadron.getNumberOfAssociatedParticles()
+        return self.numberOfAssociatedHadrons[repr(self.JetHadron)]
+
+    def getNumberOfTriggerJets(self):
+        &#39;&#39;&#39;
+        Returns the number of trigger jets
+        &#39;&#39;&#39;
+        if repr(self.Trigger) not in self.numberOfTriggerJets:
+            self.numberOfTriggerJets[repr(self.Trigger)] = self.Trigger.getNumberOfTriggerJets()
+        return self.numberOfTriggerJets[repr(self.Trigger)]</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="JetHadronAnalysis.Analysis.Analysis.computeMaxNormalizationFactor"><code class="name flex">
+<span>def <span class="ident">computeMaxNormalizationFactor</span></span>(<span>self, mixedEventCorrelationFunction, deltaEtaRestriction: float = 0.3)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the normalization factor for the mixed event correlation function using the maximum value within the restricted delta-eta range</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def computeMaxNormalizationFactor(self, mixedEventCorrelationFunction, deltaEtaRestriction: float = 0.3):
+    &#39;&#39;&#39;
+    Returns the normalization factor for the mixed event correlation function using the maximum value within the restricted delta-eta range
+    &#39;&#39;&#39;
+    # make a clone to avoid modifying the original
+    mixedEventCorrelationFunction = mixedEventCorrelationFunction.Clone()
+    # restrict delta-eta range
+    mixedEventCorrelationFunction.GetYaxis().SetRangeUser(-deltaEtaRestriction, deltaEtaRestriction)
+    # calculate the number of delta-eta bins in the range
+    deltaEtaBinCount = mixedEventCorrelationFunction.GetYaxis().FindBin(deltaEtaRestriction) - mixedEventCorrelationFunction.GetYaxis().FindBin(-deltaEtaRestriction)
+    # project onto delta-phi
+    mixedEventAzimuthalCorrelationFunction = mixedEventCorrelationFunction.ProjectionX()
+    # divide by the number of delta-eta bins to get the average
+    mixedEventAzimuthalCorrelationFunction.Scale(1 / deltaEtaBinCount)
+    # return the maximum value
+    return mixedEventAzimuthalCorrelationFunction.GetMaximum()</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.computeMixedEventNormalizationFactor"><code class="name flex">
+<span>def <span class="ident">computeMixedEventNormalizationFactor</span></span>(<span>self, mixedEventCorrelationFunction, normMethod: <a title="JetHadronAnalysis.Types.NormalizationMethod" href="Types.html#JetHadronAnalysis.Types.NormalizationMethod">NormalizationMethod</a>, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the normalization factor for the mixed event correlation function</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def computeMixedEventNormalizationFactor(self, mixedEventCorrelationFunction, normMethod: NormalizationMethod, **kwargs):
+    &#39;&#39;&#39;
+    Returns the normalization factor for the mixed event correlation function
+    &#39;&#39;&#39;
+    if normMethod == NormalizationMethod.SLIDING_WINDOW:
+        return self.computeSlidingWindowNormalizationFactor(mixedEventCorrelationFunction=mixedEventCorrelationFunction, windowSize=kwargs.get(&#34;windowSize&#34;, pi))
+    elif normMethod == NormalizationMethod.MAX:
+        return self.computeMaxNormalizationFactor(mixedEventCorrelationFunction=mixedEventCorrelationFunction)
+    else:
+        raise NotImplementedError(&#34;Normalization method not yet implemented&#34;)</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.computeSlidingWindowNormalizationFactor"><code class="name flex">
+<span>def <span class="ident">computeSlidingWindowNormalizationFactor</span></span>(<span>self, mixedEventCorrelationFunction, windowSize: float = 3.141592653589793, deltaEtaRestriction: float = 0.3)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the normalization factor for the mixed event correlation function using the sliding window method after projection onto delta-phi for |delta-eta| &lt; etaRestriction</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def computeSlidingWindowNormalizationFactor(self, mixedEventCorrelationFunction, windowSize: float = pi, deltaEtaRestriction: float = 0.3):
+    &#39;&#39;&#39;
+    Returns the normalization factor for the mixed event correlation function using the sliding window method after projection onto delta-phi for |delta-eta| &lt; etaRestriction
+    &#39;&#39;&#39;
+    # make a clone to avoid modifying the original
+    mixedEventCorrelationFunction = mixedEventCorrelationFunction.Clone()
+    # restrict delta-eta range
+    mixedEventCorrelationFunction.GetYaxis().SetRangeUser(-deltaEtaRestriction, deltaEtaRestriction)
+    # calculate the number of delta-eta bins in the range 
+    deltaEtaBinCount = mixedEventCorrelationFunction.GetYaxis().FindBin(deltaEtaRestriction) - mixedEventCorrelationFunction.GetYaxis().FindBin(-deltaEtaRestriction)
+    # project onto delta-phi
+    mixedEventAzimuthalCorrelationFunction = mixedEventCorrelationFunction.ProjectionX()
+    # divide by the number of delta-eta bins to get the average
+    mixedEventAzimuthalCorrelationFunction.Scale(1 / deltaEtaBinCount)
+    # calculate the number of delta-phi bins in the window
+    windowBinCount = int(windowSize // self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_PHI))
+    maxWindowAverage = 0
+    # slide the window across the mixed event correlation function
+    assert windowBinCount &lt; mixedEventAzimuthalCorrelationFunction.GetNbinsX(), f&#34;Window size is too large, must be less than {mixedEventAzimuthalCorrelationFunction.GetNbinsX()}, got {windowBinCount}&#34;
+    for i in range(mixedEventAzimuthalCorrelationFunction.GetNbinsX() - windowBinCount):
+        # calculate the average in the window
+        windowAverage = mixedEventAzimuthalCorrelationFunction.Integral(i, i + windowBinCount) / windowBinCount
+        # keep track of the maximum average
+        if windowAverage &gt; maxWindowAverage:
+            maxWindowAverage = windowAverage
+    return maxWindowAverage</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.fillNumberOfAssociatedHadronsDictionary"><code class="name flex">
+<span>def <span class="ident">fillNumberOfAssociatedHadronsDictionary</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns a dictionary of the number of associated hadrons in current associated hadron momentum bin</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fillNumberOfAssociatedHadronsDictionary(self):
+    &#39;&#39;&#39;
+    Returns a dictionary of the number of associated hadrons in current associated hadron momentum bin
+    &#39;&#39;&#39;
+    self.numberOfAssociatedHadronsBySpecies = {}
+    for species in ParticleType:
+        self.setParticleSelectionForJetHadron(species)
+        self.numberOfAssociatedHadronsBySpecies[species] = self.getNumberOfAssociatedParticles()
+    self.setParticleSelectionForJetHadron(self.current_species)</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.fillSparsesFromFile"><code class="name flex">
+<span>def <span class="ident">fillSparsesFromFile</span></span>(<span>self, rootFileName: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function opens the root file and appends the sparse data to the appropriate Sparse object then closes the file</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fillSparsesFromFile(self, rootFileName: str):
+    &#39;&#39;&#39;
+    This function opens the root file and appends the sparse data to the appropriate Sparse object then closes the file
+    &#39;&#39;&#39;
+    file = TFile(rootFileName)
+    rootFileListName = f&#34;AliAnalysisTaskJetH_tracks_caloClusters_biased&#34; if self.analysisType == AnalysisType.PP else f&#34;AliAnalysisTaskJetH_tracks_caloClusters_dEdxtrackBias5R2{&#39;SemiCentral&#39; if self.analysisType == AnalysisType.SEMICENTRAL else &#39;Central&#39;}q&#34;
+    rootFileList = file.Get(rootFileListName)
+    self.JetHadron.addSparse(rootFileList.FindObject(&#34;fhnJH&#34;))
+    self.Trigger.addSparse(rootFileList.FindObject(&#34;fhnTrigger&#34;))
+    self.MixedEvent.addSparse(rootFileList.FindObject(&#34;fhnMixedEvents&#34;))
+    file.Close()</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getAcceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction"><code class="name flex">
+<span>def <span class="ident">getAcceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction</span></span>(<span>self, acceptanceCorrectedDifferentialAzimuthalCorrelationFunction: cppyy.gbl.TH1D, backgroundFunction: cppyy.gbl.TH1D)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the acceptance corrected background subtracted differential correlation function
+This is the acceptance corrected differential correlation function minus the background function</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getAcceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction(self, acceptanceCorrectedDifferentialAzimuthalCorrelationFunction: TH1D, backgroundFunction:TH1D):
+    &#39;&#39;&#39;
+    Returns the acceptance corrected background subtracted differential correlation function
+    This is the acceptance corrected differential correlation function minus the background function
+    &#39;&#39;&#39;
+    acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction = acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Clone()
+    backgroundFunction = backgroundFunction.Clone()
+    backgroundFunction.Scale(-1)
+    acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction.Add(backgroundFunction)
+    return acceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getAcceptanceCorrectedDifferentialAzimuthalCorrelationFunction"><code class="name flex">
+<span>def <span class="ident">getAcceptanceCorrectedDifferentialAzimuthalCorrelationFunction</span></span>(<span>self, acceptanceCorrectedDifferentialCorrelationFunction)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the acceptance corrected differential azimuthal correlation function
+This is the acceptance corrected differential correlation function integrated over delta-eta</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getAcceptanceCorrectedDifferentialAzimuthalCorrelationFunction(self, acceptanceCorrectedDifferentialCorrelationFunction):
+    &#39;&#39;&#39;
+    Returns the acceptance corrected differential azimuthal correlation function
+    This is the acceptance corrected differential correlation function integrated over delta-eta
+    &#39;&#39;&#39;
+    acceptanceCorrectedDifferentialAzimuthalCorrelationFunction = acceptanceCorrectedDifferentialCorrelationFunction.ProjectionX()
+    acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Scale(self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_ETA))
+    # scale by the number of bins in delta-eta over which the correlation function was integrated
+    number_of_delta_eta_bins = acceptanceCorrectedDifferentialCorrelationFunction.GetYaxis().GetNbins()
+    acceptanceCorrectedDifferentialAzimuthalCorrelationFunction.Scale(1 / number_of_delta_eta_bins)
+    return acceptanceCorrectedDifferentialAzimuthalCorrelationFunction</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getAcceptanceCorrectedDifferentialCorrelationFunction"><code class="name flex">
+<span>def <span class="ident">getAcceptanceCorrectedDifferentialCorrelationFunction</span></span>(<span>self, differentialCorrelationFunction, acceptanceCorrection)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the acceptance corrected differential correlation function
+This is the raw differential correlation function divided by the normalized mixed event correlation function</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getAcceptanceCorrectedDifferentialCorrelationFunction(self, differentialCorrelationFunction, acceptanceCorrection):
+    &#39;&#39;&#39;
+    Returns the acceptance corrected differential correlation function
+    This is the raw differential correlation function divided by the normalized mixed event correlation function
+    &#39;&#39;&#39;
+    acceptanceCorrectedDifferentialCorrelationFunction = differentialCorrelationFunction.Clone()
+    acceptanceCorrection = acceptanceCorrection.Clone()
+    # Set the x and y bin ranges in the acceptance correction to match the raw correlation function
+    acceptanceCorrection.GetXaxis().SetRangeUser(differentialCorrelationFunction.GetXaxis().GetXmin(), differentialCorrelationFunction.GetXaxis().GetXmax())
+    acceptanceCorrection.GetYaxis().SetRangeUser(differentialCorrelationFunction.GetYaxis().GetXmin(), differentialCorrelationFunction.GetYaxis().GetXmax())
+    acceptanceCorrectedDifferentialCorrelationFunction.Divide(acceptanceCorrection)
+    return acceptanceCorrectedDifferentialCorrelationFunction</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getAzimuthalBackgroundFunction"><code class="name flex">
+<span>def <span class="ident">getAzimuthalBackgroundFunction</span></span>(<span>self, backgroundCorrelationFunction: cppyy.gbl.TH1D)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the background function. In proton-proton collisions this is a pedestal function estimated as the average value in the background region.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getAzimuthalBackgroundFunction(self, backgroundCorrelationFunction: TH1D):
+    &#39;&#39;&#39;
+    Returns the background function. In proton-proton collisions this is a pedestal function estimated as the average value in the background region.
+    &#39;&#39;&#39;
+    # pass backgroundCorrelationFunction to the BackgroundFunction constructor
+    backgroundFunction = BackgroundFunction(backgroundCorrelationFunction, self.analysisType)
+    # make a TH1D of the background function
+    backgroundFunctionHistogram = TH1D(&#34;backgroundFunctionHistogram&#34;, &#34;backgroundFunctionHistogram&#34;, regionDeltaPhiBinCountsDictionary[self.currentRegion], regionDeltaPhiRangeDictionary[self.currentRegion][0], regionDeltaPhiRangeDictionary[self.currentRegion][1])
+    # fill the histogram with the background function values
+    for deltaPhiBin in range(1, backgroundFunctionHistogram.GetNbinsX() + 1):
+        backgroundFunctionHistogram.SetBinContent(
+            deltaPhiBin,
+            backgroundFunction(backgroundFunctionHistogram.GetBinCenter(deltaPhiBin))
+            )
+        backgroundFunctionHistogram.SetBinError(
+            deltaPhiBin, 
+            backgroundFunction.error(backgroundFunctionHistogram.GetBinCenter(deltaPhiBin))
+            )
+
+    return backgroundFunctionHistogram</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getAzimuthalCorrelationFunctionforParticleType"><code class="name flex">
+<span>def <span class="ident">getAzimuthalCorrelationFunctionforParticleType</span></span>(<span>self, species: <a title="JetHadronAnalysis.Types.ParticleType" href="Types.html#JetHadronAnalysis.Types.ParticleType">ParticleType</a>, acceptanceCorrectedAzimuthalCorrelationFunction: cppyy.gbl.TH1D, loadFractionsFromDB=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Gets the particle fractions and scales the acceptance corrected azimuthal correlation function by the particle fraction for the specified species</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getAzimuthalCorrelationFunctionforParticleType(self, species: ParticleType, acceptanceCorrectedAzimuthalCorrelationFunction: TH1D, loadFractionsFromDB=False):
+    &#39;&#39;&#39;
+    Gets the particle fractions and scales the acceptance corrected azimuthal correlation function by the particle fraction for the specified species
+    &#39;&#39;&#39;
+
+    particle_fractions, particle_fraction_errors, chi2OverNDF_shape, Chi2OverNDF_yield = self.getPIDFractions(loadFractionsFromDB=loadFractionsFromDB)
+    
+    # now get the per species azimuthal correlation functions for each region by scaling
+    species_azimuthal_correlation_function = acceptanceCorrectedAzimuthalCorrelationFunction.Clone()
+    species_azimuthal_correlation_function.Scale(particle_fractions[species])
+    error_band = acceptanceCorrectedAzimuthalCorrelationFunction.Clone()
+    error_band.Scale(particle_fraction_errors[species])
+    # convert errorbands into numpy arrays of bin contents
+    sys_errors = np.array([error_band.GetBinContent(i) for i in range(1, error_band.GetNbinsX()+1)])
+    # reset the errors for species_azimuthal_correlation_function to add the statistical errors and systematic errors in quadrature
+    for i in range(1, species_azimuthal_correlation_function.GetNbinsX()+1):
+        species_azimuthal_correlation_function.SetBinError(i, np.sqrt(species_azimuthal_correlation_function.GetBinError(i)**2 + sys_errors[i-1]**2))
+    
+
+    return species_azimuthal_correlation_function</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getBackgroundCorrelationFunction"><code class="name flex">
+<span>def <span class="ident">getBackgroundCorrelationFunction</span></span>(<span>self, per_trigger_normalized=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the background correlation function</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getBackgroundCorrelationFunction(self, per_trigger_normalized=False):
+    &#39;&#39;&#39;
+    Returns the background correlation function
+    &#39;&#39;&#39;
+    # get the positive eta and negative eta background regions of the Jet Hadron correlation function and add them together
+    self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETANEG])
+    self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETANEG])
+
+    backgroundCorrelationFunction_etaneg = self.JetHadron.getProjection(self.JetHadron.Axes.DELTA_PHI, self.JetHadron.Axes.DELTA_ETA)
+
+    nbins_delta_eta_neg = backgroundCorrelationFunction_etaneg.GetYaxis().GetNbins()
+    backgroundCorrelationFunction_etaneg = backgroundCorrelationFunction_etaneg.ProjectionX()
+    backgroundCorrelationFunction_etaneg.Scale(1 / nbins_delta_eta_neg)
+
+    self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETAPOS])
+    self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETAPOS])
+
+    backgroundCorrelationFunction_etapos = self.JetHadron.getProjection(self.JetHadron.Axes.DELTA_PHI, self.JetHadron.Axes.DELTA_ETA)
+
+    nbins_delta_eta_pos = backgroundCorrelationFunction_etapos.GetYaxis().GetNbins()
+    backgroundCorrelationFunction_etapos = backgroundCorrelationFunction_etapos.ProjectionX()
+    backgroundCorrelationFunction_etapos.Scale(1 / nbins_delta_eta_pos)
+
+    backgroundCorrelationFunction = backgroundCorrelationFunction_etaneg.Clone()
+    backgroundCorrelationFunction.Add(backgroundCorrelationFunction_etapos)
+    # divide by the delta-phi bin width and the delta-eta bin width to get the average
+    backgroundCorrelationFunction.Scale(1 / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI))
+    if per_trigger_normalized:
+        backgroundCorrelationFunction.Scale(1 / self.getNumberOfTriggerJets())
+    # set the delta-phi and delta-eta ranges back to the previous values
+    self.setRegion(self.currentRegion)
+    return backgroundCorrelationFunction</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getDifferentialCorrelationFunction"><code class="name flex">
+<span>def <span class="ident">getDifferentialCorrelationFunction</span></span>(<span>self, per_trigger_normalized=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the differential correlation function</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getDifferentialCorrelationFunction(self, per_trigger_normalized=False):
+    &#39;&#39;&#39;
+    Returns the differential correlation function
+    &#39;&#39;&#39;
+    correlationFunction = self.JetHadron.getProjection(self.JetHadron.Axes.DELTA_PHI, self.JetHadron.Axes.DELTA_ETA)
+    correlationFunction.Scale(1 / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI) / self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_ETA))
+    if per_trigger_normalized:
+        correlationFunction.Scale(1 / self.getNumberOfTriggerJets())
+    return correlationFunction</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getEnhancedTPCnSigmaProjection"><code class="name flex">
+<span>def <span class="ident">getEnhancedTPCnSigmaProjection</span></span>(<span>self, species: <a title="JetHadronAnalysis.Types.ParticleType" href="Types.html#JetHadronAnalysis.Types.ParticleType">ParticleType</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sets the particle type for the jet hadron sparse and returns the projection onto the TPC nsigma axis, then resets the particle type</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getEnhancedTPCnSigmaProjection(self, species: ParticleType):
+    &#39;&#39;&#39;
+    Sets the particle type for the jet hadron sparse and returns the projection onto the TPC nsigma axis, then resets the particle type
+    &#39;&#39;&#39;
+    self.setParticleSelectionForJetHadron(species)
+    projection = self.getTPCPionNsigma()
+    self.setParticleSelectionForJetHadron(self.current_species)
+    return projection</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getNormalizedDifferentialMixedEventCorrelationFunction"><code class="name flex">
+<span>def <span class="ident">getNormalizedDifferentialMixedEventCorrelationFunction</span></span>(<span>self, normMethod: <a title="JetHadronAnalysis.Types.NormalizationMethod" href="Types.html#JetHadronAnalysis.Types.NormalizationMethod">NormalizationMethod</a>, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the differential mixed event correlation function</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getNormalizedDifferentialMixedEventCorrelationFunction(self, normMethod: NormalizationMethod, **kwargs):
+    &#39;&#39;&#39;
+    Returns the differential mixed event correlation function
+    &#39;&#39;&#39;
+    if &#34;TOF&#34; in kwargs:
+        if kwargs[&#39;TOF&#39;]:
+            self.MixedEvent.sethasTOF(True)
+            mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+        else:
+            mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+    mixedEventCorrelationFunction.Scale(1 / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_PHI) / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_ETA))
+
+    normalization_factor = self.computeMixedEventNormalizationFactor(mixedEventCorrelationFunction, normMethod, **kwargs)
+
+    if kwargs.get(&#34;customRegion&#34;, None) is not None:
+        customRegion = kwargs.get(&#34;customRegion&#34;)
+        self.MixedEvent.setDeltaPhiRange(*customRegion[&#34;DeltaPhi&#34;])
+        self.MixedEvent.setDeltaEtaRange(*customRegion[&#34;DeltaEta&#34;])
+        mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+        self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
+        self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+    else:
+        if self.currentRegion == Region.BACKGROUND:
+            self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETANEG])
+            self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETANEG])
+            mixedEventCorrelationFunction_etaneg = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+            self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.BACKGROUND_ETAPOS])
+            self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.BACKGROUND_ETAPOS])
+            mixedEventCorrelationFunction_etapos = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+            mixedEventCorrelationFunction = mixedEventCorrelationFunction_etaneg.Clone()
+            mixedEventCorrelationFunction.Add(mixedEventCorrelationFunction_etapos)
+            self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
+            self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+        else:
+            self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[self.currentRegion])
+            self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[self.currentRegion])
+            mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+            self.MixedEvent.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[Region.INCLUSIVE])
+            self.MixedEvent.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[Region.INCLUSIVE])
+    mixedEventCorrelationFunction.Scale(1 / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_PHI) / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_ETA))
+    mixedEventCorrelationFunction.Scale(1 / normalization_factor)
+    return mixedEventCorrelationFunction</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getNumberOfAssociatedParticles"><code class="name flex">
+<span>def <span class="ident">getNumberOfAssociatedParticles</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the number of associated particles</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getNumberOfAssociatedParticles(self):
+    &#39;&#39;&#39;
+    Returns the number of associated particles
+    &#39;&#39;&#39;
+    if repr(self.JetHadron) not in self.numberOfAssociatedHadrons:
+        self.numberOfAssociatedHadrons[repr(self.JetHadron)] = self.JetHadron.getNumberOfAssociatedParticles()
+    return self.numberOfAssociatedHadrons[repr(self.JetHadron)]</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getNumberOfTriggerJets"><code class="name flex">
+<span>def <span class="ident">getNumberOfTriggerJets</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the number of trigger jets</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getNumberOfTriggerJets(self):
+    &#39;&#39;&#39;
+    Returns the number of trigger jets
+    &#39;&#39;&#39;
+    if repr(self.Trigger) not in self.numberOfTriggerJets:
+        self.numberOfTriggerJets[repr(self.Trigger)] = self.Trigger.getNumberOfTriggerJets()
+    return self.numberOfTriggerJets[repr(self.Trigger)]</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getPIDFractions"><code class="name flex">
+<span>def <span class="ident">getPIDFractions</span></span>(<span>self, makeIntermediatePlots=True, loadFractionsFromDB=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>First checks if the PID fractions have already been computed and stored in the database
+If not, computes them and stores them in the database
+Prepares the projections for each enhanced species
+Converts them into arrays for fitting
+Fits and Extracts the optimal fit params
+Computes the PID fractions
+Returns the PID fractions</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getPIDFractions(self, makeIntermediatePlots=True, loadFractionsFromDB=False):
+    &#39;&#39;&#39;
+    First checks if the PID fractions have already been computed and stored in the database
+    If not, computes them and stores them in the database
+    Prepares the projections for each enhanced species
+    Converts them into arrays for fitting
+    Fits and Extracts the optimal fit params
+    Computes the PID fractions
+    Returns the PID fractions
+    &#39;&#39;&#39;
+    if loadFractionsFromDB:
+        print(&#34;Loading particle fractions from database&#34;)
+        # get the particle fractions from the database
+        particle_fractions, particle_fraction_errors = self.getParticleFractionsFromDB()
+        return particle_fractions, particle_fraction_errors, None
+    # set the region to inclusive to fit the shape parameters first saving the current region to reset it later
+    currentRegion = self.currentRegion
+    self.setRegion(Region.INCLUSIVE)
+    # get the projections
+    pionEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PION)
+    protonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PROTON)
+    kaonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.KAON)
+    inclusiveEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.INCLUSIVE)
+    # convert to arrays using FitTPCPionNsigma.prepareData 
+    x, y, yerr = FitTPCPionNsigma.prepareData(pionEnhancedTPCnSigma, protonEnhancedTPCnSigma, kaonEnhancedTPCnSigma, inclusiveEnhancedTPCnSigma)
+    # fit and extract the optimal fit params
+    # start by creating the fitter instance
+    fitter = FitTPCPionNsigma(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin)
+    # initialize the default parameters for the analysis type and current associated hadron momentum bin
+    fitter.initializeDefaultParameters()
+    optimal_params, covariance = fitter.performShapeFit(x, y, yerr)
+
+    chi2OverNDF_shape = fitter.chi2OverNDF(optimal_params, covariance, x, y, yerr)
+    if makeIntermediatePlots:
+        self.plotTPCPionNsigmaFit(x, y, yerr, optimal_params, covariance, fitter.fittingFunction, fitter.fittingErrorFunction, fitter.pionFittingFunction, fitter.kaonFittingFunction, fitter.protonFittingFunction, fitter.chi2OverNDF, &#34;TPCnSigmaFitPlots&#34;)
+    # now set the region back to what it was before so we can fit the inclusive yield
+    self.setRegion(currentRegion)
+    # get the inclusive yield
+
+    pionEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PION)
+    protonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PROTON)
+    kaonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.KAON)
+    inclusiveEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.INCLUSIVE)
+
+    x, y, yerr = FitTPCPionNsigma.prepareData(pionEnhancedTPCnSigma, protonEnhancedTPCnSigma, kaonEnhancedTPCnSigma, inclusiveEnhancedTPCnSigma)
+
+    x_inc = x
+    y_inc = y[3]
+    yerr_inc = yerr[3]
+
+    optimal_inclusive_yield_parameters, covariance_inclusive_yield, reducedChi2_yield  = fitter.performYieldFit(x_inc, y_inc, yerr_inc, optimal_params)
+
+    mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = optimal_params
+    apinc, apiinc, akinc = optimal_inclusive_yield_parameters
+    optimal_params = mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak
+    covariance[-5:-2, -5:-2] = covariance_inclusive_yield # overwrite the covariance matrix with the covariance matrix from the inclusive yield fit
+
+
+    if  not hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+        self.fillNumberOfAssociatedHadronsDictionary()
+    
+    
+    # compute the PID fractions
+    pid_fractions, pid_fraction_errors = fitter.computeAveragePIDFractions(optimal_params, covariance, self.numberOfAssociatedHadronsBySpecies)
+
+    return pid_fractions, pid_fraction_errors, chi2OverNDF_shape, reducedChi2_yield</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getParticleFractionsFromDB"><code class="name flex">
+<span>def <span class="ident">getParticleFractionsFromDB</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Gets the particle fractions from the database</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getParticleFractionsFromDB(self):
+    &#39;&#39;&#39;
+    Gets the particle fractions from the database
+    &#39;&#39;&#39;
+    conn = sqlite3.connect(&#34;PID.db&#34;)
+    dbCursor = conn.cursor()
+    particle_fractions = {}
+    particle_fraction_errors = {}
+    for species in ParticleType:
+        if species is ParticleType.OTHER or species is ParticleType.INCLUSIVE:
+            continue
+
+        particle_fractions[species], particle_fraction_errors[species] = getParticleFractionForMomentumBin(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin, species, dbCursor)[0]
+    conn.close()
+    return particle_fractions, particle_fraction_errors</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getRPFParamsAndErrorFromDB"><code class="name flex">
+<span>def <span class="ident">getRPFParamsAndErrorFromDB</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getRPFParamsAndErrorFromDB(self):
+    # get a db connection
+    conn = sqlite3.connect(&#34;RPF.db&#34;)
+    dbCursor = conn.cursor()
+    # get the optimal paams and their errors from the database
+    optimal_params = getParameters(self.analysisType, self.currentTriggerJetMomentumBin, self.currentAssociatedHadronMomentumBin, self.current_species, dbCursor)
+    # get the optimal params errors from the database
+    param_errors, covariance = getParameterErrors(self.analysisType, self.currentTriggerJetMomentumBin, self.currentAssociatedHadronMomentumBin, self.current_species, dbCursor)
+    # close the connection
+    conn.close()
+    reduced_chi2 = optimal_params[-1]
+    # convert the optimal params and their errors to numpy arrays
+    optimal_params = np.array(optimal_params[:-1])
+    return optimal_params, covariance, reduced_chi2</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getRPInclusiveBackgroundCorrelationFunctionUsingRPF"><code class="name flex">
+<span>def <span class="ident">getRPInclusiveBackgroundCorrelationFunctionUsingRPF</span></span>(<span>self, inPlaneCorrelationFunction: cppyy.gbl.TH1D, midPlaneCorrelationFunction: cppyy.gbl.TH1D, outPlaneCorrelationFunction: cppyy.gbl.TH1D, loadFunctionFromDB=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the background correlation function using the RPF method</p>
+<p>Check if the background function has already been computed and stored in the database
+If not, compute it and store it in the database</p>
+<h2 id="returns">Returns</h2>
+<p>backgroundCorrelationFunction (TH1D): The background correlation function with the same binning as the in-plane, mid-plane, and out-of-plane correlation functions</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getRPInclusiveBackgroundCorrelationFunctionUsingRPF(self, inPlaneCorrelationFunction: TH1D, midPlaneCorrelationFunction: TH1D, outPlaneCorrelationFunction: TH1D, loadFunctionFromDB=False):
+    &#39;&#39;&#39;
+    Returns the background correlation function using the RPF method
+
+    Check if the background function has already been computed and stored in the database
+    If not, compute it and store it in the database
+
+    Returns:
+        backgroundCorrelationFunction (TH1D): The background correlation function with the same binning as the in-plane, mid-plane, and out-of-plane correlation functions
+    &#39;&#39;&#39;
+    # create a fitter instance
+    fitter = RPFFit(self.analysisType, self.currentTriggerJetMomentumBin, self.currentAssociatedHadronMomentumBin, self.current_species)
+
+    if loadFunctionFromDB:
+        print(&#34;Loading RPF background from DB&#34;)
+        # get the background function from the database
+        optimal_params, covariance, reduced_chi2 = self.getRPFParamsAndErrorFromDB()
+    else:
+        fitter.setDefaultParameters()
+
+        # prepare the data for fitting
+        x, y, yerr = RPFFit.prepareData(inPlaneCorrelationFunction, midPlaneCorrelationFunction, outPlaneCorrelationFunction)
+
+        # fit and extract the optimal fit params
+        optimal_params, covariance, reduced_chi2 = fitter.performFit(x, y, yerr)
+        
+    # build the background function with the same binning as the correlation functions
+    x_background = np.array([inPlaneCorrelationFunction.GetBinCenter(i) for i in range(1, inPlaneCorrelationFunction.GetNbinsX()+1)])
+    backgroundCorrelationFunction = TH1D(&#34;backgroundCorrelationFunction&#34;, &#34;backgroundCorrelationFunction&#34;, len(x_background), x_background[0], x_background[-1])
+    backgroundContent = fitter.fittingFunction(None, *resolution_parameters[self.analysisType].values(), x_background, *optimal_params)
+    backgroundError = fitter.fittingErrorFunction(None, *resolution_parameters[self.analysisType].values(), x_background, *optimal_params, pcov=covariance)
+
+    inPlaneContent = backgroundContent[:len(x_background)]
+    midPlaneContent = backgroundContent[len(x_background):2*len(x_background)]
+    outPlaneContent = backgroundContent[2*len(x_background):]
+    inclusiveContent = inPlaneContent + midPlaneContent + outPlaneContent
+
+    inPlaneError = backgroundError[:len(x_background)]
+    midPlaneError = backgroundError[len(x_background):2*len(x_background)]
+    outPlaneError = backgroundError[2*len(x_background):]
+    inclusiveError = np.sqrt(inPlaneError**2 + midPlaneError**2 + outPlaneError**2)
+    # fill the background function with the optimal params
+    for i in range(len(x_background)):
+        backgroundCorrelationFunction.SetBinContent(i+1, inclusiveContent[i])
+        backgroundCorrelationFunction.SetBinError(i+1, inclusiveError[i])
+    return backgroundCorrelationFunction</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getTPCPionNsigma"><code class="name flex">
+<span>def <span class="ident">getTPCPionNsigma</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the projection onto the TPC pion nsigma axis</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getTPCPionNsigma(self):
+    &#39;&#39;&#39;
+    Returns the projection onto the TPC pion nsigma axis
+    &#39;&#39;&#39;
+    return self.JetHadron.getProjection(self.JetHadron.Axes.PION_TPC_N_SIGMA)</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.getYieldFromAzimuthalCorrelationFunction"><code class="name flex">
+<span>def <span class="ident">getYieldFromAzimuthalCorrelationFunction</span></span>(<span>self, azimuthalCorrelationFunction: cppyy.gbl.TH1D)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the yield from the azimuthal correlation function</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getYieldFromAzimuthalCorrelationFunction(self, azimuthalCorrelationFunction: TH1D):
+    &#39;&#39;&#39;
+    Returns the yield from the azimuthal correlation function
+    &#39;&#39;&#39;
+    # scale by  the bin width
+    # but first clone it 
+    azimuthalCorrelationFunction = azimuthalCorrelationFunction.Clone()
+    azimuthalCorrelationFunction.Scale(self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI))
+    yield_ = azimuthalCorrelationFunction.Integral()
+    error_ = np.sqrt(np.sum([azimuthalCorrelationFunction.GetBinError(i)**2 for i in range(1, azimuthalCorrelationFunction.GetNbinsX()+1)]))
+    return yield_, error_</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.plotTPCPionNsigmaFit"><code class="name flex">
+<span>def <span class="ident">plotTPCPionNsigmaFit</span></span>(<span>self, x, y, yerr, optimal_params, covariance, fitFunction, fitErrorFunction, pionFitFunction, kaonFitFunction, protonFitFunction, chi2OverNDFFunction, save_path=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plotTPCPionNsigmaFit(self, x, y, yerr, optimal_params, covariance, fitFunction, fitErrorFunction, pionFitFunction, kaonFitFunction, protonFitFunction, chi2OverNDFFunction, save_path=None):
+
+    if save_path is not None:
+        if save_path[-1] != &#34;/&#34;:
+            save_path += &#34;/&#34;
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+        if not os.path.exists(f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}&#34;):
+            os.makedirs(f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}&#34;)
+
+    y_pion = y[0]
+    y_proton = y[1]
+    y_kaon = y[2]
+    y_inclusive = y[3]
+
+    y_err_pion = yerr[0]
+    y_err_proton = yerr[1]
+    y_err_kaon = yerr[2]
+    y_err_inclusive = yerr[3]
+
+    x_fit = np.linspace(x[0], x[-1], 100)
+    y_fit = fitFunction(None, x_fit, *optimal_params)
+    y_fit_err = fitErrorFunction(None, x_fit, *optimal_params, pcov=covariance)
+    y_fit_pion = y_fit[:len(x_fit)]
+    y_fit_proton = y_fit[len(x_fit):2*len(x_fit)]
+    y_fit_kaon = y_fit[2*len(x_fit):3*len(x_fit)]
+    y_fit_inclusive = y_fit[3*len(x_fit):]
+    y_fit_err_pion = y_fit_err[:len(x_fit)]
+    y_fit_err_proton = y_fit_err[len(x_fit):2*len(x_fit)]
+    y_fit_err_kaon = y_fit_err[2*len(x_fit):3*len(x_fit)]
+    y_fit_err_inclusive = y_fit_err[3*len(x_fit):]
+
+    chi2OverNDF = chi2OverNDFFunction(optimal_params, covariance, x, y, yerr)
+
+    mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = optimal_params
+    y_fit_pion_pion = pionFitFunction(x=x_fit, mu=mupi, sig=sigpi, a=apipi)
+    y_fit_pion_proton = protonFitFunction(x_fit, mup, sigp, appi, alphap)
+    y_fit_pion_kaon = kaonFitFunction(x_fit, muk, sigk, akpi, alphak)
+
+    y_fit_proton_pion = pionFitFunction(x_fit, mupi, sigpi, apip)
+    y_fit_proton_proton = protonFitFunction(x_fit, mup, sigp, app, alphap)
+    y_fit_proton_kaon = kaonFitFunction(x_fit, muk, sigk, akp, alphak)
+
+    y_fit_kaon_pion = pionFitFunction(x_fit, mupi, sigpi, apik)
+    y_fit_kaon_proton = protonFitFunction(x_fit, mup, sigp, apk, alphap)
+    y_fit_kaon_kaon = kaonFitFunction(x_fit, muk, sigk, akk, alphak)
+
+    y_fit_inclusive_pion = pionFitFunction(x_fit, mupi, sigpi, apiinc)
+    y_fit_inclusive_proton = protonFitFunction(x_fit, mup, sigp, apinc, alphap)
+    y_fit_inclusive_kaon = kaonFitFunction(x_fit, muk, sigk, akinc, alphak)
+
+
+    x_data_pion = {
+        &#34;raw_pion&#34;: x,
+        &#34;pion_total&#34;: x_fit,
+        &#34;pion_pion&#34;: x_fit,
+        &#34;pion_proton&#34;: x_fit,
+        &#34;pion_kaon&#34;: x_fit,
+    }
+    x_data_proton = {
+        &#34;raw_proton&#34;: x,
+        &#34;proton_total&#34;: x_fit,
+        &#34;proton_pion&#34;: x_fit,
+        &#34;proton_proton&#34;: x_fit,
+        &#34;proton_kaon&#34;: x_fit,
+    }
+    x_data_kaon = {
+        &#34;raw_kaon&#34;: x,
+        &#34;kaon_total&#34;: x_fit,
+        &#34;kaon_pion&#34;: x_fit,
+        &#34;kaon_proton&#34;: x_fit,
+        &#34;kaon_kaon&#34;: x_fit,
+    }
+    x_data_inclusive = {
+        &#34;raw_inclusive&#34;: x,
+        &#34;inclusive_total&#34;: x_fit,
+        &#34;inclusive_pion&#34;: x_fit,
+        &#34;inclusive_proton&#34;: x_fit,
+        &#34;inclusive_kaon&#34;: x_fit,
+    }
+    y_data_pion = {
+        &#34;raw_pion&#34;: y_pion,
+        &#34;pion_total&#34;: y_fit_pion,
+        &#34;pion_pion&#34;: y_fit_pion_pion,
+        &#34;pion_proton&#34;: y_fit_pion_proton,
+        &#34;pion_kaon&#34;: y_fit_pion_kaon,
+    }
+    y_data_proton = {
+        &#34;raw_proton&#34;: y_proton,
+        &#34;proton_total&#34;: y_fit_proton,
+        &#34;proton_pion&#34;: y_fit_proton_pion,
+        &#34;proton_proton&#34;: y_fit_proton_proton,
+        &#34;proton_kaon&#34;: y_fit_proton_kaon,
+    }
+    y_data_kaon = {
+        &#34;raw_kaon&#34;: y_kaon,
+        &#34;kaon_total&#34;: y_fit_kaon,
+        &#34;kaon_pion&#34;: y_fit_kaon_pion,
+        &#34;kaon_proton&#34;: y_fit_kaon_proton,
+        &#34;kaon_kaon&#34;: y_fit_kaon_kaon,
+    }
+    y_data_inclusive = {
+        &#34;raw_inclusive&#34;: y_inclusive,
+        &#34;inclusive_total&#34;: y_fit_inclusive,
+        &#34;inclusive_pion&#34;: y_fit_inclusive_pion,
+        &#34;inclusive_proton&#34;: y_fit_inclusive_proton,
+        &#34;inclusive_kaon&#34;: y_fit_inclusive_kaon,
+    }
+
+    yerr_data_pion = {
+        &#34;raw_pion&#34;: y_err_pion,
+        &#34;pion_total&#34;: y_fit_err_pion,
+        &#34;pion_pion&#34;: None,
+        &#34;pion_proton&#34;: None,
+        &#34;pion_kaon&#34;: None,
+    }
+    yerr_data_proton = {
+        &#34;raw_proton&#34;: y_err_proton,
+        &#34;proton_total&#34;: y_fit_err_proton,
+        &#34;proton_pion&#34;: None,
+        &#34;proton_proton&#34;: None,
+        &#34;proton_kaon&#34;: None,
+    }
+    yerr_data_kaon = {
+        &#34;raw_kaon&#34;: y_err_kaon,
+        &#34;kaon_total&#34;: y_fit_err_kaon,
+        &#34;kaon_pion&#34;: None,
+        &#34;kaon_proton&#34;: None,
+        &#34;kaon_kaon&#34;: None,
+    }
+    yerr_data_inclusive = {
+        &#34;raw_inclusive&#34;: y_err_inclusive,
+        &#34;inclusive_total&#34;: y_fit_err_inclusive,
+        &#34;inclusive_pion&#34;: None,
+        &#34;inclusive_proton&#34;: None,
+        &#34;inclusive_kaon&#34;: None,
+    }
+    
+    data_labels_pion = {
+        &#34;raw_pion&#34;: &#34;Enhanced Pion&#34;,
+        &#34;pion_total&#34;: &#34;Pion Fit&#34;,
+        &#34;pion_pion&#34;: &#34;Pion Component&#34;,
+        &#34;pion_proton&#34;: &#34;Proton Component&#34;,
+        &#34;pion_kaon&#34;: &#34;Kaon Component&#34;,
+    }
+    data_labels_proton = {
+        &#34;raw_proton&#34;: &#34;Enhanced Proton&#34;,
+        &#34;proton_total&#34;: &#34;Proton Fit&#34;,
+        &#34;proton_pion&#34;: &#34;Pion Component&#34;,
+        &#34;proton_proton&#34;: &#34;Proton Component&#34;,
+        &#34;proton_kaon&#34;: &#34;Kaon Component&#34;,
+    }
+    data_labels_kaon = {
+        &#34;raw_kaon&#34;: &#34;Enhanced Kaon&#34;,
+        &#34;kaon_total&#34;: &#34;Kaon Fit&#34;,
+        &#34;kaon_pion&#34;: &#34;Pion Component&#34;,
+        &#34;kaon_proton&#34;: &#34;Proton Component&#34;,
+        &#34;kaon_kaon&#34;: &#34;Kaon Component&#34;,
+    }
+    data_labels_inclusive = {
+        &#34;raw_inclusive&#34;: &#34;Enhanced Inclusive&#34;,
+        &#34;inclusive_total&#34;: &#34;Inclusive Fit&#34;,
+        &#34;inclusive_pion&#34;: &#34;Pion Component&#34;,
+        &#34;inclusive_proton&#34;: &#34;Proton Component&#34;,
+        &#34;inclusive_kaon&#34;: &#34;Kaon Component&#34;,
+    }
+
+    format_style_pion = {
+        &#34;raw_pion&#34;: &#34;o&#34;,
+        &#34;pion_total&#34;: &#34;-&#34;,
+        &#34;pion_pion&#34;: &#34;--&#34;,
+        &#34;pion_proton&#34;: &#34;--&#34;,
+        &#34;pion_kaon&#34;: &#34;--&#34;,
+    }
+    format_style_proton = {
+        &#34;raw_proton&#34;: &#34;o&#34;,
+        &#34;proton_total&#34;: &#34;-&#34;,
+        &#34;proton_pion&#34;: &#34;--&#34;,
+        &#34;proton_proton&#34;: &#34;--&#34;,
+        &#34;proton_kaon&#34;: &#34;--&#34;,
+    }
+    format_style_kaon = {
+        &#34;raw_kaon&#34;: &#34;o&#34;,
+        &#34;kaon_total&#34;: &#34;-&#34;,
+        &#34;kaon_pion&#34;: &#34;--&#34;,
+        &#34;kaon_proton&#34;: &#34;--&#34;,
+        &#34;kaon_kaon&#34;: &#34;--&#34;,
+    }
+    format_style_inclusive = {
+        &#34;raw_inclusive&#34;: &#34;o&#34;,
+        &#34;inclusive_total&#34;: &#34;-&#34;,
+        &#34;inclusive_pion&#34;: &#34;--&#34;,
+        &#34;inclusive_proton&#34;: &#34;--&#34;,
+        &#34;inclusive_kaon&#34;: &#34;--&#34;,
+    }
+
+    plotArrays(x_data_pion, y_data_pion, yerr_data_pion, data_label=data_labels_pion, format_style=format_style_pion, error_bands=None, error_bands_label=None, title=f&#34;TPC nSigma Fit - Pions Chi^2/NDF = {chi2OverNDF}&#34;, xtitle=&#34;TPC nSigma&#34;, ytitle=&#34;Counts&#34;, output_path=f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Pion.png&#34;)
+    plotArrays(x_data_proton, y_data_proton, yerr_data_proton, data_label=data_labels_proton, format_style=format_style_proton, error_bands=None, error_bands_label=None, title=f&#34;TPC nSigma Fit - Protons Chi^2/NDF = {chi2OverNDF}&#34;, xtitle=&#34;TPC nSigma&#34;, ytitle=&#34;Counts&#34;, output_path=f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Proton.png&#34;)
+    plotArrays(x_data_kaon, y_data_kaon, yerr_data_kaon, data_label=data_labels_kaon, format_style=format_style_kaon, error_bands=None, error_bands_label=None, title=f&#34;TPC nSigma Fit - Kaons Chi^2/NDF = {chi2OverNDF}&#34;, xtitle=&#34;TPC nSigma&#34;, ytitle=&#34;Counts&#34;, output_path=f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Kaon.png&#34;)
+    plotArrays(x_data_inclusive, y_data_inclusive, yerr_data_inclusive, data_label=data_labels_inclusive, format_style=format_style_inclusive, error_bands=None, error_bands_label=None, title=f&#34;TPC nSigma Fit - Inclusive Chi^2/NDF = {chi2OverNDF}&#34;, xtitle=&#34;TPC nSigma&#34;, ytitle=&#34;Counts&#34;, output_path=f&#34;{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Inclusive.png&#34;)
+
+    # y_fit_pi = pionFitFunction(None, x_fit, *optimal_params[:3])
+    # y_fit_k = kaonFitFunction(None, x_fit, *optimal_params[3:6])
+    # y_fit_p = protonFitFunction(None, x_fit, *optimal_params[6:9])</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.setAssociatedHadronMomentumBin"><code class="name flex">
+<span>def <span class="ident">setAssociatedHadronMomentumBin</span></span>(<span>self, associatedHadronMomentumBin: <a title="JetHadronAnalysis.Types.AssociatedHadronMomentumBin" href="Types.html#JetHadronAnalysis.Types.AssociatedHadronMomentumBin">AssociatedHadronMomentumBin</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sets the associated hadron momentum bin for the JetHadron sparse</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setAssociatedHadronMomentumBin(self, associatedHadronMomentumBin: AssociatedHadronMomentumBin):
+    &#39;&#39;&#39;
+    Sets the associated hadron momentum bin for the JetHadron sparse
+    &#39;&#39;&#39;
+    self.currentAssociatedHadronMomentumBin = associatedHadronMomentumBin
+    self.JetHadron.setAssociatedHadronMomentumRange(*associatedHadronMomentumBinRangeDictionary[associatedHadronMomentumBin])
+    if hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+        self.fillNumberOfAssociatedHadronsDictionary()</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.setParticleSelectionForJetHadron"><code class="name flex">
+<span>def <span class="ident">setParticleSelectionForJetHadron</span></span>(<span>self, species: <a title="JetHadronAnalysis.Types.ParticleType" href="Types.html#JetHadronAnalysis.Types.ParticleType">ParticleType</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sets the pion, kaon, and proton TOF ranges to get the particle type specified in JetHadron sparse</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setParticleSelectionForJetHadron(self, species: ParticleType):
+    &#39;&#39;&#39;
+    Sets the pion, kaon, and proton TOF ranges to get the particle type specified in JetHadron sparse
+    &#39;&#39;&#39;
+    self.current_species = species
+    if species == ParticleType.OTHER:
+        self.JetHadron.setParticleTypeIsOther(True)
+    else:
+        self.JetHadron.setParticleTypeIsOther(False)
+        self.JetHadron.setPionTOFnSigma(*speciesTOFRangeDictionary[species][0])
+        self.JetHadron.setKaonTOFnSigma(*speciesTOFRangeDictionary[species][1])
+        self.JetHadron.setProtonTOFnSigma(*speciesTOFRangeDictionary[species][2])</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.setReactionPlaneAngleBin"><code class="name flex">
+<span>def <span class="ident">setReactionPlaneAngleBin</span></span>(<span>self, reactionPlaneAngle: <a title="JetHadronAnalysis.Types.ReactionPlaneBin" href="Types.html#JetHadronAnalysis.Types.ReactionPlaneBin">ReactionPlaneBin</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sets the reaction plane angle bin for the JetHadron sparse</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setReactionPlaneAngleBin(self, reactionPlaneAngle: ReactionPlaneBin):
+    &#39;&#39;&#39;
+    Sets the reaction plane angle bin for the JetHadron sparse
+    &#39;&#39;&#39;
+    self.reactionPlaneAngle = reactionPlaneAngle
+    self.JetHadron.setEventPlaneAngleRange(*eventPlaneAngleBinRangeDictionary[reactionPlaneAngle])
+    if hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+        self.fillNumberOfAssociatedHadronsDictionary()</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.setRegion"><code class="name flex">
+<span>def <span class="ident">setRegion</span></span>(<span>self, region: <a title="JetHadronAnalysis.Types.Region" href="Types.html#JetHadronAnalysis.Types.Region">Region</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sets the delta-phi and delta-eta ranges for the JetHadron sparse</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setRegion(self, region: Region):
+    &#39;&#39;&#39;
+    Sets the delta-phi and delta-eta ranges for the JetHadron sparse 
+    &#39;&#39;&#39;
+    self.currentRegion = region
+    if region == Region.BACKGROUND:
+        self.JetHadron.setRegionIsBackground(True)
+    else:
+        self.JetHadron.setRegionIsBackground(False)
+        self.JetHadron.setDeltaPhiRange(*regionDeltaPhiRangeDictionary[region])
+        self.JetHadron.setDeltaEtaRange(*regionDeltaEtaRangeDictionary[region])
+        if hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+            self.fillNumberOfAssociatedHadronsDictionary()</code></pre>
+</details>
+</dd>
+<dt id="JetHadronAnalysis.Analysis.Analysis.setTriggerJetMomentumBin"><code class="name flex">
+<span>def <span class="ident">setTriggerJetMomentumBin</span></span>(<span>self, triggerJetMomentumBin: <a title="JetHadronAnalysis.Types.TriggerJetMomentumBin" href="Types.html#JetHadronAnalysis.Types.TriggerJetMomentumBin">TriggerJetMomentumBin</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sets the trigger jet momentum bin for the JetHadron sparse</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setTriggerJetMomentumBin(self, triggerJetMomentumBin: TriggerJetMomentumBin):
+    &#39;&#39;&#39;
+    Sets the trigger jet momentum bin for the JetHadron sparse
+    &#39;&#39;&#39;
+    self.currentTriggerJetMomentumBin = triggerJetMomentumBin
+    self.JetHadron.setTriggerJetMomentumRange(*triggerJetMomentumBinRangeDictionary[triggerJetMomentumBin])
+    if hasattr(self, &#34;numberOfAssociatedHadronsDictionary&#34;):
+        self.fillNumberOfAssociatedHadronsDictionary()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="JetHadronAnalysis" href="index.html">JetHadronAnalysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="JetHadronAnalysis.Analysis.Analysis" href="#JetHadronAnalysis.Analysis.Analysis">Analysis</a></code></h4>
+<ul class="">
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.computeMaxNormalizationFactor" href="#JetHadronAnalysis.Analysis.Analysis.computeMaxNormalizationFactor">computeMaxNormalizationFactor</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.computeMixedEventNormalizationFactor" href="#JetHadronAnalysis.Analysis.Analysis.computeMixedEventNormalizationFactor">computeMixedEventNormalizationFactor</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.computeSlidingWindowNormalizationFactor" href="#JetHadronAnalysis.Analysis.Analysis.computeSlidingWindowNormalizationFactor">computeSlidingWindowNormalizationFactor</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.fillNumberOfAssociatedHadronsDictionary" href="#JetHadronAnalysis.Analysis.Analysis.fillNumberOfAssociatedHadronsDictionary">fillNumberOfAssociatedHadronsDictionary</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.fillSparsesFromFile" href="#JetHadronAnalysis.Analysis.Analysis.fillSparsesFromFile">fillSparsesFromFile</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getAcceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction" href="#JetHadronAnalysis.Analysis.Analysis.getAcceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction">getAcceptanceCorrectedBackgroundSubtractedDifferentialAzimuthalCorrelationFunction</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getAcceptanceCorrectedDifferentialAzimuthalCorrelationFunction" href="#JetHadronAnalysis.Analysis.Analysis.getAcceptanceCorrectedDifferentialAzimuthalCorrelationFunction">getAcceptanceCorrectedDifferentialAzimuthalCorrelationFunction</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getAcceptanceCorrectedDifferentialCorrelationFunction" href="#JetHadronAnalysis.Analysis.Analysis.getAcceptanceCorrectedDifferentialCorrelationFunction">getAcceptanceCorrectedDifferentialCorrelationFunction</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getAzimuthalBackgroundFunction" href="#JetHadronAnalysis.Analysis.Analysis.getAzimuthalBackgroundFunction">getAzimuthalBackgroundFunction</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getAzimuthalCorrelationFunctionforParticleType" href="#JetHadronAnalysis.Analysis.Analysis.getAzimuthalCorrelationFunctionforParticleType">getAzimuthalCorrelationFunctionforParticleType</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getBackgroundCorrelationFunction" href="#JetHadronAnalysis.Analysis.Analysis.getBackgroundCorrelationFunction">getBackgroundCorrelationFunction</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getDifferentialCorrelationFunction" href="#JetHadronAnalysis.Analysis.Analysis.getDifferentialCorrelationFunction">getDifferentialCorrelationFunction</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getEnhancedTPCnSigmaProjection" href="#JetHadronAnalysis.Analysis.Analysis.getEnhancedTPCnSigmaProjection">getEnhancedTPCnSigmaProjection</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getNormalizedDifferentialMixedEventCorrelationFunction" href="#JetHadronAnalysis.Analysis.Analysis.getNormalizedDifferentialMixedEventCorrelationFunction">getNormalizedDifferentialMixedEventCorrelationFunction</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getNumberOfAssociatedParticles" href="#JetHadronAnalysis.Analysis.Analysis.getNumberOfAssociatedParticles">getNumberOfAssociatedParticles</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getNumberOfTriggerJets" href="#JetHadronAnalysis.Analysis.Analysis.getNumberOfTriggerJets">getNumberOfTriggerJets</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getPIDFractions" href="#JetHadronAnalysis.Analysis.Analysis.getPIDFractions">getPIDFractions</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getParticleFractionsFromDB" href="#JetHadronAnalysis.Analysis.Analysis.getParticleFractionsFromDB">getParticleFractionsFromDB</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getRPFParamsAndErrorFromDB" href="#JetHadronAnalysis.Analysis.Analysis.getRPFParamsAndErrorFromDB">getRPFParamsAndErrorFromDB</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getRPInclusiveBackgroundCorrelationFunctionUsingRPF" href="#JetHadronAnalysis.Analysis.Analysis.getRPInclusiveBackgroundCorrelationFunctionUsingRPF">getRPInclusiveBackgroundCorrelationFunctionUsingRPF</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getTPCPionNsigma" href="#JetHadronAnalysis.Analysis.Analysis.getTPCPionNsigma">getTPCPionNsigma</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.getYieldFromAzimuthalCorrelationFunction" href="#JetHadronAnalysis.Analysis.Analysis.getYieldFromAzimuthalCorrelationFunction">getYieldFromAzimuthalCorrelationFunction</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.plotTPCPionNsigmaFit" href="#JetHadronAnalysis.Analysis.Analysis.plotTPCPionNsigmaFit">plotTPCPionNsigmaFit</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.setAssociatedHadronMomentumBin" href="#JetHadronAnalysis.Analysis.Analysis.setAssociatedHadronMomentumBin">setAssociatedHadronMomentumBin</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.setParticleSelectionForJetHadron" href="#JetHadronAnalysis.Analysis.Analysis.setParticleSelectionForJetHadron">setParticleSelectionForJetHadron</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.setReactionPlaneAngleBin" href="#JetHadronAnalysis.Analysis.Analysis.setReactionPlaneAngleBin">setReactionPlaneAngleBin</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.setRegion" href="#JetHadronAnalysis.Analysis.Analysis.setRegion">setRegion</a></code></li>
+<li><code><a title="JetHadronAnalysis.Analysis.Analysis.setTriggerJetMomentumBin" href="#JetHadronAnalysis.Analysis.Analysis.setTriggerJetMomentumBin">setTriggerJetMomentumBin</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
