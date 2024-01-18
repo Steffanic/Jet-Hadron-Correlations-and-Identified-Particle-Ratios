@@ -207,6 +207,8 @@ class Analysis:
                 mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
             else:
                 mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
+        else:
+            mixedEventCorrelationFunction = self.MixedEvent.getProjection(self.MixedEvent.Axes.DELTA_PHI, self.MixedEvent.Axes.DELTA_ETA)
         mixedEventCorrelationFunction.Scale(1 / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_PHI) / self.MixedEvent.getBinWidth(self.MixedEvent.Axes.DELTA_ETA))
 
         normalization_factor = self.computeMixedEventNormalizationFactor(mixedEventCorrelationFunction, normMethod, **kwargs)
@@ -321,6 +323,7 @@ class Analysis:
             particle_fractions, particle_fraction_errors = self.getParticleFractionsFromDB()
             return particle_fractions, particle_fraction_errors, None
         # set the region to inclusive to fit the shape parameters first saving the current region to reset it later
+        fitter = FitTPCPionNsigma(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin)
         currentRegion = self.currentRegion
         self.setRegion(Region.INCLUSIVE)
         # get the projections
@@ -332,7 +335,6 @@ class Analysis:
         x, y, yerr = FitTPCPionNsigma.prepareData(pionEnhancedTPCnSigma, protonEnhancedTPCnSigma, kaonEnhancedTPCnSigma, inclusiveEnhancedTPCnSigma)
         # fit and extract the optimal fit params
         # start by creating the fitter instance
-        fitter = FitTPCPionNsigma(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin)
         # initialize the default parameters for the analysis type and current associated hadron momentum bin
         fitter.initializeDefaultParameters()
         optimal_params, covariance = fitter.performShapeFit(x, y, yerr)
@@ -399,6 +401,7 @@ class Analysis:
         
         
         # compute the PID fractions
+        print("Computing PID fractions for momentum bin", self.currentAssociatedHadronMomentumBin.name, " and region ", self.currentRegion.name)
         pid_fractions, pid_fraction_errors = fitter.computeAveragePIDFractions(optimal_params, covariance, self.numberOfAssociatedHadronsBySpecies)
 
         return pid_fractions, pid_fraction_errors, chi2OverNDF_shape, reducedChi2_yield
