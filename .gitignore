@@ -33,5 +33,3 @@ JetHadronAnalysis/tests/__pycache__/Sparse_test.cpython-310-pytest-7.4.0.pyc
 */*/*/*.pyc
 sqlitepractice.ipynb
 tutorial.db
-JetHadronAnalysis/TPCPionNsigmaFit.py
-PID.db

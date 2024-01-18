@@ -1,4 +1,5 @@
 
+import json
 import numpy as np
 import uncertainties
 import sqlite3
@@ -42,61 +43,92 @@ class FitTPCPionNsigma:
     def setBounds(self, bounds):
         self.bounds = bounds
 
-    def initializeDefaultParameters(self):
-        if self.analysisType==AnalysisType.PP:
-            inclusive_p0 = [8,100,12]
+    def initializeDefaultParameters(self, from_file=True):
+        if from_file:
+            with open("/home/steffanic/Projects/Jet-Hadron-Correlations-and-Identified-Particle-Ratios/JetHadronAnalysis/Fitting/TPCnSigmaFitInitialParams.json", "r") as f:
+                initial_parameters = json.load(f)
+
+            if self.analysisType==AnalysisType.PP:
+                initial_parameters = initial_parameters["pp"]
+            elif self.analysisType==AnalysisType.SEMICENTRAL:
+                initial_parameters = initial_parameters["semicentral"]
+            elif self.analysisType==AnalysisType.CENTRAL:
+                initial_parameters = initial_parameters["central"]
+            else:
+                raise ValueError("Invalid analysis type, no initial parameters available for this analysis type", self.analysisType)
+
             if self.current_region==Region.BACKGROUND:
-                inclusive_p0 = [0.8, 10, 1.2]
-            inclusive_bounds = [[0,0,0],[100000,100000,100000]]
-
-            generalized_p0 = [0.1, 0.1]
-            generalized_bounds = [[-4, -4], [4, 4]]
-            if self.current_associated_hadron_momentum_bin.value==1:
-                p0 = [2.5, 0, -.5, 0.5, 0.5, 0.5, 100,100, 0.11, 10,100, 10, 0.11,100, 100]+inclusive_p0 + generalized_p0
-                if self.current_region==Region.BACKGROUND:
-                    p0 = [2.5, 0, -.5, 0.5, 0.5, 0.5, 10,10, 0.11, 1,10, 1, 0.11,10, 10]+inclusive_p0 + generalized_p0
-                bounds = [[-6, -0.05, -6, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [6, 0.05, 6, 100.0, 100.0, 100.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
-                
-                bounds = [bounds[0]+inclusive_bounds[0] + generalized_bounds[0], bounds[1]+inclusive_bounds[1] + generalized_bounds[1]]
-
-            elif self.current_associated_hadron_momentum_bin.value>1 and self.current_associated_hadron_momentum_bin.value<4:
-                p0 = [-1.0, 0, -2.5, 0.5, 0.5, 0.5, 100,100, 0.11, 10,100, 10, 0.11,100, 100] + inclusive_p0+ generalized_p0
-                if self.current_region==Region.BACKGROUND:
-                    p0 = [-1.0, 0, -2.5, 0.5, 0.5, 0.5, 10,10, 0.11, 1,10, 1, 0.11,10, 10] + inclusive_p0+ generalized_p0
-                bounds = [[-6, -0.05, -6, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [0, 0.05, 0, 100.0, 100.0, 100.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
-                
-                bounds = [bounds[0]+inclusive_bounds[0]+ generalized_bounds[0], bounds[1]+inclusive_bounds[1] + generalized_bounds[1]]
+                initial_parameters = initial_parameters["background"]
+            elif self.current_region==Region.INCLUSIVE:
+                initial_parameters = initial_parameters["inclusive"]
+            elif self.current_region==Region.NEAR_SIDE_SIGNAL:
+                initial_parameters = initial_parameters["near_side"]
+            elif self.current_region==Region.AWAY_SIDE_SIGNAL:
+                initial_parameters = initial_parameters["away_side"]
             else:
-                p0 = [-3.5, 0, -2.5, 0.5, 0.5, 0.5, 100,100, 0.11, 10,100, 10, 0.11,100, 100] + inclusive_p0+ generalized_p0
-                if self.current_region==Region.BACKGROUND:
-                    p0 = [-3.5, 0, -2.5, 0.5, 0.5, 0.5, 10,10, 0.11, 1,10, 1, 0.11,10, 10] + inclusive_p0+ generalized_p0
-                bounds = [[-6, -0.05, -6, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [0, 0.05, 0, 100.0, 100.0, 100.0, 100000,100000,10000,100000,100000,100000,10000,100000,100000]]
-                
-                bounds = [bounds[0]+inclusive_bounds[0] + generalized_bounds[0], bounds[1]+inclusive_bounds[1]+ generalized_bounds[1]]
-        else:
-            inclusive_p0 = [80,1000,120]
-            inclusive_bounds = [[0,0,0],[100000,100000,100000]]
-
-            generalized_p0 = [0.5, 0.1]
-            generalized_bounds = [[-6, -6], [6, 6]]
-            if self.current_associated_hadron_momentum_bin.value==1:
-                p0 = [3.0, 0.0, -2.0,  1.5, 1.5, 1.5, 1000,2000, 100, 100,10000, 100, 100,1000, 1000] + inclusive_p0+ generalized_p0
-                bounds = [[-5.0, -0.5, -5.0, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [5.0, 0.5, 5.0, 10.0, 10.0, 10.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
-                
-                bounds = [bounds[0]+inclusive_bounds[0] + generalized_bounds[0], bounds[1]+inclusive_bounds[1]+ generalized_bounds[1]]
-            if self.current_associated_hadron_momentum_bin.value>5:
-                p0 = [3.0, 0.0, -2.0,  1.5, 1.5, 1.5, 10,20, 1, 1,100, 1, 1,10, 10] + inclusive_p0+ generalized_p0
-                bounds = [[-5.0, -0.5, -5.0, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [5.0, 0.5, 5.0, 10.0, 10.0, 10.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
-                
-                bounds = [bounds[0]+inclusive_bounds[0] + generalized_bounds[0], bounds[1]+inclusive_bounds[1]+ generalized_bounds[1]]
-            else:
-                p0 = [-1.0, 0.0, 1.0,  1.5, 1.5, 1.5, 100,100, 1.1, 10,100, 10, 1.1,100, 100] + inclusive_p0+ generalized_p0
-                bounds = [[-1.5, -0.5, -1.5, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [1.5, 0.5, 1.5, 10.0, 10.0, 10.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
-                
-                bounds = [bounds[0]+inclusive_bounds[0]+generalized_bounds[0], bounds[1]+inclusive_bounds[1]+generalized_bounds[1]]
+                raise ValueError("Invalid region, no initial parameters available for this region", self.current_region)
             
-        self.initial_parameters = p0
-        self.bounds = bounds
+            initial_parameters = initial_parameters[self.current_associated_hadron_momentum_bin.name]
+            self.initial_parameters = list(initial_parameters["p0"].values())
+            self.bounds = initial_parameters["bounds"]
+
+
+        else:
+
+            if self.analysisType==AnalysisType.PP:
+                inclusive_p0 = [8,100,12]
+                if self.current_region==Region.BACKGROUND:
+                    inclusive_p0 = [0.8, 10, 1.2]
+                inclusive_bounds = [[0,0,0],[100000,100000,100000]]
+
+                generalized_p0 = [0.1, 0.1]
+                generalized_bounds = [[-4, -4], [4, 4]]
+                if self.current_associated_hadron_momentum_bin.value==1:
+                    p0 = [2.5, 0, -.5, 0.5, 0.5, 0.5, 100,100, 0.11, 10,100, 10, 0.11,100, 100]+inclusive_p0 + generalized_p0
+                    if self.current_region==Region.BACKGROUND:
+                        p0 = [2.5, 0, -.5, 0.5, 0.5, 0.5, 10,10, 0.11, 1,10, 1, 0.11,10, 10]+inclusive_p0 + generalized_p0
+                    bounds = [[-6, -0.05, -6, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [6, 0.05, 6, 100.0, 100.0, 100.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
+                    
+                    bounds = [bounds[0]+inclusive_bounds[0] + generalized_bounds[0], bounds[1]+inclusive_bounds[1] + generalized_bounds[1]]
+
+                elif self.current_associated_hadron_momentum_bin.value>1 and self.current_associated_hadron_momentum_bin.value<4:
+                    p0 = [-1.0, 0, -2.5, 0.5, 0.5, 0.5, 100,100, 0.11, 10,100, 10, 0.11,100, 100] + inclusive_p0+ generalized_p0
+                    if self.current_region==Region.BACKGROUND:
+                        p0 = [-1.0, 0, -2.5, 0.5, 0.5, 0.5, 10,10, 0.11, 1,10, 1, 0.11,10, 10] + inclusive_p0+ generalized_p0
+                    bounds = [[-6, -0.05, -6, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [0, 0.05, 0, 100.0, 100.0, 100.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
+                    
+                    bounds = [bounds[0]+inclusive_bounds[0]+ generalized_bounds[0], bounds[1]+inclusive_bounds[1] + generalized_bounds[1]]
+                else:
+                    p0 = [-3.5, 0, -2.5, 0.5, 0.5, 0.5, 100,100, 0.11, 10,100, 10, 0.11,100, 100] + inclusive_p0+ generalized_p0
+                    if self.current_region==Region.BACKGROUND:
+                        p0 = [-3.5, 0, -2.5, 0.5, 0.5, 0.5, 10,10, 0.11, 1,10, 1, 0.11,10, 10] + inclusive_p0+ generalized_p0
+                    bounds = [[-6, -0.05, -6, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [0, 0.05, 0, 100.0, 100.0, 100.0, 100000,100000,10000,100000,100000,100000,10000,100000,100000]]
+                    
+                    bounds = [bounds[0]+inclusive_bounds[0] + generalized_bounds[0], bounds[1]+inclusive_bounds[1]+ generalized_bounds[1]]
+            else:
+                inclusive_p0 = [80,1000,120]
+                inclusive_bounds = [[0,0,0],[100000,100000,100000]]
+
+                generalized_p0 = [0.5, 0.1]
+                generalized_bounds = [[-6, -6], [6, 6]]
+                if self.current_associated_hadron_momentum_bin.value==1:
+                    p0 = [3.0, 0.0, -2.0,  1.5, 1.5, 1.5, 1000,2000, 100, 100,10000, 100, 100,1000, 1000] + inclusive_p0+ generalized_p0
+                    bounds = [[-5.0, -0.5, -5.0, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [5.0, 0.5, 5.0, 10.0, 10.0, 10.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
+                    
+                    bounds = [bounds[0]+inclusive_bounds[0] + generalized_bounds[0], bounds[1]+inclusive_bounds[1]+ generalized_bounds[1]]
+                if self.current_associated_hadron_momentum_bin.value>5:
+                    p0 = [3.0, 0.0, -2.0,  1.5, 1.5, 1.5, 10,20, 1, 1,100, 1, 1,10, 10] + inclusive_p0+ generalized_p0
+                    bounds = [[-5.0, -0.5, -5.0, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [5.0, 0.5, 5.0, 10.0, 10.0, 10.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
+                    
+                    bounds = [bounds[0]+inclusive_bounds[0] + generalized_bounds[0], bounds[1]+inclusive_bounds[1]+ generalized_bounds[1]]
+                else:
+                    p0 = [-1.0, 0.0, 1.0,  1.5, 1.5, 1.5, 100,100, 1.1, 10,100, 10, 1.1,100, 100] + inclusive_p0+ generalized_p0
+                    bounds = [[-1.5, -0.5, -1.5, 4e-1,4e-1,4e-1, 0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0], [1.5, 0.5, 1.5, 10.0, 10.0, 10.0, 100000,100000,100000,100000,100000,100000,100000,100000,100000]]
+                    
+                    bounds = [bounds[0]+inclusive_bounds[0]+generalized_bounds[0], bounds[1]+inclusive_bounds[1]+generalized_bounds[1]]
+                
+            self.initial_parameters = p0
+            self.bounds = bounds
 
     def initializeDatabase(self):
         '''
@@ -114,15 +146,15 @@ class FitTPCPionNsigma:
     def prepareData(cls, pionEnhancedTPCnSigma:TH1D, protonEnhancedTPCnSigma:TH1D, kaonEnhancedTPCnSigma:TH1D, inclusiveTPCnSigma:TH1D):
         nbins = pionEnhancedTPCnSigma.GetNbinsX()
         x = np.array([pionEnhancedTPCnSigma.GetBinCenter(i) for i in range(1, nbins+1)])
-        y_pi = np.array([pionEnhancedTPCnSigma.GetBinContent(i) for i in range(1, nbins+1)])
-        y_p = np.array([protonEnhancedTPCnSigma.GetBinContent(i) for i in range(1, nbins+1)])
-        y_k = np.array([kaonEnhancedTPCnSigma.GetBinContent(i) for i in range(1, nbins+1)])
-        y_inc = np.array([inclusiveTPCnSigma.GetBinContent(i) for i in range(1, nbins+1)])
+        y_pi = np.array([pionEnhancedTPCnSigma.GetBinContent(i) for i in range(1, nbins+1)])/pionEnhancedTPCnSigma.Integral()
+        y_p = np.array([protonEnhancedTPCnSigma.GetBinContent(i) for i in range(1, nbins+1)])/protonEnhancedTPCnSigma.Integral()
+        y_k = np.array([kaonEnhancedTPCnSigma.GetBinContent(i) for i in range(1, nbins+1)])/kaonEnhancedTPCnSigma.Integral()
+        y_inc = np.array([inclusiveTPCnSigma.GetBinContent(i) for i in range(1, nbins+1)])/inclusiveTPCnSigma.Integral()
         y = [y_pi, y_p, y_k, y_inc]
-        yerr_pi = np.array([pionEnhancedTPCnSigma.GetBinError(i) for i in range(1, nbins+1)])
-        yerr_p = np.array([protonEnhancedTPCnSigma.GetBinError(i) for i in range(1, nbins+1)])
-        yerr_k = np.array([kaonEnhancedTPCnSigma.GetBinError(i) for i in range(1, nbins+1)])
-        yerr_inc = np.array([inclusiveTPCnSigma.GetBinError(i) for i in range(1, nbins+1)])
+        yerr_pi = np.array([pionEnhancedTPCnSigma.GetBinError(i) for i in range(1, nbins+1)])/pionEnhancedTPCnSigma.Integral()
+        yerr_p = np.array([protonEnhancedTPCnSigma.GetBinError(i) for i in range(1, nbins+1)])/protonEnhancedTPCnSigma.Integral()
+        yerr_k = np.array([kaonEnhancedTPCnSigma.GetBinError(i) for i in range(1, nbins+1)])/kaonEnhancedTPCnSigma.Integral()
+        yerr_inc = np.array([inclusiveTPCnSigma.GetBinError(i) for i in range(1, nbins+1)])/inclusiveTPCnSigma.Integral()
         yerr = [yerr_pi, yerr_p, yerr_k, yerr_inc]
 
         return x, y, yerr

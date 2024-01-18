@@ -90,24 +90,27 @@ def plotArray(x_arrays: Union[List[np.ndarray], np.ndarray], y_arrays: Union[Lis
     plt.close()
 
 def plotArrays(x_data:dict, y_data:dict, error:dict, data_label:dict, format_style:dict, error_bands:Optional[dict], error_bands_label:Optional[dict], title: str, xtitle: str, ytitle: str, output_path: str, logy: bool = False, logx: bool = False):
-    plt.figure()
+    plt.figure(figsize=(10,10))
     for key in x_data.keys():
         if error[key] is None:
             plt.plot(x_data[key], y_data[key], format_style[key], label=data_label[key])   
         plt.errorbar(x_data[key], y_data[key], yerr=error[key], fmt=format_style[key], label=data_label[key])
 
-    if error_bands is not None and error_bands_label is not None:
+    if error_bands is not None:
         for key in error_bands.keys():
             if not isinstance(error_bands[key], list):
                 error_bands[key] = [error_bands[key]]
-            if not isinstance(error_bands_label[key], list):
-                error_bands_label[key] = [error_bands_label[key]]
-            for band, label in zip(error_bands[key], error_bands_label[key]):
-                assert isinstance(error_bands[key], (np.ndarray, float, int))
-                if isinstance(error_bands[key], (float, int)):
-                    error_bands[key] = np.full(y_data[key].shape, error_bands[key])
-                assert error_bands[key].shape == y_data[key].shape
-                plt.fill_between(x_data[key], y_data[key]-error_bands[key], y_data[key]+error_bands[key], alpha=0.3, label=error_bands_label[key])
+            if error_bands_label is not None:
+                if not isinstance(error_bands_label[key], list):
+                    error_bands_label[key] = [error_bands_label[key]]
+            for i,band in enumerate(error_bands[key]):
+                if band is None:
+                    continue
+                assert isinstance(band, (np.ndarray, float, int))
+                if isinstance(band, (float, int)):
+                    band = np.full(y_data[key].shape, band)
+                assert band.shape == y_data[key].shape
+                plt.fill_between(x_data[key], y_data[key]-band, y_data[key]+band, alpha=0.3, label=None if error_bands_label is None else error_bands_label[key][i])
     plt.title(title)
     plt.xlabel(xtitle)
     plt.ylabel(ytitle)
