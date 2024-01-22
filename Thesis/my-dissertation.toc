@@ -1,0 +1,46 @@
+\contentsline {chapter}{List of Tables}{x}{section*.13}%
+\contentsline {chapter}{List of Figures}{xi}{section*.15}%
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Disclaimer}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Getting started}{2}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Important Files}{2}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}Updating Information}{3}{subsection.1.2.2}%
+\contentsline {section}{\numberline {1.3}References}{5}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Theorem environments}{5}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Figures and Tables}{6}{section.1.5}%
+\contentsline {subsection}{\numberline {1.5.1}General Rules}{6}{subsection.1.5.1}%
+\contentsline {subsection}{\numberline {1.5.2}Single figures}{8}{subsection.1.5.2}%
+\contentsline {subsection}{\numberline {1.5.3}Multipart figures}{8}{subsection.1.5.3}%
+\contentsline {subsection}{\numberline {1.5.4}Tables}{9}{subsection.1.5.4}%
+\contentsline {chapter}{\numberline {2}Lorem Ipsum}{11}{chapter.2}%
+\contentsline {chapter}{\numberline {3}Ipsum Lorum}{12}{chapter.3}%
+\contentsline {chapter}{\numberline {4}Conclusions}{13}{chapter.4}%
+\contentsline {chapter}{Bibliography}{14}{section*.22}%
+\contentsline {section}{\numberline {.1}PP}{15}{section.Alph0.1}%
+\contentsline {subsection}{\numberline {.1.1}PP Yields and Ratios}{15}{subsection.Alph0.1.1}%
+\contentsline {subsection}{\numberline {.1.2}PP PT-1-15}{19}{subsection.Alph0.1.2}%
+\contentsline {subsection}{\numberline {.1.3}PP PT-15-2}{23}{subsection.Alph0.1.3}%
+\contentsline {subsection}{\numberline {.1.4}PP PT-2-3}{27}{subsection.Alph0.1.4}%
+\contentsline {subsection}{\numberline {.1.5}PP PT-3-4}{31}{subsection.Alph0.1.5}%
+\contentsline {subsection}{\numberline {.1.6}PP PT-4-5}{35}{subsection.Alph0.1.6}%
+\contentsline {subsection}{\numberline {.1.7}PP PT-5-6}{39}{subsection.Alph0.1.7}%
+\contentsline {subsection}{\numberline {.1.8}PP PT-6-10}{43}{subsection.Alph0.1.8}%
+\contentsline {section}{\numberline {.2}CENTRAL}{47}{section.Alph0.2}%
+\contentsline {subsection}{\numberline {.2.1}CENTRAL Yields and Ratios}{47}{subsection.Alph0.2.1}%
+\contentsline {subsection}{\numberline {.2.2}CENTRAL PT-1-15}{51}{subsection.Alph0.2.2}%
+\contentsline {subsection}{\numberline {.2.3}CENTRAL PT-15-2}{55}{subsection.Alph0.2.3}%
+\contentsline {subsection}{\numberline {.2.4}CENTRAL PT-2-3}{59}{subsection.Alph0.2.4}%
+\contentsline {subsection}{\numberline {.2.5}CENTRAL PT-3-4}{63}{subsection.Alph0.2.5}%
+\contentsline {subsection}{\numberline {.2.6}CENTRAL PT-4-5}{67}{subsection.Alph0.2.6}%
+\contentsline {subsection}{\numberline {.2.7}CENTRAL PT-5-6}{71}{subsection.Alph0.2.7}%
+\contentsline {subsection}{\numberline {.2.8}CENTRAL PT-6-10}{75}{subsection.Alph0.2.8}%
+\contentsline {section}{\numberline {.3}SEMICENTRAL}{79}{section.Alph0.3}%
+\contentsline {subsection}{\numberline {.3.1}SEMICENTRAL Yields and Ratios}{79}{subsection.Alph0.3.1}%
+\contentsline {subsection}{\numberline {.3.2}SEMICENTRAL PT-1-15}{83}{subsection.Alph0.3.2}%
+\contentsline {subsection}{\numberline {.3.3}SEMICENTRAL PT-15-2}{87}{subsection.Alph0.3.3}%
+\contentsline {subsection}{\numberline {.3.4}SEMICENTRAL PT-2-3}{91}{subsection.Alph0.3.4}%
+\contentsline {subsection}{\numberline {.3.5}SEMICENTRAL PT-3-4}{95}{subsection.Alph0.3.5}%
+\contentsline {subsection}{\numberline {.3.6}SEMICENTRAL PT-4-5}{99}{subsection.Alph0.3.6}%
+\contentsline {subsection}{\numberline {.3.7}SEMICENTRAL PT-5-6}{103}{subsection.Alph0.3.7}%
+\contentsline {subsection}{\numberline {.3.8}SEMICENTRAL PT-6-10}{107}{subsection.Alph0.3.8}%
+\contentsline {chapter}{Vita}{111}{section*.120}%

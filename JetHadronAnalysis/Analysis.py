@@ -2,6 +2,7 @@
 # This file contains the class whose responsibility it is to manage the analysis and its configuration 
 
 import sqlite3
+from typing import Optional
 import numpy as np
 import os
 import uncertainties
@@ -169,7 +170,7 @@ class Analysis:
         Gets the particle fractions and scales the acceptance corrected azimuthal correlation function by the particle fraction for the specified species
         '''
 
-        particle_fractions, particle_fraction_errors, chi2OverNDF_shape, Chi2OverNDF_yield = self.getPIDFractions(loadFractionsFromDB=loadFractionsFromDB)
+        particle_fractions, particle_fraction_errors, pid_fit_sys_err, chi2OverNDF_shape, Chi2OverNDF_yield = self.getPIDFractions(loadFractionsFromDB=loadFractionsFromDB)
         
         # now get the per species azimuthal correlation functions for each region by scaling
         species_azimuthal_correlation_function = acceptanceCorrectedAzimuthalCorrelationFunction.Clone()
@@ -183,9 +184,9 @@ class Analysis:
             species_azimuthal_correlation_function.SetBinError(i, np.sqrt(species_azimuthal_correlation_function.GetBinError(i)**2 + sys_errors[i-1]**2))
         
 
-        return species_azimuthal_correlation_function
+        return species_azimuthal_correlation_function, pid_fit_sys_err[species]
         
-    def getYieldFromAzimuthalCorrelationFunction(self, azimuthalCorrelationFunction: TH1D):
+    def getYieldFromAzimuthalCorrelationFunction(self, azimuthalCorrelationFunction: TH1D, pid_fit_sys_err: Optional[float] = None):
         '''
         Returns the yield from the azimuthal correlation function
         '''
@@ -195,7 +196,8 @@ class Analysis:
         azimuthalCorrelationFunction.Scale(self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI))
         yield_ = azimuthalCorrelationFunction.Integral()
         error_ = np.sqrt(np.sum([azimuthalCorrelationFunction.GetBinError(i)**2 for i in range(1, azimuthalCorrelationFunction.GetNbinsX()+1)]))
-        return yield_, error_
+        pid_fit_sys_err_ = None if pid_fit_sys_err is None else pid_fit_sys_err * yield_
+        return yield_, error_, pid_fit_sys_err_
 
     def getNormalizedDifferentialMixedEventCorrelationFunction(self, normMethod: NormalizationMethod, **kwargs):
         '''
@@ -320,8 +322,8 @@ class Analysis:
         if loadFractionsFromDB:
             print("Loading particle fractions from database")
             # get the particle fractions from the database
-            particle_fractions, particle_fraction_errors = self.getParticleFractionsFromDB()
-            return particle_fractions, particle_fraction_errors, None
+            particle_fractions, particle_fraction_errors, pid_fit_sys_err = self.getParticleFractionsFromDB()
+            return particle_fractions, particle_fraction_errors, pid_fit_sys_err, None, None
         # set the region to inclusive to fit the shape parameters first saving the current region to reset it later
         fitter = FitTPCPionNsigma(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin)
         currentRegion = self.currentRegion
@@ -355,7 +357,7 @@ class Analysis:
         y_inc = y[3]
         yerr_inc = yerr[3]
 
-        optimal_inclusive_yield_parameters, covariance_inclusive_yield, reducedChi2_yield  = fitter.performYieldFit(x_inc, y_inc, yerr_inc, optimal_params)
+        optimal_inclusive_yield_parameters, covariance_inclusive_yield, reducedChi2_yield  = fitter.performYieldFit(x_inc, y_inc, yerr_inc, optimal_params, covariance)
 
         mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = optimal_params
         apinc, apiinc, akinc = optimal_inclusive_yield_parameters
@@ -394,7 +396,7 @@ class Analysis:
         fit_err_band = np.concatenate((pion_fit_function_mean_error, proton_fit_function_mean_error, kaon_fit_function_mean_error, inclusive_fit_function_mean_error)) # shape is (4*len(x),)
 
         if makeIntermediatePlots:
-            self.plotTPCPionNsigmaFit(x, y, yerr, fit_err_band, optimal_params, covariance, fitter.fittingFunction, fitter.fittingErrorFunction, fitter.pionFittingFunction, fitter.kaonFittingFunction, fitter.protonFittingFunction, fitter.chi2OverNDF, "TPCnSigmaFitPlots")
+            self.plotTPCPionNsigmaFit(x, y, yerr, fit_err_band, optimal_params, covariance, fitter.fittingFunction, fitter.fittingErrorFunction, fitter.pionFittingFunction, fitter.kaonFittingFunction, fitter.protonFittingFunction, fitter.chi2OverNDF, "TPCnSigmaFits")
 
         if  not hasattr(self, "numberOfAssociatedHadronsDictionary"):
             self.fillNumberOfAssociatedHadronsDictionary()
@@ -402,9 +404,9 @@ class Analysis:
         
         # compute the PID fractions
         print("Computing PID fractions for momentum bin", self.currentAssociatedHadronMomentumBin.name, " and region ", self.currentRegion.name)
-        pid_fractions, pid_fraction_errors = fitter.computeAveragePIDFractions(optimal_params, covariance, self.numberOfAssociatedHadronsBySpecies)
+        pid_fractions, pid_fraction_errors, pid_fit_sys_err = fitter.computeAveragePIDFractions(optimal_params, covariance, self.numberOfAssociatedHadronsBySpecies)
 
-        return pid_fractions, pid_fraction_errors, chi2OverNDF_shape, reducedChi2_yield
+        return pid_fractions, pid_fraction_errors, pid_fit_sys_err, chi2OverNDF_shape, reducedChi2_yield
 
     def getParticleFractionsFromDB(self):
         '''
@@ -414,13 +416,14 @@ class Analysis:
         dbCursor = conn.cursor()
         particle_fractions = {}
         particle_fraction_errors = {}
+        pid_fit_sys_err = {}
         for species in ParticleType:
             if species is ParticleType.OTHER or species is ParticleType.INCLUSIVE:
                 continue
 
-            particle_fractions[species], particle_fraction_errors[species] = getParticleFractionForMomentumBin(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin, species, dbCursor)[0]
+            particle_fractions[species], particle_fraction_errors[species], pid_fit_sys_err[species] = getParticleFractionForMomentumBin(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin, species, dbCursor)[0]
         conn.close()
-        return particle_fractions, particle_fraction_errors
+        return particle_fractions, particle_fraction_errors, pid_fit_sys_err
 
     def getEnhancedTPCnSigmaProjection(self, species: ParticleType):
         '''
@@ -444,10 +447,11 @@ class Analysis:
         if save_path is not None:
             if save_path[-1] != "/":
                 save_path += "/"
+            save_path = f"Plots/{self.analysisType.name}/{self.currentAssociatedHadronMomentumBin.name}/" + save_path
+
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
-            if not os.path.exists(f"{save_path}{self.currentAssociatedHadronMomentumBin.name}"):
-                os.makedirs(f"{save_path}{self.currentAssociatedHadronMomentumBin.name}")
+            
 
         y_pion = y[0]
         y_proton = y[1]
@@ -496,7 +500,58 @@ class Analysis:
         y_fit_inclusive_proton = protonFitFunction(x_fit, mup, sigp, apinc, alphap)
         y_fit_inclusive_kaon = kaonFitFunction(x_fit, muk, sigk, akinc, alphak)
 
+        # lets generate a bootstrap error for the components of each fit 
 
+        # first lets get the number of bootstrap samples
+        number_of_bootstrap_samples = 1000
+
+        # now lets get the bootstrap samples
+        param_value_samples = np.random.multivariate_normal(optimal_params, covariance, number_of_bootstrap_samples) # shape is (number_of_bootstrap_samples, len(optimal_params))
+        pion_in_pion_param_indices = [1, 4, 10]
+        proton_in_pion_param_indices = [0, 3, 9, 18]
+        kaon_in_pion_param_indices = [2, 5, 11, 19]
+        pion_in_proton_param_indices = [1, 4, 7]
+        proton_in_proton_param_indices = [0, 3, 6, 18]
+        kaon_in_proton_param_indices = [2, 5, 8, 19]
+        pion_in_kaon_param_indices = [1, 4, 13]
+        proton_in_kaon_param_indices = [0, 3, 12, 18]
+        kaon_in_kaon_param_indices = [2, 5, 14, 19]
+        pion_in_inclusive_param_indices = [1, 4, 16]
+        proton_in_inclusive_param_indices = [0, 3, 15, 18]
+        kaon_in_inclusive_param_indices = [2, 5, 17, 19]
+
+        # and generate the fit functions for each sample
+        pion_in_pion_fit_functions = np.array([pionFitFunction(x_fit, param_values[pion_in_pion_param_indices[0]], param_values[pion_in_pion_param_indices[1]], param_values[pion_in_pion_param_indices[2]]) for param_values in param_value_samples])
+        proton_in_pion_fit_functions = np.array([protonFitFunction(x_fit, param_values[proton_in_pion_param_indices[0]], param_values[proton_in_pion_param_indices[1]], param_values[proton_in_pion_param_indices[2]], param_values[proton_in_pion_param_indices[3]]) for param_values in param_value_samples])
+        kaon_in_pion_fit_functions = np.array([kaonFitFunction(x_fit, param_values[kaon_in_pion_param_indices[0]], param_values[kaon_in_pion_param_indices[1]], param_values[kaon_in_pion_param_indices[2]], param_values[kaon_in_pion_param_indices[3]]) for param_values in param_value_samples])
+
+        pion_in_proton_fit_functions = np.array([pionFitFunction(x_fit, param_values[pion_in_proton_param_indices[0]], param_values[pion_in_proton_param_indices[1]], param_values[pion_in_proton_param_indices[2]]) for param_values in param_value_samples])
+        proton_in_proton_fit_functions = np.array([protonFitFunction(x_fit, param_values[proton_in_proton_param_indices[0]], param_values[proton_in_proton_param_indices[1]], param_values[proton_in_proton_param_indices[2]], param_values[proton_in_proton_param_indices[3]]) for param_values in param_value_samples])
+        kaon_in_proton_fit_functions = np.array([kaonFitFunction(x_fit, param_values[kaon_in_proton_param_indices[0]], param_values[kaon_in_proton_param_indices[1]], param_values[kaon_in_proton_param_indices[2]], param_values[kaon_in_proton_param_indices[3]]) for param_values in param_value_samples])
+
+        pion_in_kaon_fit_functions = np.array([pionFitFunction(x_fit, param_values[pion_in_kaon_param_indices[0]], param_values[pion_in_kaon_param_indices[1]], param_values[pion_in_kaon_param_indices[2]]) for param_values in param_value_samples])
+        proton_in_kaon_fit_functions = np.array([protonFitFunction(x_fit, param_values[proton_in_kaon_param_indices[0]], param_values[proton_in_kaon_param_indices[1]], param_values[proton_in_kaon_param_indices[2]], param_values[proton_in_kaon_param_indices[3]]) for param_values in param_value_samples])
+        kaon_in_kaon_fit_functions = np.array([kaonFitFunction(x_fit, param_values[kaon_in_kaon_param_indices[0]], param_values[kaon_in_kaon_param_indices[1]], param_values[kaon_in_kaon_param_indices[2]], param_values[kaon_in_kaon_param_indices[3]]) for param_values in param_value_samples])
+
+        pion_in_inclusive_fit_functions = np.array([pionFitFunction(x_fit, param_values[pion_in_inclusive_param_indices[0]], param_values[pion_in_inclusive_param_indices[1]], param_values[pion_in_inclusive_param_indices[2]]) for param_values in param_value_samples])
+        proton_in_inclusive_fit_functions = np.array([protonFitFunction(x_fit, param_values[proton_in_inclusive_param_indices[0]], param_values[proton_in_inclusive_param_indices[1]], param_values[proton_in_inclusive_param_indices[2]], param_values[proton_in_inclusive_param_indices[3]]) for param_values in param_value_samples])
+        kaon_in_inclusive_fit_functions = np.array([kaonFitFunction(x_fit, param_values[kaon_in_inclusive_param_indices[0]], param_values[kaon_in_inclusive_param_indices[1]], param_values[kaon_in_inclusive_param_indices[2]], param_values[kaon_in_inclusive_param_indices[3]]) for param_values in param_value_samples])
+
+        # now lets compute the mean deviation of the fit functions from the correct fit function
+        pion_in_pion_fit_function_mean_error = np.mean((pion_in_pion_fit_functions-y_fit_pion_pion)**2, axis=0)
+        proton_in_pion_fit_function_mean_error = np.mean((proton_in_pion_fit_functions-y_fit_pion_proton)**2, axis=0)
+        kaon_in_pion_fit_function_mean_error = np.mean((kaon_in_pion_fit_functions-y_fit_pion_kaon)**2, axis=0)
+        pion_in_proton_fit_function_mean_error = np.mean((pion_in_proton_fit_functions-y_fit_proton_pion)**2, axis=0)
+        proton_in_proton_fit_function_mean_error = np.mean((proton_in_proton_fit_functions-y_fit_proton_proton)**2, axis=0)
+        kaon_in_proton_fit_function_mean_error = np.mean((kaon_in_proton_fit_functions-y_fit_proton_kaon)**2, axis=0)
+        pion_in_kaon_fit_function_mean_error = np.mean((pion_in_kaon_fit_functions-y_fit_kaon_pion)**2, axis=0)
+        proton_in_kaon_fit_function_mean_error = np.mean((proton_in_kaon_fit_functions-y_fit_kaon_proton)**2, axis=0)
+        kaon_in_kaon_fit_function_mean_error = np.mean((kaon_in_kaon_fit_functions-y_fit_kaon_kaon)**2, axis=0)
+        pion_in_inclusive_fit_function_mean_error = np.mean((pion_in_inclusive_fit_functions-y_fit_inclusive_pion)**2, axis=0)
+        proton_in_inclusive_fit_function_mean_error = np.mean((proton_in_inclusive_fit_functions-y_fit_inclusive_proton)**2, axis=0)
+        kaon_in_inclusive_fit_function_mean_error = np.mean((kaon_in_inclusive_fit_functions-y_fit_inclusive_kaon)**2, axis=0)
+
+        
 
 
         x_data_pion = {
@@ -588,33 +643,33 @@ class Analysis:
         yerr_band_data_pion = {
             "raw_pion": None,
             "pion_total": y_fit_err_band_pion,
-            "pion_pion": None,
-            "pion_proton": None,
-            "pion_kaon": None,
+            "pion_pion": pion_in_pion_fit_function_mean_error,
+            "pion_proton": proton_in_pion_fit_function_mean_error,
+            "pion_kaon": kaon_in_pion_fit_function_mean_error,
         }
 
         yerr_band_data_proton = {
             "raw_proton": None,
             "proton_total": y_fit_err_band_proton,
-            "proton_pion": None,
-            "proton_proton": None,
-            "proton_kaon": None,
+            "proton_pion": pion_in_proton_fit_function_mean_error,
+            "proton_proton": proton_in_proton_fit_function_mean_error,
+            "proton_kaon": kaon_in_proton_fit_function_mean_error,
         }
 
         yerr_band_data_kaon = {
             "raw_kaon": None,
             "kaon_total": y_fit_err_band_kaon,
-            "kaon_pion": None,
-            "kaon_proton": None,
-            "kaon_kaon": None,
+            "kaon_pion": pion_in_kaon_fit_function_mean_error,
+            "kaon_proton": proton_in_kaon_fit_function_mean_error,
+            "kaon_kaon": kaon_in_kaon_fit_function_mean_error,
         }
 
         yerr_band_data_inclusive = {
             "raw_inclusive": None,
             "inclusive_total": y_fit_err_band_inclusive,
-            "inclusive_pion": None,
-            "inclusive_proton": None,
-            "inclusive_kaon": None,
+            "inclusive_pion": pion_in_inclusive_fit_function_mean_error,
+            "inclusive_proton": proton_in_inclusive_fit_function_mean_error,
+            "inclusive_kaon": kaon_in_inclusive_fit_function_mean_error,
         }
         
         data_labels_pion = {
@@ -675,10 +730,10 @@ class Analysis:
             "inclusive_kaon": "g--",
         }
 
-        plotArrays(x_data_pion, y_data_pion, yerr_data_pion, data_label=data_labels_pion, format_style=format_style_pion, error_bands=yerr_band_data_pion, error_bands_label=None, title=f"{self.currentRegion}, {self.analysisType.name}, p_T^{{assoc.}} {self.currentAssociatedHadronMomentumBin.name}, Pions Chi^2/NDF = {chi2OverNDF:.2f}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Pion.png")
-        plotArrays(x_data_proton, y_data_proton, yerr_data_proton, data_label=data_labels_proton, format_style=format_style_proton, error_bands=yerr_band_data_proton, error_bands_label=None, title=f"{self.currentRegion}, {self.analysisType.name}, p_T^{{assoc.}} {self.currentAssociatedHadronMomentumBin.name}, Protons Chi^2/NDF = {chi2OverNDF:.2f}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Proton.png")
-        plotArrays(x_data_kaon, y_data_kaon, yerr_data_kaon, data_label=data_labels_kaon, format_style=format_style_kaon, error_bands=yerr_band_data_kaon, error_bands_label=None, title=f"{self.currentRegion}, {self.analysisType.name}, p_T^{{assoc.}} {self.currentAssociatedHadronMomentumBin.name}, Kaons Chi^2/NDF = {chi2OverNDF:.2f}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Kaon.png")
-        plotArrays(x_data_inclusive, y_data_inclusive, yerr_data_inclusive, data_label=data_labels_inclusive, format_style=format_style_inclusive, error_bands=yerr_band_data_inclusive, error_bands_label=None, title=f"{self.currentRegion}, {self.analysisType.name}, p_T^{{assoc.}} {self.currentAssociatedHadronMomentumBin.name}, Inclusive Chi^2/NDF = {chi2OverNDF:.2f}", xtitle="TPC nSigma", ytitle="Counts", output_path=f"{save_path}{self.currentAssociatedHadronMomentumBin.name}TPCnSigmaFit{self.analysisType}_{self.currentRegion}_Inclusive.png")
+        plotArrays(x_data_pion, y_data_pion, yerr_data_pion, data_label=data_labels_pion, format_style=format_style_pion, error_bands=yerr_band_data_pion, error_bands_label=None, title=f"{self.currentRegion.name}, {self.analysisType.name}, p_T^{{assoc.}} {self.currentAssociatedHadronMomentumBin.name}, Pions Chi^2/NDF = {chi2OverNDF:.2f}", xtitle="TPC nSigma", ytitle="Density", output_path=f"{save_path}TPCnSigmaFit_{self.currentRegion}_Pion.png")
+        plotArrays(x_data_proton, y_data_proton, yerr_data_proton, data_label=data_labels_proton, format_style=format_style_proton, error_bands=yerr_band_data_proton, error_bands_label=None, title=f"{self.currentRegion}, {self.analysisType.name}, p_T^{{assoc.}} {self.currentAssociatedHadronMomentumBin.name}, Protons Chi^2/NDF = {chi2OverNDF:.2f}", xtitle="TPC nSigma", ytitle="Density", output_path=f"{save_path}TPCnSigmaFit_{self.currentRegion}_Proton.png")
+        plotArrays(x_data_kaon, y_data_kaon, yerr_data_kaon, data_label=data_labels_kaon, format_style=format_style_kaon, error_bands=yerr_band_data_kaon, error_bands_label=None, title=f"{self.currentRegion}, {self.analysisType.name}, p_T^{{assoc.}} {self.currentAssociatedHadronMomentumBin.name}, Kaons Chi^2/NDF = {chi2OverNDF:.2f}", xtitle="TPC nSigma", ytitle="Density", output_path=f"{save_path}TPCnSigmaFit_{self.currentRegion}_Kaon.png")
+        plotArrays(x_data_inclusive, y_data_inclusive, yerr_data_inclusive, data_label=data_labels_inclusive, format_style=format_style_inclusive, error_bands=yerr_band_data_inclusive, error_bands_label=None, title=f"{self.currentRegion}, {self.analysisType.name}, p_T^{{assoc.}} {self.currentAssociatedHadronMomentumBin.name}, Inclusive Chi^2/NDF = {chi2OverNDF:.2f}", xtitle="TPC nSigma", ytitle="Density", output_path=f"{save_path}TPCnSigmaFit_{self.currentRegion}_Inclusive.png")
 
         # y_fit_pi = pionFitFunction(None, x_fit, *optimal_params[:3])
         # y_fit_k = kaonFitFunction(None, x_fit, *optimal_params[3:6])

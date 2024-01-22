@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>My Page</title>
+    <style>
+        body {
+            display: flex;
+        }
+
+        #sidebar {
+            width: 20%;
+            height: 100%;
+            border-color: rgb(6, 198, 18);
+            border-style: solid;
+            background-color: #c6ffc2;
+            padding: 2px;
+            margin: 1px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: large;
+            line-height: 1.6em;
+        }
+
+        #main {
+            width: 80%;
+            padding: 20px;
+        }
+
+        
+
+        .row {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0 4px;
+        }
+
+        /* Create two equal columns that sits next to each other */
+        .column {
+        flex: 40%;
+        padding: 0 4px;
+
+        }
+
+        .column img {
+        margin-top: 8px;
+        vertical-align: middle;
+        max-width: 100%;
+        }
+    </style>
+    <script>
+        function toggleTPCnSigmaOptions() {
+            var region_inclusive = document.getElementById("region_inclusive");
+            var region_inclusive_label = document.getElementById("region_inclusive_label");
+            var region_near_side = document.getElementById("region_near_side");
+            var region_near_side_label = document.getElementById("region_near_side_label");
+            var region_away_side = document.getElementById("region_away_side");
+            var region_away_side_label = document.getElementById("region_away_side_label");
+            var region_background = document.getElementById("region_background");
+            var region_background_label = document.getElementById("region_background_label");
+            var particle_inclusive = document.getElementById("particle_inclusive");
+            var particle_inclusive_label = document.getElementById("particle_inclusive_label");
+            var particle_pion = document.getElementById("particle_pion");
+            var particle_pion_label = document.getElementById("particle_pion_label");
+            var particle_kaon = document.getElementById("particle_kaon");
+            var particle_kaon_label = document.getElementById("particle_kaon_label");
+            var particle_proton = document.getElementById("particle_proton");
+            var particle_proton_label = document.getElementById("particle_proton_label");
+            var region_header = document.getElementById("RegionHeader");
+            var particle_header = document.getElementById("ParticleHeader");
+
+
+            if (region_inclusive.style.display === "none") {
+                region_inclusive.style.display = "flex";
+                region_inclusive_label.style.display = "flex";
+                region_near_side.style.display = "flex";
+                region_near_side_label.style.display = "flex";
+                region_away_side.style.display = "flex";
+                region_away_side_label.style.display = "flex";
+                region_background.style.display = "flex";
+                region_background_label.style.display = "flex";
+                particle_inclusive.style.display = "flex";
+                particle_inclusive_label.style.display = "flex";
+                particle_pion.style.display = "flex";
+                particle_pion_label.style.display = "flex";
+                particle_kaon.style.display = "flex";
+                particle_kaon_label.style.display = "flex";
+                particle_proton.style.display = "flex";
+                particle_proton_label.style.display = "flex";
+                region_header.style.display = "flex";
+                particle_header.style.display = "flex";
+                update_images();
+            } else {
+                region_inclusive.style.display = "none";
+                region_inclusive_label.style.display = "none";
+                region_near_side.style.display = "none";
+                region_near_side_label.style.display = "none";
+                region_away_side.style.display = "none";
+                region_away_side_label.style.display = "none";
+                region_background.style.display = "none";
+                region_background_label.style.display = "none";
+                particle_inclusive.style.display = "none";
+                particle_inclusive_label.style.display = "none";
+                particle_pion.style.display = "none";
+                particle_pion_label.style.display = "none";
+                particle_kaon.style.display = "none";
+                particle_kaon_label.style.display = "none";
+                particle_proton.style.display = "none";
+                particle_proton_label.style.display = "none";
+                region_header.style.display = "none";
+                particle_header.style.display = "none";
+                remove_images_from_list();
+            }
+
+        }
+
+        function add_image_to_list(image_name) {
+            var image_list_1 = document.getElementById("image_list_1");
+            var image_list_2 = document.getElementById("image_list_2");
+            if(image_list_1.childElementCount > image_list_2.childElementCount){
+                var image_list = image_list_2;
+            } else {
+                var image_list = image_list_1;
+            }
+            var image = document.createElement("img");
+            image.src = image_name;
+            image.id = image_name;
+            image_list.appendChild(image);
+        }
+
+        function remove_image_from_list(image_name) {
+            var image = document.getElementById(image_name);
+            if(image){
+            image.remove();
+            } else {
+                console.log("Image not found");
+            }
+        }
+
+        function remove_images_from_list(){
+            var image_list_1 = document.getElementById("image_list_1");
+            var image_list_2 = document.getElementById("image_list_2");
+            while(image_list_1.firstChild){
+                image_list_1.removeChild(image_list_1.firstChild);
+            }
+            while(image_list_2.firstChild){
+                image_list_2.removeChild(image_list_2.firstChild);
+            }
+        }
+
+        function update_images(){
+            remove_images_from_list();
+            var image_list = document.getElementById("image_list");
+            
+            var region_inclusive = document.getElementById("region_inclusive");
+            var region_near_side = document.getElementById("region_near_side");
+            var region_away_side = document.getElementById("region_away_side");
+            var region_background = document.getElementById("region_background");
+            var particle_inclusive = document.getElementById("particle_inclusive");
+            var particle_pion = document.getElementById("particle_pion");
+            var particle_kaon = document.getElementById("particle_kaon");
+            var particle_proton = document.getElementById("particle_proton");
+
+            if(region_inclusive.checked){
+                if(particle_inclusive.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.INCLUSIVE_Inclusive.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.INCLUSIVE_Inclusive.png");
+                }
+                if(particle_pion.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.INCLUSIVE_Pion.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.INCLUSIVE_Pion.png");
+                }
+                if(particle_kaon.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.INCLUSIVE_Kaon.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.INCLUSIVE_Kaon.png");
+                }
+                if(particle_proton.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.INCLUSIVE_Proton.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.INCLUSIVE_Proton.png");
+                }
+            }
+            if(region_near_side.checked){
+                if(particle_inclusive.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.NEAR_SIDE_SIGNAL_Inclusive.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.NEAR_SIDE_SIGNAL_Inclusive.png");
+                }
+                if(particle_pion.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.NEAR_SIDE_SIGNAL_Pion.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.NEAR_SIDE_SIGNAL_Pion.png");
+                }
+                if(particle_kaon.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.NEAR_SIDE_SIGNAL_Kaon.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.NEAR_SIDE_SIGNAL_Kaon.png");
+                }
+                if(particle_proton.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.NEAR_SIDE_SIGNAL_Proton.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.NEAR_SIDE_SIGNAL_Proton.png");
+                }
+            }
+            if(region_away_side.checked){
+                if(particle_inclusive.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.AWAY_SIDE_SIGNAL_Inclusive.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.AWAY_SIDE_SIGNAL_Inclusive.png");
+                }
+                if(particle_pion.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.AWAY_SIDE_SIGNAL_Pion.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.AWAY_SIDE_SIGNAL_Pion.png");
+                }
+                if(particle_kaon.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.AWAY_SIDE_SIGNAL_Kaon.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.AWAY_SIDE_SIGNAL_Kaon.png");
+                }
+                if(particle_proton.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.AWAY_SIDE_SIGNAL_Proton.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.AWAY_SIDE_SIGNAL_Proton.png");
+                }
+            }
+            if(region_background.checked){
+                if(particle_inclusive.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.BACKGROUND_Inclusive.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.BACKGROUND_Inclusive.png");
+                }
+                if(particle_pion.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.BACKGROUND_Pion.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.BACKGROUND_Pion.png");
+                }
+                if(particle_kaon.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.BACKGROUND_Kaon.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.BACKGROUND_Kaon.png");
+                }
+                if(particle_proton.checked){
+                    add_image_to_list("TPCnSigmaFits/TPCnSigmaFit_Region.BACKGROUND_Proton.png");
+                } else {
+                    remove_image_from_list("TPCnSigmaFits/TPCnSigmaFit_Region.BACKGROUND_Proton.png");
+                }
+            }
+        }
+        
+    </script>
+</head>
+
+<body>
+    <div id="sidebar">
+        <ul>
+            <li><a href="../../ViewPlots.html">Home</a></li>
+<li><a href="../PT_1_15/index.html">p_T^assoc. 1-1.5 GeV/c</a></li>
+            <li><a href="../PT_15_2/index.html">p_T^assoc. 1.5-2 GeV/c</a></li>
+            <li><a href="../PT_2_3/index.html">p_T^assoc. 2-3 GeV/c</a></li>
+            <li><a href="../PT_3_4/index.html">p_T^assoc. 3-4 GeV/c</a></li>
+            <li><a href="../PT_4_5/index.html">p_T^assoc. 4-5 GeV/c</a></li>
+            <li><a href="../PT_5_6/index.html">p_T^assoc. 5-6 GeV/c</a></li>
+            <li><a href="../PT_6_10/index.html">p_T^assoc. 6-10 GeV/c</a></li>
+        </ul>
+        <p>Plot Options</p>
+        <input type="checkbox" id="show_tpc_nsigma" name="options" value="option1" onchange="toggleTPCnSigmaOptions()"/>
+        <label for="option1">TPC nSigma Fits</label>
+        <p id="RegionHeader" style="display: none;">Region:</p>
+        <input type="checkbox" id="region_inclusive" name="options" value="region_inclusive" style="display: none;" checked onclick="update_images()"><label for="region_inclusive" id="region_inclusive_label" style="display: none;" onclick="update_images()">Inclusive</label>
+        <input type="checkbox" id="region_near_side" name="options" value="region_near_side" style="display: none;" onclick="update_images()"><label for="region_near_side" id="region_near_side_label" style="display: none;">Near Side</label>
+        <input type="checkbox" id="region_away_side" name="options" value="region_away_side" style="display: none;" onclick="update_images()"><label for="region_away_side" id="region_away_side_label" style="display: none;">Away Side</label>
+        <input type="checkbox" id="region_background" name="options" value="region_background" style="display: none;" onclick="update_images()"><label for="region_background" id="region_background_label" style="display: none;">Background</label>
+
+        <p id="ParticleHeader" style="display: none;">Particle:</p>
+        <input type="checkbox" id="particle_inclusive" name="options" value="particle_inclusive" style="display: none;" checked  onclick="update_images()"><label for="particle_inclusive" id="particle_inclusive_label" style="display: none;">Inclusive</label>
+        <input type="checkbox" id="particle_pion" name="options" value="particle_pion" style="display: none;" checked  onclick="update_images()"><label for="particle_pion" id="particle_pion_label" style="display: none;">Pion</label>
+        <input type="checkbox" id="particle_kaon" name="options" value="particle_kaon" style="display: none;" checked  onclick="update_images()"><label for="particle_kaon" id="particle_kaon_label" style="display: none;">Kaon</label>
+        <input type="checkbox" id="particle_proton" name="options" value="particle_proton" style="display: none;" checked  onclick="update_images()"><label for="particle_proton" id="particle_proton_label" style="display: none;">Proton</label>
+        
+
+    </div>
+    <div>
+        <h1>Welcome to my Plot Dashboard!</h1>
+        <p><--------------------- Click on the links!</p>
+        <div class="row" >
+        <div class="column" id="image_list_1">
+
+        </div>
+        <div class="column" id="image_list_2">
+
+        </div>
+        
+        </div>
+    </div>
+</body>
+
+</html>

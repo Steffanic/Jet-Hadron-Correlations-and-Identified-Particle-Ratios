@@ -1,0 +1,3 @@
+30 mtime=1698423767.213194974
+72 LIBARCHIVE.xattr.com.apple.quarantine=MDA4Mzs2NTNhZDA3OTtPdXRsb29rOw
+60 SCHILY.xattr.com.apple.quarantine=0083;653ad079;Outlook;

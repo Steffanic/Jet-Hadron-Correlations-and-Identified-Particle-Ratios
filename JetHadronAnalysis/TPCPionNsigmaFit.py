@@ -138,7 +138,7 @@ class FitTPCPionNsigma:
         self.databaseConnection = sqlite3.connect("PID.db")
         cursor = self.databaseConnection.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS particle_fractions(analysis_type TEXT, region TEXT, momentum_bin INTEGER, pion_fraction REAL, proton_fraction REAL, kaon_fraction REAL, pion_fraction_error REAL, proton_fraction_error REAL, kaon_fraction_error REAL, PRIMARY KEY(analysis_type, region, momentum_bin))")
-        cursor.execute("CREATE TABLE IF NOT EXISTS fit_parameters(analysis_type TEXT, region TEXT, momentum_bin INTEGER, reduced_chi2 REAL, mu_pion REAL, mu_proton REAL, mu_kaon REAL, sigma_pion REAL, sigma_proton REAL, sigma_kaon REAL, alpha_proton REAL, alpha_kaon REAL, pion_enhanced_pion_fraction REAL, pion_enhanced_proton_fraction REAL, pion_enhanced_kaon_fraction REAL, proton_enhanced_pion_fraction REAL, proton_enhanced_proton_fraction REAL, proton_enhanced_kaon_fraction REAL, kaon_enhanced_pion_fraction REAL, kaon_enhanced_proton_fraction REAL, kaon_enhanced_kaon_fraction REAL, inclusive_pion_fraction REAL, inclusive_proton_fraction REAL, inclusive_kaon_fraction REAL, mu_pion_error REAL, mu_proton_error REAL, mu_kaon_error REAL, sigma_pion_error REAL, sigma_proton_error REAL, sigma_kaon_error REAL, alpha_proton_error REAL, alpha_kaon_error REAL, pion_enhanced_pion_fraction_error REAL, pion_enhanced_proton_fraction_error REAL, pion_enhanced_kaon_fraction_error REAL, proton_enhanced_pion_fraction_error REAL, proton_enhanced_proton_fraction_error REAL, proton_enhanced_kaon_fraction_error REAL, kaon_enhanced_pion_fraction_error REAL, kaon_enhanced_proton_fraction_error REAL, kaon_enhanced_kaon_fraction_error REAL, inclusive_pion_fraction_error REAL, inclusive_proton_fraction_error REAL, inclusive_kaon_fraction_error REAL , PRIMARY KEY(analysis_type, region, momentum_bin))")
+        cursor.execute("CREATE TABLE IF NOT EXISTS fit_parameters(analysis_type TEXT, region TEXT, momentum_bin INTEGER, reduced_chi2 REAL, mu_pion REAL, mu_proton REAL, mu_kaon REAL, sigma_pion REAL, sigma_proton REAL, sigma_kaon REAL, alpha_proton REAL, alpha_kaon REAL, pion_enhanced_pion_fraction REAL, pion_enhanced_proton_fraction REAL, pion_enhanced_kaon_fraction REAL, proton_enhanced_pion_fraction REAL, proton_enhanced_proton_fraction REAL, proton_enhanced_kaon_fraction REAL, kaon_enhanced_pion_fraction REAL, kaon_enhanced_proton_fraction REAL, kaon_enhanced_kaon_fraction REAL, inclusive_pion_fraction REAL, inclusive_proton_fraction REAL, inclusive_kaon_fraction REAL, mu_pion_error REAL, mu_proton_error REAL, mu_kaon_error REAL, sigma_pion_error REAL, sigma_proton_error REAL, sigma_kaon_error REAL, alpha_proton_error REAL, alpha_kaon_error REAL, pion_enhanced_pion_fraction_error REAL, pion_enhanced_proton_fraction_error REAL, pion_enhanced_kaon_fraction_error REAL, proton_enhanced_pion_fraction_error REAL, proton_enhanced_proton_fraction_error REAL, proton_enhanced_kaon_fraction_error REAL, kaon_enhanced_pion_fraction_error REAL, kaon_enhanced_proton_fraction_error REAL, kaon_enhanced_kaon_fraction_error REAL, inclusive_pion_fraction_error REAL, inclusive_proton_fraction_error REAL, inclusive_kaon_fraction_error REAL , covariance BLOB, PRIMARY KEY(analysis_type, region, momentum_bin))")
         self.databaseConnection.commit()
 
 
@@ -175,11 +175,11 @@ class FitTPCPionNsigma:
         # put the parameters into a the database 
         if self.databaseConnection is not None:
             cursor = self.databaseConnection.cursor()
-            cursor.execute("REPLACE INTO fit_parameters VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (self.analysisType.name, self.current_region.name, self.current_associated_hadron_momentum_bin.value, reduced_chi2, mupi.n, mup.n, muk.n, sigpi.n, sigp.n, sigk.n, alphap.n, alphak.n, apipi.n, appi.n, akpi.n, apip.n, app.n, akp.n, apik.n, apk.n, akk.n, apiinc.n, apinc.n, akinc.n, mupi.s, mup.s, muk.s, sigpi.s, sigp.s, sigk.s, alphap.s, alphak.s, apipi.s, appi.s, akpi.s, apip.s, app.s, akp.s, apik.s, apk.s, akk.s, apiinc.s, apinc.s, akinc.s))
+            cursor.execute("REPLACE INTO fit_parameters VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (self.analysisType.name, self.current_region.name, self.current_associated_hadron_momentum_bin.value, reduced_chi2, mupi.n, mup.n, muk.n, sigpi.n, sigp.n, sigk.n, alphap.n, alphak.n, apipi.n, appi.n, akpi.n, apip.n, app.n, akp.n, apik.n, apk.n, akk.n, apiinc.n, apinc.n, akinc.n, mupi.s, mup.s, muk.s, sigpi.s, sigp.s, sigk.s, alphap.s, alphak.s, apipi.s, appi.s, akpi.s, apip.s, app.s, akp.s, apik.s, apk.s, akk.s, apiinc.s, apinc.s, akinc.s, covariance.tobytes()))
             self.databaseConnection.commit()
         return final_parameters, covariance
     
-    def performYieldFit(self, x:np.ndarray, y:np.ndarray, yerr:np.ndarray, optimal_parameters:np.ndarray):
+    def performYieldFit(self, x:np.ndarray, y:np.ndarray, yerr:np.ndarray, optimal_parameters:np.ndarray, shape_covariance:np.ndarray):
         non_zero_mask = (y != 0)
 
         y = y[non_zero_mask]
@@ -196,9 +196,13 @@ class FitTPCPionNsigma:
         y_fit = self.yieldFittingFunction(non_zero_mask, mup, mupi, muk, sigp, sigpi, sigk, alphap, alphak,x, *final_parameters)
         reduced_chi2 = np.sum((y-y_fit)**2/yerr**2)/(len(x)-len(final_parameters)) 
 
+        total_covariance = shape_covariance
+        total_covariance[-3:, -3:] = covariance
+
+
         if self.databaseConnection is not None:
             cursor = self.databaseConnection.cursor()
-            cursor.execute("UPDATE fit_parameters SET inclusive_pion_fraction=?, inclusive_proton_fraction=?, inclusive_kaon_fraction=?, inclusive_pion_fraction_error=?, inclusive_proton_fraction_error=?, inclusive_kaon_fraction_error=? WHERE analysis_type=? AND region=? AND momentum_bin=? ", (apiinc.n, apinc.n, akinc.n, apiinc.s, apinc.s, akinc.s, self.analysisType.name, self.current_region.name, self.current_associated_hadron_momentum_bin.value))
+            cursor.execute("UPDATE fit_parameters SET inclusive_pion_fraction=?, inclusive_proton_fraction=?, inclusive_kaon_fraction=?, inclusive_pion_fraction_error=?, inclusive_proton_fraction_error=?, inclusive_kaon_fraction_error=?, covariance=? WHERE analysis_type=? AND region=? AND momentum_bin=? ", (apiinc.n, apinc.n, akinc.n, apiinc.s, apinc.s, akinc.s, total_covariance.tobytes(), self.analysisType.name, self.current_region.name, self.current_associated_hadron_momentum_bin.value))
             self.databaseConnection.commit()
 
         return final_parameters, covariance, reduced_chi2
@@ -223,54 +227,46 @@ class FitTPCPionNsigma:
         '''
         Computes PID fractions from the optimal fit params
         '''
+
+        # get the parameters as ufloats
         mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = uncertainties.correlated_values(optimal_params, covariance)
 
+        # generate some bootstrap samples of the fit parameters
+        n_samples = 1000
+        samples = np.random.multivariate_normal(optimal_params, covariance, n_samples) # shape (n_samples, n_params)
+
         int_x = np.linspace(-100, 100, 1000)
-        int_y = upiKpInc_generalized_fit(None, int_x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak)
+        int_y = upiKpInc_generalized_fit(None, int_x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak) # shape (4*n_x,)
 
+        int_y_samples = np.array([upiKpInc_generalized_fit(None, int_x, *sample) for sample in samples]) # shape (n_samples, 4*n_x)
 
-        pionEnhNorm  = np.trapz(int_y[:1000], int_x)
-        protonEnhNorm = np.trapz(int_y[1000:2000], int_x)
-        kaonEnhNorm  = np.trapz(int_y[2000:3000], int_x)
         inclusiveNorm= np.trapz(int_y[3000:], int_x)
 
-        gpp = np.trapz(ugeneralized_gauss(int_x, mup, sigp, app, alphap), int_x)/protonEnhNorm
-        gppi = np.trapz(ugauss(int_x, mupi, sigpi, apip), int_x)/protonEnhNorm
-        gpk = np.trapz(ugeneralized_gauss(int_x, muk, sigk, akp, alphak), int_x)/protonEnhNorm
+        inclusiveNorm_samples = np.array([np.trapz(int_y_samples[i, 3000:], int_x) for i in range(n_samples)])
+        # split the samples into these parameters mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak
 
-        gpip = np.trapz(ugeneralized_gauss(int_x, mup, sigp, appi, alphap), int_x)/pionEnhNorm
-        gpipi = np.trapz(ugauss(int_x, mupi, sigpi, apipi), int_x)/pionEnhNorm
-        gpik = np.trapz(ugeneralized_gauss(int_x, muk, sigk, akpi, alphak), int_x)/pionEnhNorm
-
-        gkp = np.trapz(ugeneralized_gauss(int_x, mup, sigp, apk, alphap), int_x)/kaonEnhNorm
-        gkpi = np.trapz(ugauss(int_x, mupi, sigpi, apik), int_x)/kaonEnhNorm
-        gkk = np.trapz(ugeneralized_gauss(int_x, muk, sigk, akk, alphak), int_x)/kaonEnhNorm
 
         gincp = np.trapz(ugeneralized_gauss(int_x, mup, sigp, apinc, alphap), int_x)/inclusiveNorm
         gincpi = np.trapz(ugauss(int_x, mupi, sigpi, apiinc), int_x)/inclusiveNorm
         ginck = np.trapz(ugeneralized_gauss(int_x, muk, sigk, akinc, alphak), int_x)/inclusiveNorm
 
-        fpp = (gpp/gincp)*(n_enhanced_associated_hadrons[ParticleType.PROTON]/n_enhanced_associated_hadrons[ParticleType.INCLUSIVE])
-        fppi = (gppi/gincpi)*(n_enhanced_associated_hadrons[ParticleType.PROTON]/n_enhanced_associated_hadrons[ParticleType.INCLUSIVE])
-        fpk = (gpk/ginck)*(n_enhanced_associated_hadrons[ParticleType.PROTON]/n_enhanced_associated_hadrons[ParticleType.INCLUSIVE])
+        gincp_samples = np.array([np.trapz(ugeneralized_gauss(int_x, sample[0], sample[3], sample[15], sample[18]), int_x) for sample in samples])/inclusiveNorm_samples
+        gincpi_samples = np.array([np.trapz(ugauss(int_x, sample[1], sample[4], sample[16]), int_x) for sample in samples])/inclusiveNorm_samples
+        ginck_samples = np.array([np.trapz(ugeneralized_gauss(int_x, sample[2], sample[5], sample[17], sample[19]), int_x) for sample in samples])/inclusiveNorm_samples
 
-        fpip = (gpip/gincp)*(n_enhanced_associated_hadrons[ParticleType.PION]/n_enhanced_associated_hadrons[ParticleType.INCLUSIVE])
-        fpipi = (gpipi/gincpi)*(n_enhanced_associated_hadrons[ParticleType.PION]/n_enhanced_associated_hadrons[ParticleType.INCLUSIVE])
-        fpik = (gpik/ginck)*(n_enhanced_associated_hadrons[ParticleType.PION]/n_enhanced_associated_hadrons[ParticleType.INCLUSIVE])
-
-        fkp = (gkp/gincp)*(n_enhanced_associated_hadrons[ParticleType.KAON]/n_enhanced_associated_hadrons[ParticleType.INCLUSIVE])
-        fkpi = (gkpi/gincpi)*(n_enhanced_associated_hadrons[ParticleType.KAON]/n_enhanced_associated_hadrons[ParticleType.INCLUSIVE])
-        fkk = (gkk/ginck)*(n_enhanced_associated_hadrons[ParticleType.KAON]/n_enhanced_associated_hadrons[ParticleType.INCLUSIVE])
-
-        sum_of_particles_used = n_enhanced_associated_hadrons[ParticleType.PION]+n_enhanced_associated_hadrons[ParticleType.PROTON]+n_enhanced_associated_hadrons[ParticleType.KAON] # Hack to get appropriate fractions, replace once the OTHER bin is added
         pionFraction = gincpi#1/3*(gpipi*pionEnhNorm/(fpipi)+gppi*protonEnhNorm/(fppi)+gkpi*kaonEnhNorm/(fkpi))/sum_of_particles_used#n_enhanced_associated_hadrons[ParticleType.INCLUSIVE]
         protonFraction = gincp#1/3*(gpip*pionEnhNorm/(fpip)+gpp*protonEnhNorm/(fpp)+gkp*kaonEnhNorm/(fkp))/sum_of_particles_used#n_enhanced_associated_hadrons[ParticleType.INCLUSIVE]
         kaonFraction = ginck#1/3*(gpik*pionEnhNorm/(fpik)+gpk*protonEnhNorm/(fpk)+gkk*kaonEnhNorm/(fkk))/sum_of_particles_used#n_enhanced_associated_hadrons[ParticleType.INCLUSIVE]
 
+        pionFraction_pid_fit_sys_err = float(np.mean((gincpi_samples - gincpi.n)**2)**0.5)
+        protonFraction_pid_fit_sys_err = float(np.mean((gincp_samples - gincp.n)**2)**0.5)
+        kaonFraction_pid_fit_sys_err = float(np.mean((ginck_samples - ginck.n)**2)**0.5)
+
+
         # save the particle fractions to the database
         if self.databaseConnection is not None:
             cursor = self.databaseConnection.cursor()
-            cursor.execute("REPLACE INTO particle_fractions VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", (self.analysisType.name, self.current_region.name, self.current_associated_hadron_momentum_bin.value, pionFraction.n, protonFraction.n, kaonFraction.n, pionFraction.s, protonFraction.s, kaonFraction.s))
+            cursor.execute("REPLACE INTO particle_fractions VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (self.analysisType.name, self.current_region.name, self.current_associated_hadron_momentum_bin.value, pionFraction.n, protonFraction.n, kaonFraction.n, pionFraction.s, protonFraction.s, kaonFraction.s, pionFraction_pid_fit_sys_err, protonFraction_pid_fit_sys_err, kaonFraction_pid_fit_sys_err))
             self.databaseConnection.commit()
 
-        return {ParticleType.PION: pionFraction.n, ParticleType.PROTON:protonFraction.n, ParticleType.KAON:kaonFraction.n}, {ParticleType.PION:pionFraction.s, ParticleType.PROTON:protonFraction.s, ParticleType.KAON:kaonFraction.s}
+        return {ParticleType.PION: pionFraction.n, ParticleType.PROTON:protonFraction.n, ParticleType.KAON:kaonFraction.n}, {ParticleType.PION:pionFraction.s, ParticleType.PROTON:protonFraction.s, ParticleType.KAON:kaonFraction.s}, {ParticleType.PION:pionFraction_pid_fit_sys_err, ParticleType.PROTON:protonFraction_pid_fit_sys_err, ParticleType.KAON:kaonFraction_pid_fit_sys_err}

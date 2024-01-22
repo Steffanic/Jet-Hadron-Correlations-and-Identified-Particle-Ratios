@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>My Page</title>
+    <style>
+        body {
+            display: flex;
+        }
+
+        #sidebar {
+            width: 20%;
+            height: 100%;
+            border-color: rgb(6, 198, 18);
+            border-style: solid;
+            background-color: #c6ffc2;
+            padding: 2px;
+            margin: 1px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: large;
+            line-height: 1.6em;
+        }
+
+        #main {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="sidebar">
+        <ul>
+            <li><a href="PT_1_15/index.html">p_T^assoc. 1-1.5 GeV/c</a></li>
+            <li><a href="PT_15_2/index.html">p_T^assoc. 1.5-2 GeV/c</a></li>
+            <li><a href="PT_2_3/index.html">p_T^assoc. 2-3 GeV/c</a></li>
+            <li><a href="PT_3_4/index.html">p_T^assoc. 3-4 GeV/c</a></li>
+            <li><a href="PT_4_5/index.html">p_T^assoc. 4-5 GeV/c</a></li>
+            <li><a href="PT_5_6/index.html">p_T^assoc. 5-6 GeV/c</a></li>
+            <li><a href="PT_6_10/index.html">p_T^assoc. 6-10 GeV/c</a></li>
+        </ul>
+    </div>
+    <div id="main">
+        <h1>Welcome to my Plot Dashboard!</h1>
+        <p><--------------------- Click on the links!</p>
+                <img src="Region.INCLUSIVE_yields.png"></img>
+                <img src="Region.NEAR_SIDE_SIGNAL_yields.png"></img>
+                <img src="Region.AWAY_SIDE_SIGNAL_yields.png"></img>
+                <img src="Region.BACKGROUND_yields.png"></img>
+                
+                <img src="Region.INCLUSIVE_background_subtracted_yields.png"></img>
+                <img src="Region.NEAR_SIDE_SIGNAL_background_subtracted_yields.png"></img>
+                <img src="Region.AWAY_SIDE_SIGNAL_background_subtracted_yields.png"></img>
+    </div>
+</body>
+
+</html>
