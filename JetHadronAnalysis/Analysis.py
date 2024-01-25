@@ -170,7 +170,7 @@ class Analysis:
         Gets the particle fractions and scales the acceptance corrected azimuthal correlation function by the particle fraction for the specified species
         '''
 
-        particle_fractions, particle_fraction_errors, pid_fit_sys_err, chi2OverNDF_shape, Chi2OverNDF_yield = self.getPIDFractions(loadFractionsFromDB=loadFractionsFromDB)
+        particle_fractions, particle_fraction_errors, pid_fit_shape_sys_err, pid_fit_yield_sys_err, chi2OverNDF_shape, Chi2OverNDF_yield = self.getPIDFractions(loadFractionsFromDB=loadFractionsFromDB)
         
         # now get the per species azimuthal correlation functions for each region by scaling
         species_azimuthal_correlation_function = acceptanceCorrectedAzimuthalCorrelationFunction.Clone()
@@ -184,9 +184,9 @@ class Analysis:
             species_azimuthal_correlation_function.SetBinError(i, np.sqrt(species_azimuthal_correlation_function.GetBinError(i)**2 + sys_errors[i-1]**2))
         
 
-        return species_azimuthal_correlation_function, pid_fit_sys_err[species]
+        return species_azimuthal_correlation_function, pid_fit_shape_sys_err[species],pid_fit_yield_sys_err[species]
         
-    def getYieldFromAzimuthalCorrelationFunction(self, azimuthalCorrelationFunction: TH1D, pid_fit_sys_err: Optional[float] = None):
+    def getYieldFromAzimuthalCorrelationFunction(self, azimuthalCorrelationFunction: TH1D, pid_fit_shape_sys_err: Optional[float] = None, pid_fit_yield_sys_err: Optional[float] = None):
         '''
         Returns the yield from the azimuthal correlation function
         '''
@@ -196,8 +196,9 @@ class Analysis:
         azimuthalCorrelationFunction.Scale(self.JetHadron.getBinWidth(self.JetHadron.Axes.DELTA_PHI))
         yield_ = azimuthalCorrelationFunction.Integral()
         error_ = np.sqrt(np.sum([azimuthalCorrelationFunction.GetBinError(i)**2 for i in range(1, azimuthalCorrelationFunction.GetNbinsX()+1)]))
-        pid_fit_sys_err_ = None if pid_fit_sys_err is None else pid_fit_sys_err * yield_
-        return yield_, error_, pid_fit_sys_err_
+        pid_fit_shape_sys_err_ = None if pid_fit_shape_sys_err is None else pid_fit_shape_sys_err * yield_
+        pid_fit_yield_sys_err_ = None if pid_fit_yield_sys_err is None else pid_fit_yield_sys_err * yield_
+        return yield_, error_, pid_fit_shape_sys_err_, pid_fit_yield_sys_err_
 
     def getNormalizedDifferentialMixedEventCorrelationFunction(self, normMethod: NormalizationMethod, **kwargs):
         '''
@@ -322,8 +323,8 @@ class Analysis:
         if loadFractionsFromDB:
             print("Loading particle fractions from database")
             # get the particle fractions from the database
-            particle_fractions, particle_fraction_errors, pid_fit_sys_err = self.getParticleFractionsFromDB()
-            return particle_fractions, particle_fraction_errors, pid_fit_sys_err, None, None
+            particle_fractions, particle_fraction_errors, pid_fit_shape_sys_err, pid_fit_yield_sys_err = self.getParticleFractionsFromDB()
+            return particle_fractions, particle_fraction_errors, pid_fit_shape_sys_err, pid_fit_yield_sys_err, None, None
         # set the region to inclusive to fit the shape parameters first saving the current region to reset it later
         fitter = FitTPCPionNsigma(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin)
         currentRegion = self.currentRegion
@@ -404,9 +405,9 @@ class Analysis:
         
         # compute the PID fractions
         print("Computing PID fractions for momentum bin", self.currentAssociatedHadronMomentumBin.name, " and region ", self.currentRegion.name)
-        pid_fractions, pid_fraction_errors, pid_fit_sys_err = fitter.computeAveragePIDFractions(optimal_params, covariance, self.numberOfAssociatedHadronsBySpecies)
+        pid_fractions, pid_fraction_errors, pid_fit_shape_sys_err, pid_fit_yield_sys_err = fitter.computeAveragePIDFractions(optimal_params, covariance, self.numberOfAssociatedHadronsBySpecies)
 
-        return pid_fractions, pid_fraction_errors, pid_fit_sys_err, chi2OverNDF_shape, reducedChi2_yield
+        return pid_fractions, pid_fraction_errors, pid_fit_shape_sys_err, pid_fit_yield_sys_err, chi2OverNDF_shape, reducedChi2_yield
 
     def getParticleFractionsFromDB(self):
         '''
@@ -416,14 +417,15 @@ class Analysis:
         dbCursor = conn.cursor()
         particle_fractions = {}
         particle_fraction_errors = {}
-        pid_fit_sys_err = {}
+        pid_fit_shape_sys_err = {}
+        pid_fit_yield_sys_err = {}
         for species in ParticleType:
             if species is ParticleType.OTHER or species is ParticleType.INCLUSIVE:
                 continue
 
-            particle_fractions[species], particle_fraction_errors[species], pid_fit_sys_err[species] = getParticleFractionForMomentumBin(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin, species, dbCursor)[0]
+            particle_fractions[species], particle_fraction_errors[species], pid_fit_shape_sys_err[species], pid_fit_yield_sys_err[species] = getParticleFractionForMomentumBin(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin, species, dbCursor)[0]
         conn.close()
-        return particle_fractions, particle_fraction_errors, pid_fit_sys_err
+        return particle_fractions, particle_fraction_errors, pid_fit_shape_sys_err, pid_fit_yield_sys_err
 
     def getEnhancedTPCnSigmaProjection(self, species: ParticleType):
         '''

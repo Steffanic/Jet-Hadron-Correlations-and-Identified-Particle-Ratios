@@ -1,127 +1,136 @@
 
 analysis_type_names = ["PP", "CENTRAL", "SEMICENTRAL"]
 assoc_pt_folder_names = ["PT_1_15", "PT_15_2", "PT_2_3", "PT_3_4", "PT_4_5", "PT_5_6", "PT_6_10"]
+assoc_pt_labels = {
+    "PT_1_15": "$1 < \\pTassoc < 1.5$ GeV/c",
+    "PT_15_2": "$1.5 < \\pTassoc < 2$ GeV/c",
+    "PT_2_3": "$2 < \\pTassoc < 3$ GeV/c",
+    "PT_3_4": "$3 < \\pTassoc < 4$ GeV/c",
+    "PT_4_5": "$4 < \\pTassoc < 5$ GeV/c",
+    "PT_5_6": "$5 < \\pTassoc < 6$ GeV/c",
+    "PT_6_10": "$6 < \\pTassoc < 10$ GeV/c"
+}
 regions = ["INCLUSIVE", "NEAR_SIDE_SIGNAL", "AWAY_SIDE_SIGNAL", "BACKGROUND"]
 particle_types = ["Inclusive", "Pion", "Proton", "Kaon"]
 
 def build_appendix_entry(analysis_type, assoc_pt_folder):
     return f"""
-            \\subsection{{{analysis_type} {"-".join(assoc_pt_folder.split("_"))}}}
+            \\subsection{{{analysis_type} {assoc_pt_labels[assoc_pt_folder]}}}
             \\begin{{figure}}[H]
                 \\title{{Region Inclusive}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.INCLUSIVE_Inclusive.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} INCLUSIVE region for Inclusive particles.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_INCLUSIVE_Inclusive}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} INCLUSIVE region for Inclusive particles.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_INCLUSIVE_Inclusive}}
                 \\end{{subfigure}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.INCLUSIVE_Pion.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} INCLUSIVE region for Pions.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_INCLUSIVE_Pion}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} INCLUSIVE region for Pions.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_INCLUSIVE_Pion}}
                 \\end{{subfigure}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.INCLUSIVE_Proton.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} INCLUSIVE region for Protons.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_INCLUSIVE_Proton}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} INCLUSIVE region for Protons.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_INCLUSIVE_Proton}}
                 \\end{{subfigure}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.INCLUSIVE_Kaon.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} INCLUSIVE region for Kaons.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_INCLUSIVE_Kaon}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} INCLUSIVE region for Kaons.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_INCLUSIVE_Kaon}}
                 \\end{{subfigure}}
-                \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} INCLUSIVE region.}}
-                \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_INCLUSIVE}}
+                \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} INCLUSIVE region.}}
+                \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_INCLUSIVE}}
             \\end{{figure}}
             \\begin{{figure}}[H]
                 \\title{{Region Near-side}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.NEAR_SIDE_SIGNAL_Inclusive.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} NEAR-SIDE region for Inclusive particles.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_NEAR_SIDE_SIGNAL_Inclusive}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} NEAR-SIDE region for Inclusive particles.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_NEAR_SIDE_SIGNAL_Inclusive}}
                 \\end{{subfigure}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.NEAR_SIDE_SIGNAL_Pion.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} NEAR-SIDE region for Pions.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_NEAR_SIDE_SIGNAL_Pion}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} NEAR-SIDE region for Pions.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_NEAR_SIDE_SIGNAL_Pion}}
                 \\end{{subfigure}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.NEAR_SIDE_SIGNAL_Proton.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} NEAR-SIDE region for Protons.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_NEAR_SIDE_SIGNAL_Proton}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} NEAR-SIDE region for Protons.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_NEAR_SIDE_SIGNAL_Proton}}
                 \\end{{subfigure}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.NEAR_SIDE_SIGNAL_Kaon.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} NEAR-SIDE region for Kaons.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_NEAR_SIDE_SIGNAL_Kaon}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} NEAR-SIDE region for Kaons.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_NEAR_SIDE_SIGNAL_Kaon}}
                 \\end{{subfigure}}
-                \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} NEAR-SIDE region.}}
-                \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_NEAR_SIDE_SIGNAL}}
+                \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} NEAR-SIDE region.}}
+                \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_NEAR_SIDE_SIGNAL}}
             \\end{{figure}}
             \\begin{{figure}}[H]
                 \\title{{Region Away-side}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.AWAY_SIDE_SIGNAL_Inclusive.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} AWAY-SIDE region for Inclusive particles.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_AWAY_SIDE_SIGNAL_Inclusive}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} AWAY-SIDE region for Inclusive particles.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_AWAY_SIDE_SIGNAL_Inclusive}}
                 \\end{{subfigure}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.AWAY_SIDE_SIGNAL_Pion.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} AWAY-SIDE region for Pions.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_AWAY_SIDE_SIGNAL_Pion}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} AWAY-SIDE region for Pions.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_AWAY_SIDE_SIGNAL_Pion}}
                 \\end{{subfigure}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.AWAY_SIDE_SIGNAL_Proton.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} AWAY-SIDE region for Protons.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_AWAY_SIDE_SIGNAL_Proton}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} AWAY-SIDE region for Protons.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_AWAY_SIDE_SIGNAL_Proton}}
                 \\end{{subfigure}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.AWAY_SIDE_SIGNAL_Kaon.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} AWAY-SIDE region for Kaons.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_AWAY_SIDE_SIGNAL_Kaon}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} AWAY-SIDE region for Kaons.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_AWAY_SIDE_SIGNAL_Kaon}}
                 \\end{{subfigure}}
-                \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} AWAY-SIDE region.}}
-                \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_AWAY_SIDE_SIGNAL}}
+                \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} AWAY-SIDE region.}}
+                \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_AWAY_SIDE_SIGNAL}}
             \\end{{figure}}
             \\begin{{figure}}[H]
                 \\title{{Region Background}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.BACKGROUND_Inclusive.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} BACKGROUND region for Inclusive particles.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_BACKGROUND_Inclusive}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} BACKGROUND region for Inclusive particles.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_BACKGROUND_Inclusive}}
                 \\end{{subfigure}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.BACKGROUND_Pion.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} BACKGROUND region for Pions.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_BACKGROUND_Pion}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} BACKGROUND region for Pions.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_BACKGROUND_Pion}}
                 \\end{{subfigure}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.BACKGROUND_Proton.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} BACKGROUND region for Protons.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_BACKGROUND_Proton}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} BACKGROUND region for Protons.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_BACKGROUND_Proton}}
                 \\end{{subfigure}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
                     \\centering
                     \\includegraphics[width=\\textwidth]{{figures/png/appendix_plots/{analysis_type}/{assoc_pt_folder}/TPCnSigmaFits/TPCnSigmaFit_Region.BACKGROUND_Kaon.png}}
-                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} BACKGROUND region for Kaons.}}
-                    \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_BACKGROUND_Kaon}}
+                    \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} BACKGROUND region for Kaons.}}
+                    \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_BACKGROUND_Kaon}}
                 \\end{{subfigure}}
-                \\caption{{TPC n$\\sigma$ fits for {analysis_type} {"-".join(assoc_pt_folder.split("_"))} BACKGROUND region.}}
-                \\label{{fig:appendix_{analysis_type}_{"-".join(assoc_pt_folder.split("_"))}_BACKGROUND}}
+                \\caption{{TPC n$\\sigma$ fits for {analysis_type} {assoc_pt_labels[assoc_pt_folder]} BACKGROUND region.}}
+                \\label{{fig:appendix_{analysis_type}_{assoc_pt_labels[assoc_pt_folder]}_BACKGROUND}}
             \\end{{figure}}
             \\clearpage
             

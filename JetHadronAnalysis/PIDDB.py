@@ -13,7 +13,7 @@ def getParticleFractionByMomentum(analysisType, region, particleType, dbCursor):
 def getParticleFractionForMomentumBin(analysisType, region, momentum_bin, particleType, dbCursor):
 
     # define the SQL query
-    query = f"SELECT {particleType.name.lower()}_fraction, {particleType.name.lower()}_fraction_error, {particleType.name.lower()}_pid_fit_sys_err FROM particle_fractions WHERE analysis_type = ? AND region = ? AND momentum_bin = ?;"
+    query = f"SELECT {particleType.name.lower()}_fraction, {particleType.name.lower()}_fraction_error, {particleType.name.lower()}_pid_fit_shape_sys_err, {particleType.name.lower()}_pid_fit_yield_sys_err FROM particle_fractions WHERE analysis_type = ? AND region = ? AND momentum_bin = ?;"
     # execute the query
     result = dbCursor.execute(query, (f"{analysisType.name}", f"{region.name}", f"{momentum_bin.value}"))
     # get the result

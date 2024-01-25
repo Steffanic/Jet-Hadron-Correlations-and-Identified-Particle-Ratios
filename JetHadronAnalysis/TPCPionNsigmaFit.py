@@ -232,41 +232,54 @@ class FitTPCPionNsigma:
         mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = uncertainties.correlated_values(optimal_params, covariance)
 
         # generate some bootstrap samples of the fit parameters
-        n_samples = 1000
-        samples = np.random.multivariate_normal(optimal_params, covariance, n_samples) # shape (n_samples, n_params)
+        n_samples = 50
+        shape_samples = np.random.multivariate_normal(optimal_params, covariance, n_samples) # shape (n_samples, n_params)
+        # now just sample apinc, apiinc, akinc with the appropriate subset of covariance matrix
+        # this would be covariance[-5:-2, -5:-2] 
+        yield_samples = np.random.multivariate_normal([apinc.n, apiinc.n, akinc.n], covariance[-5:-2, -5:-2], n_samples) # shape (n_samples, 3)
 
         int_x = np.linspace(-100, 100, 1000)
         int_y = upiKpInc_generalized_fit(None, int_x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak) # shape (4*n_x,)
 
-        int_y_samples = np.array([upiKpInc_generalized_fit(None, int_x, *sample) for sample in samples]) # shape (n_samples, 4*n_x)
+        print("Computing bootstrap PID shape errors")
+        int_y_shape_samples = np.array([upiKpInc_generalized_fit(None, int_x, *sample) for sample in shape_samples]) # shape (n_samples, 4*n_x)
+        print("Computing bootstrap PID yields errors")
+        int_y_yield_samples = np.array([upiKpInc_generalized_fit(None, int_x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, *sample, alphap, alphak) for sample in yield_samples]) # shape (n_samples, 4*n_x)
 
         inclusiveNorm= np.trapz(int_y[3000:], int_x)
 
-        inclusiveNorm_samples = np.array([np.trapz(int_y_samples[i, 3000:], int_x) for i in range(n_samples)])
-        # split the samples into these parameters mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak
+        inclusiveNorm_shape_samples = np.array([np.trapz(int_y_shape_samples[i, 3000:], int_x) for i in range(n_samples)])
+        inclusiveNorm_yield_samples = np.array([np.trapz(int_y_yield_samples[i, 3000:], int_x) for i in range(n_samples)])
 
 
         gincp = np.trapz(ugeneralized_gauss(int_x, mup, sigp, apinc, alphap), int_x)/inclusiveNorm
         gincpi = np.trapz(ugauss(int_x, mupi, sigpi, apiinc), int_x)/inclusiveNorm
         ginck = np.trapz(ugeneralized_gauss(int_x, muk, sigk, akinc, alphak), int_x)/inclusiveNorm
 
-        gincp_samples = np.array([np.trapz(ugeneralized_gauss(int_x, sample[0], sample[3], sample[15], sample[18]), int_x) for sample in samples])/inclusiveNorm_samples
-        gincpi_samples = np.array([np.trapz(ugauss(int_x, sample[1], sample[4], sample[16]), int_x) for sample in samples])/inclusiveNorm_samples
-        ginck_samples = np.array([np.trapz(ugeneralized_gauss(int_x, sample[2], sample[5], sample[17], sample[19]), int_x) for sample in samples])/inclusiveNorm_samples
+        gincp_shape_samples = np.array([np.trapz(ugeneralized_gauss(int_x, sample[0], sample[3], sample[15], sample[18]), int_x) for sample in shape_samples])/inclusiveNorm_shape_samples
+        gincpi_shape_samples = np.array([np.trapz(ugauss(int_x, sample[1], sample[4], sample[16]), int_x) for sample in shape_samples])/inclusiveNorm_shape_samples
+        ginck_shape_samples = np.array([np.trapz(ugeneralized_gauss(int_x, sample[2], sample[5], sample[17], sample[19]), int_x) for sample in shape_samples])/inclusiveNorm_shape_samples
+
+        gincp_yield_samples = np.array([np.trapz(ugeneralized_gauss(int_x, mup, sigp, sample[0], alphap), int_x) for sample in yield_samples])/inclusiveNorm_yield_samples
+        gincpi_yield_samples = np.array([np.trapz(ugauss(int_x, mupi, sigpi, sample[1]), int_x) for sample in yield_samples])/inclusiveNorm_yield_samples
+        ginck_yield_samples = np.array([np.trapz(ugeneralized_gauss(int_x, muk, sigk, sample[2], alphak), int_x) for sample in yield_samples])/inclusiveNorm_yield_samples
 
         pionFraction = gincpi#1/3*(gpipi*pionEnhNorm/(fpipi)+gppi*protonEnhNorm/(fppi)+gkpi*kaonEnhNorm/(fkpi))/sum_of_particles_used#n_enhanced_associated_hadrons[ParticleType.INCLUSIVE]
         protonFraction = gincp#1/3*(gpip*pionEnhNorm/(fpip)+gpp*protonEnhNorm/(fpp)+gkp*kaonEnhNorm/(fkp))/sum_of_particles_used#n_enhanced_associated_hadrons[ParticleType.INCLUSIVE]
         kaonFraction = ginck#1/3*(gpik*pionEnhNorm/(fpik)+gpk*protonEnhNorm/(fpk)+gkk*kaonEnhNorm/(fkk))/sum_of_particles_used#n_enhanced_associated_hadrons[ParticleType.INCLUSIVE]
 
-        pionFraction_pid_fit_sys_err = float(np.mean((gincpi_samples - gincpi.n)**2)**0.5)
-        protonFraction_pid_fit_sys_err = float(np.mean((gincp_samples - gincp.n)**2)**0.5)
-        kaonFraction_pid_fit_sys_err = float(np.mean((ginck_samples - ginck.n)**2)**0.5)
+        pionFraction_pid_fit_shape_sys_err = float(np.mean([(sample - gincpi.n)**2 for sample in gincpi_shape_samples]))
+        protonFraction_pid_fit_shape_sys_err = float(np.mean([(sample - gincp.n)**2 for sample in gincp_shape_samples]))
+        kaonFraction_pid_fit_shape_sys_err = float(np.mean([(sample - ginck.n)**2 for sample in ginck_shape_samples]))
 
+        pionFraction_pid_fit_yield_sys_err = float(np.mean([(sample.n - gincpi.n)**2 for sample in gincpi_yield_samples]))
+        protonFraction_pid_fit_yield_sys_err = float(np.mean([(sample.n - gincp.n)**2 for sample in gincp_yield_samples]))
+        kaonFraction_pid_fit_yield_sys_err = float(np.mean([(sample.n - ginck.n)**2 for sample in ginck_yield_samples]))
 
         # save the particle fractions to the database
         if self.databaseConnection is not None:
             cursor = self.databaseConnection.cursor()
-            cursor.execute("REPLACE INTO particle_fractions VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (self.analysisType.name, self.current_region.name, self.current_associated_hadron_momentum_bin.value, pionFraction.n, protonFraction.n, kaonFraction.n, pionFraction.s, protonFraction.s, kaonFraction.s, pionFraction_pid_fit_sys_err, protonFraction_pid_fit_sys_err, kaonFraction_pid_fit_sys_err))
+            cursor.execute("REPLACE INTO particle_fractions VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (self.analysisType.name, self.current_region.name, self.current_associated_hadron_momentum_bin.value, pionFraction.n, protonFraction.n, kaonFraction.n, pionFraction.s, protonFraction.s, kaonFraction.s, pionFraction_pid_fit_shape_sys_err, protonFraction_pid_fit_shape_sys_err, kaonFraction_pid_fit_shape_sys_err, pionFraction_pid_fit_yield_sys_err, protonFraction_pid_fit_yield_sys_err, kaonFraction_pid_fit_yield_sys_err))
             self.databaseConnection.commit()
 
-        return {ParticleType.PION: pionFraction.n, ParticleType.PROTON:protonFraction.n, ParticleType.KAON:kaonFraction.n}, {ParticleType.PION:pionFraction.s, ParticleType.PROTON:protonFraction.s, ParticleType.KAON:kaonFraction.s}, {ParticleType.PION:pionFraction_pid_fit_sys_err, ParticleType.PROTON:protonFraction_pid_fit_sys_err, ParticleType.KAON:kaonFraction_pid_fit_sys_err}
+        return {ParticleType.PION: pionFraction.n, ParticleType.PROTON:protonFraction.n, ParticleType.KAON:kaonFraction.n}, {ParticleType.PION:pionFraction.s, ParticleType.PROTON:protonFraction.s, ParticleType.KAON:kaonFraction.s}, {ParticleType.PION:pionFraction_pid_fit_shape_sys_err, ParticleType.PROTON:protonFraction_pid_fit_shape_sys_err, ParticleType.KAON:kaonFraction_pid_fit_shape_sys_err}, {ParticleType.PION:pionFraction_pid_fit_yield_sys_err, ParticleType.PROTON:protonFraction_pid_fit_yield_sys_err, ParticleType.KAON:kaonFraction_pid_fit_yield_sys_err}
