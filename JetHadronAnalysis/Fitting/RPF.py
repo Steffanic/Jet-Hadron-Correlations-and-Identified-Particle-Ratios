@@ -116,6 +116,118 @@ initial_parameter_defaults[(AnalysisType.SEMICENTRAL, TriggerJetMomentumBin.PT_4
     0.2,
     0.03,
 ]  # pTtrig 40-60, pTassoc 6.0-10.0
+initial_parameter_defaults[(AnalysisType.CENTRAL, TriggerJetMomentumBin.PT_20_40, AssociatedHadronMomentumBin.PT_1_15)] = [
+    1000042.8,
+    0.0473,
+    -0.000306,
+    0.02,
+    0.1013,
+    0.03,
+]  # pTtrig 20-40, pTassoc 1.0-1.5
+initial_parameter_defaults[(AnalysisType.CENTRAL, TriggerJetMomentumBin.PT_20_40, AssociatedHadronMomentumBin.PT_15_2)] = [
+    40000.19,
+    0.0402,
+    -0.0058,
+    0.02,
+    0.1506,
+    0.03,
+]  # pTtrig 20-40, pTassoc 1.5-2.0
+initial_parameter_defaults[(AnalysisType.CENTRAL, TriggerJetMomentumBin.PT_20_40, AssociatedHadronMomentumBin.PT_2_3)] = [
+    4006.86,
+    0.0414,
+    0.0015,
+    0.02,
+    0.234,
+    0.03,
+]  # pTtrig 20-40, pTassoc 2.0-3.0
+initial_parameter_defaults[(AnalysisType.CENTRAL, TriggerJetMomentumBin.PT_20_40, AssociatedHadronMomentumBin.PT_3_4)] = [
+    56.84,
+    0.0636,
+    -0.00766,
+    0.02,
+    0.237,
+    0.03,
+]  # pTtrig 20-40, pTassoc 3.0-4.0
+initial_parameter_defaults[(AnalysisType.CENTRAL, TriggerJetMomentumBin.PT_20_40, AssociatedHadronMomentumBin.PT_4_5)] = [
+    8.992,
+    0.1721,
+    -0.0987,
+    0.02,
+    0.233,
+    0.03,
+]  # pTtrig 20-40, pTassoc 4.0-5.0
+initial_parameter_defaults[(AnalysisType.CENTRAL, TriggerJetMomentumBin.PT_20_40, AssociatedHadronMomentumBin.PT_5_6)] = [
+    2.318,
+    -0.0508,
+    -0.143,
+    0.02,
+    0.1876,
+    0.03,
+]  # pTtrig 20-40, pTassoc  5.0-6.0
+initial_parameter_defaults[(AnalysisType.CENTRAL, TriggerJetMomentumBin.PT_20_40, AssociatedHadronMomentumBin.PT_6_10)] = [
+    2.076,
+    -0.0886,
+    0.12929,
+    0.02,
+    0.0692,
+    0.03,
+]  # pTtrig 20-40, pTassoc 6.0-10.0
+initial_parameter_defaults[(AnalysisType.CENTRAL, TriggerJetMomentumBin.PT_40_60, AssociatedHadronMomentumBin.PT_1_15)] = [
+    1,
+    0.02,
+    0.005,
+    0.02,
+    0.2,
+    0.03,
+]  # pTtrig 40-60, pTassoc 1.0-1.5
+initial_parameter_defaults[(AnalysisType.CENTRAL, TriggerJetMomentumBin.PT_40_60, AssociatedHadronMomentumBin.PT_15_2)] = [
+    1,
+    0.02,
+    0.005,
+    0.02,
+    0.2,
+    0.03,
+]  # pTtrig 40-60, pTassoc 1.5-2.0
+initial_parameter_defaults[(AnalysisType.CENTRAL, TriggerJetMomentumBin.PT_40_60, AssociatedHadronMomentumBin.PT_2_3)] = [
+    1,
+    0.02,
+    0.005,
+    0.02,
+    0.2,
+    0.03,
+]  # pTtrig 40-60, pTassoc 2.0-3.0
+initial_parameter_defaults[(AnalysisType.CENTRAL, TriggerJetMomentumBin.PT_40_60, AssociatedHadronMomentumBin.PT_3_4)] = [
+    1,
+    0.02,
+    0.005,
+    0.02,
+    0.2,
+    0.03,
+]  # pTtrig 40-60, pTassoc 3.0-4.0
+initial_parameter_defaults[(AnalysisType.CENTRAL, TriggerJetMomentumBin.PT_40_60, AssociatedHadronMomentumBin.PT_4_5)] = [
+    1,
+    0.02,
+    0.005,
+    0.02,
+    0.2,
+    0.03,
+]  # pTtrig 40-60, pTassoc    4.0-5.0
+initial_parameter_defaults[(AnalysisType.CENTRAL, TriggerJetMomentumBin.PT_40_60, AssociatedHadronMomentumBin.PT_5_6)] = [
+    1,
+    0.02,
+    0.005,
+    0.02,
+    0.2,
+    0.03,
+]  # pTtrig 40-60, pTassoc 5.0-6.0
+initial_parameter_defaults[(AnalysisType.CENTRAL, TriggerJetMomentumBin.PT_40_60, AssociatedHadronMomentumBin.PT_6_10)] = [
+    1,
+    0.02,
+    0.005,
+    0.02,
+    0.2,
+    0.03,
+]  # pTtrig 40-60, pTassoc 6.0-10.0
 
 bounds = [[0.0,  -0.2, -0.2, -0.1, -0.005, -0.02], [1e8,  0.2, 0.3, 0.10, 0.80, 0.15]]
 

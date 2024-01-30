@@ -15,7 +15,7 @@ particle_types = ["Inclusive", "Pion", "Proton", "Kaon"]
 
 def build_appendix_entry(analysis_type, assoc_pt_folder):
     return f"""
-            \\subsection{{{analysis_type} {assoc_pt_labels[assoc_pt_folder]}}}
+            \\subsection*{{{analysis_type} {assoc_pt_labels[assoc_pt_folder]}}}
             \\begin{{figure}}[H]
                 \\title{{Region Inclusive}}
                 \\begin{{subfigure}}[b]{{0.5\\textwidth}}
@@ -138,7 +138,7 @@ def build_appendix_entry(analysis_type, assoc_pt_folder):
 
 def build_yields_and_ratios(analysis_type):
     return f'''
-                \\subsection{{{analysis_type} Yields and Ratios}}
+                \\subsection*{{{analysis_type} Yields and Ratios}}
                 \\begin{{figure}}[H]
                     \\title{{Region Inclusive}}
                     \\begin{{subfigure}}[b]{{0.5\\textwidth}}

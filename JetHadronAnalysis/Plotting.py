@@ -110,7 +110,8 @@ def plotArrays(x_data:dict, y_data:dict, error:dict, data_label:dict, format_sty
                 if isinstance(band, (float, int)):
                     band = np.full(y_data[key].shape, band)
                 assert band.shape == y_data[key].shape
-                plt.fill_between(x_data[key], y_data[key]-band, y_data[key]+band, alpha=0.3, label=None if error_bands_label is None else error_bands_label[key][i])
+                color = format_style[key][0]
+                plt.fill_between(x_data[key], y_data[key]-band, y_data[key]+band, alpha=0.3, color = color, label=None if error_bands_label is None else error_bands_label[key][i])
     plt.title(title)
     plt.xlabel(xtitle)
     plt.ylabel(ytitle)

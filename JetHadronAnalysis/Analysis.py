@@ -245,7 +245,7 @@ class Analysis:
         mixedEventCorrelationFunction.Scale(1 / normalization_factor)
         return mixedEventCorrelationFunction
     
-    def getRPInclusiveBackgroundCorrelationFunctionUsingRPF(self, inPlaneCorrelationFunction: TH1D, midPlaneCorrelationFunction: TH1D, outPlaneCorrelationFunction: TH1D, loadFunctionFromDB=False):
+    def getRPInclusiveBackgroundCorrelationFunctionUsingRPF(self, inPlaneCorrelationFunction: TH1D= None, midPlaneCorrelationFunction: TH1D= None, outPlaneCorrelationFunction: TH1D= None, loadFunctionFromDB=False):
         '''
         Returns the background correlation function using the RPF method
 
@@ -795,6 +795,23 @@ class Analysis:
         mixedEventAzimuthalCorrelationFunction.Scale(1 / deltaEtaBinCount)
         # return the maximum value
         return mixedEventAzimuthalCorrelationFunction.GetMaximum()
+
+    def getBackgroundFunction(self, backgroundCorrelationFunction: TH1D):
+        '''
+        Returns the background function. In proton-proton collisions this is a pedestal function estimated as the average value in the background region. And in PbPb collisions we use the getRPInclusiveBackgroundCorrelationFunctionUsingRPF method to get the background function
+        '''
+        if self.analysisType != AnalysisType.PP:
+            return self.getRPInclusiveBackgroundCorrelationFunctionUsingRPF(inPlaneCorrelationFunction=backgroundCorrelationFunction, loadFunctionFromDB=True)
+        else:
+            average_background_level = [backgroundCorrelationFunction.GetBinContent(i) for i in range(1, backgroundCorrelationFunction.GetNbinsX() + 1)]
+            average_background_level = np.mean(average_background_level)
+            average_background_level_error = [backgroundCorrelationFunction.GetBinError(i) for i in range(1, backgroundCorrelationFunction.GetNbinsX() + 1)]
+            average_background_level_error = np.mean(average_background_level_error)
+            backgroundFunction = TH1D("backgroundFunction", "backgroundFunction", backgroundCorrelationFunction.GetNbinsX(), -np.pi/2, np.pi/2)
+            for deltaPhiBin in range(1, backgroundFunction.GetNbinsX() + 1):
+                backgroundFunction.SetBinContent(deltaPhiBin, average_background_level)
+                backgroundFunction.SetBinError(deltaPhiBin, average_background_level_error)
+            return backgroundFunction
 
     def getBackgroundCorrelationFunction(self, per_trigger_normalized=False):
         '''

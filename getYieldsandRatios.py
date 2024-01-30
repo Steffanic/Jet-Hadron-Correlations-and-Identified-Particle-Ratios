@@ -14,6 +14,12 @@ def getYieldAndError(analysis, particle_type, azimuthal_correlation_function, lo
     # now get the per species azimuthal correlation functions for each region by scaling
     particle_pid_fit_shape_sys_err = None
     particle_pid_fit_yield_sys_err = None
+    
+    if analysis.currentRegion == Region.BACKGROUND:
+        background_azimuthal_correlation_function = azimuthal_correlation_function
+        background_function = analysis.getBackgroundFunction(background_azimuthal_correlation_function)
+        azimuthal_correlation_function = background_function
+
     if particle_type == pt.INCLUSIVE:
         particle_azimuthal_correlation_function = azimuthal_correlation_function
     else:
@@ -255,6 +261,7 @@ if __name__=="__main__":
             plt.ylabel("Ratio")
             plt.xticks(assoc_pt_bin_centers)
             plt.ylim(0, 1.2)
+            plt.xlim(0, 10)
             plt.hlines(1.0, 0, 10, color="black")
             plt.legend()
             plt.savefig(f"Plots/PP/{region}_proton_to_pion_ratio.png")
@@ -275,6 +282,7 @@ if __name__=="__main__":
             plt.ylabel("Ratio")
             plt.xticks(assoc_pt_bin_centers)
             plt.ylim(0, 1.2)
+            plt.xlim(0, 10)
             plt.hlines(1.0, 0, 10, color="black")
             plt.legend()
             plt.savefig(f"Plots/PP/{region}_kaon_to_pion_ratio.png")
@@ -312,7 +320,7 @@ if __name__=="__main__":
     # SemiCentral
     # +++++++++++++++++++++++
             
-    ana_semicentral = Analysis(at.SEMICENTRAL, ["/mnt/d/18q/new_root/296510.root","/mnt/d/18q/new_root/296550.root","/mnt/d/18q/new_root/296551.root","/mnt/d/18q/new_root/295673.root","/mnt/d/18q/new_root/295754.root","/mnt/d/18q/new_root/296065.root","/mnt/d/18q/new_root/296068.root","/mnt/d/18q/new_root/296133.root","/mnt/d/18q/new_root/296191.root","/mnt/d/18q/new_root/296377.root","/mnt/d/18q/new_root/296379.root","/mnt/d/18q/new_root/296423.root","/mnt/d/18q/new_root/296433.root","/mnt/d/18q/new_root/296472.root",])
+    ana_semicentral = Analysis(at.SEMICENTRAL, ["/mnt/d/18q/new_root/296510.root",])#"/mnt/d/18q/new_root/296550.root","/mnt/d/18q/new_root/296551.root","/mnt/d/18q/new_root/295673.root","/mnt/d/18q/new_root/295754.root","/mnt/d/18q/new_root/296065.root","/mnt/d/18q/new_root/296068.root","/mnt/d/18q/new_root/296133.root","/mnt/d/18q/new_root/296191.root","/mnt/d/18q/new_root/296377.root","/mnt/d/18q/new_root/296379.root","/mnt/d/18q/new_root/296423.root","/mnt/d/18q/new_root/296433.root","/mnt/d/18q/new_root/296472.root", "/mnt/d/18r/new_root/296690.root", "/mnt/d/18r/new_root/296794.root", "/mnt/d/18r/new_root/296894.root", "/mnt/d/18r/new_root/296941.root", "/mnt/d/18r/new_root/297031.root", "/mnt/d/18r/new_root/297085.root", "/mnt/d/18r/new_root/297118.root", "/mnt/d/18r/new_root/297129.root", "/mnt/d/18r/new_root/297372.root", "/mnt/d/18r/new_root/297415.root", "/mnt/d/18r/new_root/297441.root", "/mnt/d/18r/new_root/297446.root", "/mnt/d/18r/new_root/297479.root", "/mnt/d/18r/new_root/297544.root", ])
     load_from_file = False
     semicentral_yields = {}
     semicentral_yield_errors = {}
@@ -526,6 +534,7 @@ if __name__=="__main__":
             plt.ylabel("Ratio")
             plt.xticks(assoc_pt_bin_centers)
             plt.ylim(0, 1.2)
+            plt.xlim(0, 10)
             plt.hlines(1.0, 0, 10, color="black")
             plt.legend()
             plt.savefig(f"Plots/SEMICENTRAL/{region}_proton_to_pion_ratio.png")
@@ -546,6 +555,7 @@ if __name__=="__main__":
             plt.ylabel("Ratio")
             plt.xticks(assoc_pt_bin_centers)
             plt.ylim(0, 1.2)
+            plt.xlim(0, 10)
             plt.hlines(1.0, 0, 10, color="black")
             plt.legend()
             plt.savefig(f"Plots/SEMICENTRAL/{region}_kaon_to_pion_ratio.png")
@@ -583,13 +593,13 @@ if __name__=="__main__":
 #         writer.writerow(header)
 #         writer.writerows(zip(*away_side_data))
 
-    
+    del(ana_semicentral)
     # +++++++++++++++++++++++
     # Central
     # +++++++++++++++++++++++
             
 
-    ana_central = Analysis(at.CENTRAL, ["/mnt/d/18q/new_root/296510.root","/mnt/d/18q/new_root/296550.root","/mnt/d/18q/new_root/296551.root","/mnt/d/18q/new_root/295673.root","/mnt/d/18q/new_root/295754.root","/mnt/d/18q/new_root/296065.root","/mnt/d/18q/new_root/296068.root","/mnt/d/18q/new_root/296133.root","/mnt/d/18q/new_root/296191.root","/mnt/d/18q/new_root/296377.root","/mnt/d/18q/new_root/296379.root","/mnt/d/18q/new_root/296423.root","/mnt/d/18q/new_root/296433.root","/mnt/d/18q/new_root/296472.root",])
+    ana_central = Analysis(at.CENTRAL, ["/mnt/d/18q/new_root/296510.root",])#"/mnt/d/18q/new_root/296550.root","/mnt/d/18q/new_root/296551.root","/mnt/d/18q/new_root/295673.root","/mnt/d/18q/new_root/295754.root","/mnt/d/18q/new_root/296065.root","/mnt/d/18q/new_root/296068.root","/mnt/d/18q/new_root/296133.root","/mnt/d/18q/new_root/296191.root","/mnt/d/18q/new_root/296377.root","/mnt/d/18q/new_root/296379.root","/mnt/d/18q/new_root/296423.root","/mnt/d/18q/new_root/296433.root","/mnt/d/18q/new_root/296472.root", "/mnt/d/18r/new_root/296690.root", "/mnt/d/18r/new_root/296794.root", "/mnt/d/18r/new_root/296894.root", "/mnt/d/18r/new_root/296941.root", "/mnt/d/18r/new_root/297031.root", "/mnt/d/18r/new_root/297085.root", "/mnt/d/18r/new_root/297118.root", "/mnt/d/18r/new_root/297129.root", "/mnt/d/18r/new_root/297372.root", "/mnt/d/18r/new_root/297415.root", "/mnt/d/18r/new_root/297441.root", "/mnt/d/18r/new_root/297446.root", "/mnt/d/18r/new_root/297479.root", "/mnt/d/18r/new_root/297544.root",     ])
     load_from_file = False
     central_yields = {}
     central_yield_errors = {}
@@ -804,6 +814,7 @@ if __name__=="__main__":
             plt.ylabel("Ratio")
             plt.xticks(assoc_pt_bin_centers)
             plt.ylim(0, 1.2)
+            plt.xlim(0, 10)
             plt.hlines(1.0, 0, 10, color="black")
             plt.legend()
             plt.savefig(f"Plots/CENTRAL/{region}_proton_to_pion_ratio.png")
@@ -824,6 +835,7 @@ if __name__=="__main__":
             plt.ylabel("Ratio")
             plt.xticks(assoc_pt_bin_centers)
             plt.ylim(0, 1.2)
+            plt.xlim(0, 10)
             plt.hlines(1.0, 0, 10, color="black")
             plt.legend()
             plt.savefig(f"Plots/CENTRAL/{region}_kaon_to_pion_ratio.png")

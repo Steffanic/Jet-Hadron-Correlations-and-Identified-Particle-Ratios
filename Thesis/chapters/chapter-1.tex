@@ -1,197 +1,103 @@
 \chapter{Introduction} \label{ch:introduction}
 
-This is a very short guide to an unofficial thesis/dissertation template for the University of Tennessee. It has been updated to meet the specifications as of 2023 but can be easily altered as the guidelines are changed. This template requires a basic knowledge of \LaTeX\ and should cover the basic requirements in terms of required packages and functionality.
+At extreme temperatures and pressures, like those found in the very early universe and in particle colliders, quarks and gluons are no longer confined as hadrons. Instead, they form a new state of matter called the quark-gluon plasma (QGP). The QGP is a hot, dense, and strongly interacting fluid in which free quarks and gluons are the relevant degrees of freedom. This form of matter is very short-lived, only around 10fm/c, or $10^-23$ seconds. It is impossible to measure the QGP with external probes due to this short lifetime, so we must use an internal probe. In all particle collisions, it is possible for a hard scattering to occur, where two partons from the colliding particles interact at a high momentum transfer, $Q^2$. The resulting particle shower is called a jet. This is one of the earliest processes to occur in the collision, and the resulting partons interact with the QGP as they traverse it and form a jet. Partons interacting with the QGP will lose energy to the medium resulting in a softer jet than if it had been produced in a vacuum. By comparing the properties of jets measured in proton-proton collisions to those measured in heavy ion collisions we can understand not only the properties of the QGP, but also the processes that occur during the evolution of the collision. In this thesis, we study the modifications to hadronization in jets produced in heavy ion collisions.
 
-\section{Disclaimer}
-\textcolor{red}{\bf
-This template is distributed AS IS WITH NO WARRANTY. It serves as a guideline and constitutes a basic structure for a thesis/dissertation. The user assumes full responsibility for formatting and typesetting their document and for verifying that all the thesis requirements set by the University of Tennessee are met. Please refer to the most recent UT thesis guide 
-or contact the thesis consultant to whom you should also report bugs.}
+\section{QGP}
 
-\section{Getting started}
-The general structure of this template is based on the tree shown in Figure \ref{fig:intro-folder-structure}. The titles of the folders are self descriptive and should guide you to proper file placement. Note that this is only a suggested model that could be modified to fit your own organizational structure.
-You will find the mentioned figure on the next page. This is in accordance with Graduate School policy which states that so-called floats should not appear alongside with text. 
+Quantum-Chromodynamics (QCD) is the mathematical theory governing the strong interaction, whose fermions are the six quarks and the eight gluons. Each quark has a color charge, either red, green, or blue, and gluons mediate interactions between pairs of color charges. Quarks are almost always bound as hadrons, comprised of either two or three quarks called mesons and baryons respectively. This is due to one of the properties of QCD called confinement, referring to the inability to isolate a color charge. Confinement arises from the fact that the strong force remains constant as the separation between quarks increases and the energy required to separate them is enough to produce a new quark pair. On the other hand, as the separation between quarks decreases the strong force decreases. This phenomenon is referred to as asymptotic freedom and allows for the use of perturbative techniques to calculate the properties of QCD at short distance scales. 
 
-\begin{figure}[p]
-  \centering
-  \includegraphics[width=6.5in]{fig01-folder-structure}\\
-  \caption{UT thesis template folder structure.}\label{fig:intro-folder-structure}
-\end{figure}
-
-\subsection{Important Files}
-There are two important files in this template: utthesis.cls and my-dissertation.tex.
-\begin{itemize}
-
-\item
-utthesis.cls: Based on the report class, this file contains customized settings, definitions, packages, and macros. The file is located in the root directory. One or more of the packages included may conflict with a package that you want to add. If so, you must resolve the conflict either by removing the unused package or by modifying settings for either package. Preloaded packages include amsmath, amsthm, amssymb, setspace, geometry, hyperref, and color.
-
-\item
-my-dissertation.tex: This is the main file for your thesis/dissertation that brings everything together. Each individual section of your dissertation should be its own .tex file saved in the proper place. For example, a chapter for your dissertation should be saved in the chapters directory while your acknowledgments should be saved in the front-matter directory. You compile my-dissertation.tex to create a complete pdf that can be printed/shared. You may want to change the name of the file to my-name-dissertation.tex. The utthesis document class takes all the options for the report class in addition to thesis/dissertation and monochrome options. If you are writing a thesis, you must use "thesis" otherwise, use "dissertation" or omit that option because dissertation is the default setting. The monochrome option converts all your document to monochrome - except figures. This may be useful when printing your document since this dissertation has colored hyperlinks which tend to look washed out when printed on a monochrome printer. 
-\end{itemize}
-
-
-\subsection{Updating Information}
-Your next step is to update information in my-dissertion.tex such as the document title, your name, degree, etc. 
-This can be done as follows.
-
-\begin{verbatim}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% TO DO: FILL IN YOUR INFORMATION BELOW - READ THIS SECTION CAREFULLY
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{Thesis or Dissertation Title}	 % title 
-\author{My Name}                         % your name
-\copyrightYear{20XX}            		 % copyright year 
-\graduationMonth{Month}           	     % month of graduation 
-\degree{Degree}   % degree: Doctor of Philosophy, Master of ...
-\university{The University  of Tennessee, Knoxville}	% school 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\end{verbatim}
-
-\clearpage
-
-\section{References}
-The bibliography style used in this template is "apalike". It is an author-year style based on the APA specification. 
-Here is example \citep{Fermi1956,Iznogood2000}. Many other bibliograhy style exist. See documentation elsewhere.
-\begin{verbatim}
-\bibliographystyle{apalike}
-\bibliography{references-dissertation}
-\end{verbatim} 
-The second line specifies the .bib file that lists your references. Remember to run BibTeX in order to compile the bibliography. 
-
-\section{Theorem environments}
-This template contains predefined theorem, lemma, proposition, corollary, and definition environments. Numbering and other
-style matters can be changed in the ``utthesis.clc'' file.
-
-\begin{definition}
-	This is an example of a definition.
-\end{definition}
-\begin{proposition}
-	This is an example of a proposition.
-\end{proposition}
-\begin{theorem}[First theorem]\label{thm:theorem-a}
-    This is an example theorem.
-\end{theorem}
-\begin{proof}[Proof for theorem]
-    This is the proof for this theorem.
-\end{proof}
-\begin{lemma}[First lemma]
-    This is the first lemma.
-\end{lemma}
-\begin{proof}
-	This is the proof for this lemma that requires Theorem \ref{thm:theorem-a}.
-\end{proof}
-\begin{corollary}
-    This is the first corollary.
-\end{corollary}
-
-\section{Figures and Tables}
-
-\subsection{General Rules}
-To comply with Graduate School formatting rules, 
-figure captions should be placed below the figure and table captions should be placed above the table. Also, figures and tables should appear on pages of their own with no text (except for the caption of course). You must allow figures and table to float. DO NOT HARD CODE POSITIONS. In addition, no figure or table should spill into the margins. Should that happen, either resize it so that it or put it on its own landscape oriented page. See Figure \ref{fig:wide-pic} for an example of the latter. Note the page number location in the example. The code for this is given by:
-
-\begin{verbatim}
-\begin{landscape}
-\begin{figure}[h]
+\begin{figure}
     \centering
-    \fbox{\rule{8in}{0pt}\rule{0pt}{5in}}
-    \caption{This figure is too wide for a portrait page.}
-    \label{fig:wide-pic}
+    \includegraphics[width=0.5\textwidth]{figures/png/strong_force.png}
+    \caption{The strong force as a function of distance.}\label{fig:strong_force}
 \end{figure}
-\end{landscape}
-\end{verbatim}
 
-Be careful about where you place this landscape page, as well as all figures and tables. These objects are not considered part of the text, and thus their placement should not be assigned to a precise location. The general rule to follow is that no text page should have significant white space, with the exception being the last page of a chapter. So if you mention a figure in some paragraph but the figure will not fit on the remainder of the page, continue the text (even if it's a new section) to fill the current page with text and then place the figure on the next page. 
+At high temperatures and densities, a phase transition is predicted from confined, hadronic QCD matter to a deconfined QCD matter called the quark-gluon plasma. There is an abundance of evidence for this phase transition and the existence of a QGP from numerical lattice QCD calculations and myriad experimental measurements. The QGP forms around a termperature of 156 MeV~\cite{QCDTemp} and an energy density of around 1GeV/$fm^3$. Remarkably, the QGP behaves like a perfect liquid, which is a fluid with zero viscosity. Because of this, the QGP exhibits collective behavior, like flow, which is the hydrodynamic evolution of pressure gradients arising from spatial anisotropies in the initial state. Additionally, the QGP is opaque to jets, which lose energy as they traverse the medium. This phenomenon is called jet quenching and is one of the most important probes of the QGP. 
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/png/phase_diagram.jpg}
+    \caption{The QCD phase diagram.}\label{fig:phase_diagram}
+\end{figure}
 
-\begin{landscape}
-	\begin{figure}[p]
-		\centering
-	    \fbox{\rule{8in}{0pt}\rule{0pt}{5in}}
-		\caption{This figure is too wide for a portrait page.}
-		\label{fig:wide-pic}
-	\end{figure}
-\end{landscape}
+\section{Heavy Ion Collisions}
 
-\subsection{Single figures}
+Heavy ion collisions produce conditions similar to the very early universe, forming the QGP along with many other processes. A collision undergoes several stages starting from the moments before the collision, to the final state of the collision that is measured by our detectors. These stages are useful for organizing computations and simulations of the collision, as well as characterizing the modifications that the presence of a QGP has on each stage. In this analysis we focus on Pb-Pb collisions, but other species have been collided at the Large Hadron Collider (LHC) and the Relativistic Heavy Ion Collider (RHIC).
 
-Single figures can created as shown below.
-For more information, see \\ \href{http://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions}{http://en.wikibooks.org/wiki/LaTeX/Floats,\_Figures\_and\_Captions}.
+\subsection*{Initial State}
 
-\begin{verbatim}
-    \begin{figure}[t for top, b for bottom, h for here, 
-                   p for page with float(s) but no text]
-        % Requires \usepackage{graphicx}
-        \centering % center the figure
-        \includegraphics[width=5in or 127mm etc...]{figure-name}\\
-        \caption{figure caption}\label{figure label}
-    \end{figure}
-\end{verbatim}
+The initial state of a Pb-Pb collision is characterized by the transverse spatial distribution, and the longitudinal momentum distribution of each parton in the colliding nuclei, described by the Glauber model and nuclear parton distribution function (PDF) respectively. The Glauber model approximates the nuclei as a collection of nucleons, which are transversely distributed in the nucleus according to a Woods-Saxon distribution and follow a straight trajectory. 
 
-\subsection{Multipart figures}
+\subsection*{QGP}
 
-For multipart figures, use the package "subfig". You can
-add space between the figures using spacing commands such as ``\verb|\qquad|''. For example, 
+\subsection*{Hydrodynamic Evolution}
 
-\begin{verbatim}
-\begin{figure}[p]
-   \centering
-   \subfloat[Circle]{\label{fig:fig-a-space}\includegraphics[width=1in]
-     {fig02a-circle}} \qquad
-   \subfloat[Rectangle]{\label{fig:fig-b-space}\includegraphics[width=1in]
-     {fig02b-rectangle}}\qquad
-   \subfloat[Cube]{\label{fig:fig-c-space}\includegraphics[width=1in]
-     {fig02c-cube}}\qquad
-   \caption{Geometric shapes with space between images.}
-   \label{fig:multipart-figure-space}
-\end{figure} 
-\end{verbatim}
+\subsection*{Hadronization}
 
-\begin{figure}[p]
-  \centering
-  \includegraphics[width=1in]{fig02a-circle}\\
-  \caption{Simple figure example.}\label{fig:simple_example}
+\subsection*{Chemical Freeze-Out}
 
-  \vskip 20pt
+\subsection*{Thermal Freeze-Out}
 
-  \subfloat[Circle]{\label{fig:fig-a-space}\includegraphics[width=1in]{fig02a-circle}} \qquad
-  \subfloat[Rectangle]{\label{fig:fig-b-space}\includegraphics[width=1in]{fig02b-rectangle}}\qquad
-  \subfloat[Cube]{\label{fig:fig-c-space}\includegraphics[width=1in]{fig02c-cube}}\qquad
-  \caption{Example showing multiple subfigures.}
-  \label{fig:multipart-figure-space}
-\end{figure} 
+\section{Jets}
 
-\subsection{Tables}
+Introductory paragraph about jets and why they are used as tools of internal tomography in the QGP
+%TODO: Expand with a bit more theory
 
-Again, table captions should be placed above the table. See Table \ref{tab:table-a} for an example. 
-For more information about tables, 
-see \href{https://en.wikibooks.org/wiki/LaTeX/Tables}{https://en.wikibooks.org/wiki/LaTeX/Tables}.
+\subsection*{Jet Reconstruction}
 
-Be aware that LaTeX may decide to group multiple floats together on the no-text page. 
-If you don't like the resulting layout, try different placement options or move
-one or more floats before or after a large body of text to break the flow. 
-An alternative to the \verb+[p]+ option is 
-\verb+\clearpage+ which flushes any remaining floats before continuing on a new page. 
-The command \verb+\newpage+ breaks to a new page without flushing floats. 
+Jet-finding algorithms are designed to group objects together into jets based on their kinematic properties in both theoretical simulations and measured data. Simulations provide access to complete information about the underlying physics and is not subject to experimental limitations. Therefore, to facilitate comparison with theoretical calculations, jet-finding algorithms are designed to be infrared and collinear safe, ensuring that their properties remain calculable in perturbative QCD. There are a number of different algorithms for reconstructing jets, including the anti-kT algorithm [7], the kT algorithm [10], and the Cambridge-Aachen algorithm [8], which all fall into the class of sequential recombination algorithms introduced for hadron colisions in [11]. The anti-kT algorithm is used in this analysis. The anti-kT algorithm is infrared and collinear safe.
 
-\begin{table}[p]
-\caption{A simple table with info on Smokey}
-\label{tab:table-a}
-\begin{center}
-\begin{tabular}[b]{|c|c|c|c|}
-	\hline
-	Dog & Years & Record & Pct. \\ \hline
-	Blue Smokey & 1953-1954 & 10-10-1 & .500 \\ \hline
-	Smokey II & 1955-1963 & 58-39-5 & .597 \\ \hline
-	Smokey III & 1964-1977 & 105-39-5 & .729 \\ \hline
-	Smokey IV & 1978-1979 & 12-10-1 & .545 \\ \hline
-	Smokey V & 1980-1983 & 28-18-1 & .608 \\ \hline
-	Smokey VI & 1984-1991 & 67-23-6 & .744 \\ \hline
-	Smokey VII & 1992-1994 & 27-9 & .750 \\ \hline
-	Smokey VIII & 1995-2003 & 91-22 & .805 \\ \hline
-	Smokey IX & 2004-2012 & 62-53 & .539 \\ \hline
-	Smokey X & 2013-present & 21-17 & .552 \\ \hline
-\end{tabular}
-\end{center}
-\end{table}
+\subsubsection*{Anti-$k_T$ Algorithm}
+The anti-$k_T$ algorithm begins by defining a list of entities, either particles, tracks, detector hits, or groups of these referred to as pseudojets that are used to construct the jets. The algorithm proceeds by sequentially and recursively grouping entities until every entity is assigned to a psuedojet and then marked as a jet.  The anti-$k_T$ algorithm defines a distance measure between two entities, $d_{ij}$, and between an entity and the beam, $d_{iB}$. The distance measure is defined as
 
+\begin{equation}
+d_{ij} = \min(p_{Ti}^{-2} p_{Tj}^{-2})\frac{\Delta_{ij}^2}{R^2}
+\end{equation}
 
+where $p_{Ti}$ and $p_{Tj}$ are the transverse momenta of entities i and j, respectively, $\Delta_{ij}^2$=$(\eta_i - \eta_j )^2$ + $(\phi_i - \phi_j )^2$, and R is the radius parameter, whose particular value is chosen as part of the definition of the analysis. The distance measure between an entity and the beam is defined as
+
+\begin{equation}
+d_{iB} = p_{Ti}^{-2}
+\end{equation}
+
+The anti-kT algorithm then finds the minimum of ${d_{ij}, d_{iB}}$ for each entity i. If the minimum is $d_{ij}$, then entities i, and j are combined into a pseudojet with a four-momentum given by the sum of the four-momenta of entities i and j. If the minimum is $d_{iB}$, then entity i is labeled as a jet and removed from the list of entities. The anti-kT algorithm then repeats the process until there are no entities left in the list of entities.
+
+The anti-$k_T$ algorithm tends to cluster higher momentum particles first which reduces the effects of the underlying event and pile-up. However, the anti-$k_T$ algorithm also clusters all the particles in an event, including those which arise from the underlying event and pile-up. This means that the resulting population of jets is contaminated by the presence of combinatorial jets which are not associated with any hard scattering process of interest. There are various techniques for supressing combinatorial jets, and the correct choice depends heavily on the type of analysis being performed. In our analysis, the presence of combinatorial jets confuses the interpretation of the results, so we apply liberal cuts to reduce their presence in our sample. This is described further in Chapter~\ref{ch:methods}. 
+
+The other secquential recombination algorithms, $k_T$ and Cambridge-Aachen, have other strengths and weaknesses. The simple difference between these algorithms is the definition of the distance measure. The $k_T$ algorithm defines the distance measure as
+
+\begin{equation}
+d_{ij} = \min(p_{Ti}^{2} p_{Tj}^{2})\frac{\Delta_{ij}^2}{R^2}
+\end{equation}
+
+and the Cambridge-Aachen algorithm defines the distance measure as
+
+\begin{equation}
+d_{ij} = \frac{\Delta_{ij}^2}{R^2}.
+\end{equation}
+
+The $k_T$ algorithm tends to cluster softer particles first, which typically arise from the underlying event. The Cambridge-Aachen algorithm clusters particles based on their angular separation, which is useful in measurements of the substructure of jets. The $k_T$ algorithm is used in this analysis to estimate the background density. Described further in Chapter~\ref{ch:methods}.
+
+\subsubsection*{Jet Area}
+Jet areas provide a measure of the extent of a jet in the $\eta$-$\phi$ plane. The jet area is estimated by filling an event with many very soft particles, called ghosts, and clustering them into jets. The jet area is then proportional to the number of ghosts that are clustered into that jet. A jet's area is closely related to its senstitivity to soft background contamination and is used to estimate the background contamination in that jet. 
+
+\subsubsection*{Charged and Full Jets} 
+Jets are composed of charged and neutral hadrons. In experiment, we have much more precise information about the charged hadrons in jets due to the types of detectors we use. Experimentally, therefore, we make the distinction between charged and full jets, the former composed only of charged hadrons and the latter composed of charged and neutral hadrons. Charged hadrons are measured using the detectors in the central barrel of ALICE, which have full geometric coverage and excellent momentum resolution.  The neutral hadrons can only be measured in the calorimeter which has limited geometric coverage ,and a lower momentum resolution at low momentum which improves towards higher momentum. Measurements of charged and full jets are complementary, but differ in their relation to theoretical calculations. Charged jets are missing their neutral component and so their properties are not directly calculable in perturbative QCD, but their measurements are more precise than full jets and can still be used to constrain theoretical calculations. The properties of full jets are directly calculable in perturbative QCD, but their measurements are less precise. 
+
+\subsection*{Factorization Theorem}
+
+\subsection*{Medium Modification}
+
+\subsection*{Jet Quenching}
+
+\subsection*{Hadronization Modification}
+
+\section{Previous Results}
+
+\begin{enumerate}
+    \item Hadron $R_{AA}$
+    \item Jet $R_{AA}$
+    \item $v_2$-inclusive and jet
+    \item Jet Modification
+    \item PID Jet Results
+\end{enumerate}

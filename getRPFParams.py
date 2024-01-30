@@ -17,20 +17,40 @@ from JetHadronAnalysis.Fitting.RPF import resolution_parameters
 
 def get_azimuthal_correlation_function(analysis):
     correlation_function = analysis.getDifferentialCorrelationFunction(True)
-    mixed_event_correlation_function = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(nm.SLIDING_WINDOW, windowSize=pi/2, TOF=True)
+    mixed_event_correlation_function = analysis.getNormalizedDifferentialMixedEventCorrelationFunction(nm.SLIDING_WINDOW, windowSize=pi/2)
     acceptance_corrected_correlation_function = analysis.getAcceptanceCorrectedDifferentialCorrelationFunction(correlation_function, mixed_event_correlation_function)
     azimuthal_correlation_function = analysis.getAcceptanceCorrectedDifferentialAzimuthalCorrelationFunction(acceptance_corrected_correlation_function)
     return azimuthal_correlation_function
 
-def plot_in_mid_out_and_inclusive_with_fit(x, y, yerr, optimal_params, covariance, reduced_chi2, fit_function, analysis):
+def plot_in_mid_out_and_inclusive_with_fit(x, y, yerr, optimal_params, covariance, reduced_chi2, fit_function, fit_error_function, analysis):
     plt.figure(figsize=(20, 5))
     for i, rpa_bin in enumerate(rpa):
         plt.subplot(1, 4, i+1)
-        plt.errorbar(x, y[i], yerr[i], label=f"{rpa_bin.name}", fmt=".")
+        plt.errorbar(x, y[i], yerr[i], label=f"{rpa_bin.name}", fmt="k.")
         if i<3:
-            plt.plot(x, fit_function(None, *resolution_parameters[analysis.analysisType].values(), x, *optimal_params)[i*len(x):(i+1)*len(x)], "b--", label=f"fit {rpa_bin.name}")
+            # generate bootstrap estimate of error on fit
+            bootstrap_samples = []
+            for _ in range(50):
+                bootstrap_samples.append(np.random.multivariate_normal(optimal_params, covariance))
+            bootstrap_samples = np.array(bootstrap_samples)
+            bootstrap_fit = np.array([fit_function(None, *resolution_parameters[analysis.analysisType].values(), x, *bootstrap_sample) for bootstrap_sample in bootstrap_samples])
+            central_fit = fit_function(None, *resolution_parameters[analysis.analysisType].values(), x, *optimal_params)
+            fit_error = np.mean((bootstrap_fit-central_fit)**2, axis=0)
+            plt.errorbar(x, fit_function(None, *resolution_parameters[analysis.analysisType].values(), x, *optimal_params)[i*len(x):(i+1)*len(x)], fit_error_function(None, *resolution_parameters[analysis.analysisType].values(), x, *optimal_params, covariance)[i*len(x):(i+1)*len(x)], fmt="b--", label=f"fit {rpa_bin.name}")
+            plt.fill_between(x, fit_function(None, *resolution_parameters[analysis.analysisType].values(), x, *optimal_params)[i*len(x):(i+1)*len(x)]-fit_error[i*len(x):(i+1)*len(x)], fit_function(None, *resolution_parameters[analysis.analysisType].values(), x, *optimal_params)[i*len(x):(i+1)*len(x)]+fit_error[i*len(x):(i+1)*len(x)], alpha=0.5)
+            
         else:
-            plt.plot(x, np.sum([fit_function(None, *resolution_parameters[analysis.analysisType].values(), x, *optimal_params)[rp_bin*len(x):(rp_bin+1)*len(x)] for rp_bin in range(3)], axis=0), label=f"fit {rpa_bin.name}")
+            # plot the inclusive fit
+            # generate bootstrap estimate of error on fit
+            bootstrap_samples = []
+            for _ in range(50):
+                bootstrap_samples.append(np.random.multivariate_normal(optimal_params, covariance))
+            bootstrap_samples = np.array(bootstrap_samples)
+            bootstrap_fit = np.array([fit_function(None, *resolution_parameters[analysis.analysisType].values(), x, *bootstrap_sample) for bootstrap_sample in bootstrap_samples])
+            central_fit = fit_function(None, *resolution_parameters[analysis.analysisType].values(), x, *optimal_params)
+            fit_error = np.mean((bootstrap_fit-central_fit)**2, axis=0)
+            plt.errorbar(x, np.sum([fit_function(None, *resolution_parameters[analysis.analysisType].values(), x, *optimal_params)[rp_bin*len(x):(rp_bin+1)*len(x)] for rp_bin in range(3)], axis=0), np.sum([fit_error_function(None, *resolution_parameters[analysis.analysisType].values(), x, *optimal_params, covariance)[rp_bin*len(x):(rp_bin+1)*len(x)] for rp_bin in range(3)], axis=0), fmt="b--", label=f"fit {rpa_bin.name}")
+            plt.fill_between(x, np.sum([fit_function(None, *resolution_parameters[analysis.analysisType].values(), x, *optimal_params)[rp_bin*len(x):(rp_bin+1)*len(x)] - fit_error[rp_bin*len(x):(rp_bin+1)*len(x)] for rp_bin in range(3)], axis=0), np.sum([fit_function(None, *resolution_parameters[analysis.analysisType].values(), x, *optimal_params)[rp_bin*len(x):(rp_bin+1)*len(x)] + fit_error[rp_bin*len(x):(rp_bin+1)*len(x)] for rp_bin in range(3)], axis=0), alpha=0.5)
         plt.title(f"{rpa_bin.name}")
         plt.legend()
     plt.suptitle(f"{analysis.analysisType} {analysis.currentTriggerJetMomentumBin} {analysis.currentAssociatedHadronMomentumBin} {analysis.current_species} reduced chi2: {reduced_chi2}")
@@ -69,15 +89,22 @@ def fit_and_plot(analysis, species):
             y.append(np.array([inclusive_azimuthal_correlation_function.GetBinContent(i) for i in range(1, inclusive_azimuthal_correlation_function.GetNbinsX()+1)]))
             yerr.append(np.array([inclusive_azimuthal_correlation_function.GetBinError(i) for i in range(1, inclusive_azimuthal_correlation_function.GetNbinsX()+1)]))
 
-            plot_in_mid_out_and_inclusive_with_fit(x, y, yerr, optimal_params, covariance, reduced_chi2, rpf_fitter.fittingFunction, analysis)
+            plot_in_mid_out_and_inclusive_with_fit(x, y, yerr, optimal_params, covariance, reduced_chi2, rpf_fitter.fittingFunction, rpf_fitter.fittingErrorFunction, analysis)
 
 
 if __name__=="__main__":
-    ana_SEMICENTRAL = Analysis(at.SEMICENTRAL, ["/mnt/d/18q/296510.root", "/mnt/d/18q/296191.root", "/mnt/d/18q/296379.root", "/mnt/d/18q/296551.root", "/mnt/d/18q/296550.root", "/mnt/d/18q/296472.root", "/mnt/d/18q/296433.root", "/mnt/d/18q/296423.root", "/mnt/d/18q/296377.root", "/mnt/d/18q/296133.root", "/mnt/d/18q/296068.root", "/mnt/d/18q/296065.root", "/mnt/d/18q/295754.root", "/mnt/d/18q/295673.root", "/mnt/d/18r/297129.root", "/mnt/d/18r/297372.root", "/mnt/d/18r/297415.root", "/mnt/d/18r/297441.root", "/mnt/d/18r/297446.root", "/mnt/d/18r/297479.root", "/mnt/d/18r/297544.root", "/mnt/d/18r/296690.root", "/mnt/d/18r/296794.root", "/mnt/d/18r/296894.root", "/mnt/d/18r/296941.root", "/mnt/d/18r/297031.root", "/mnt/d/18r/297085.root", "/mnt/d/18r/297118.root"])
-    analysis = ana_SEMICENTRAL
-    region = Region.BACKGROUND
-    for species in [pt.PROTON, pt.INCLUSIVE]:
+    # ana_SEMICENTRAL = Analysis(at.SEMICENTRAL, ["/mnt/d/18q/new_root/296510.root","/mnt/d/18q/new_root/296550.root","/mnt/d/18q/new_root/296551.root","/mnt/d/18q/new_root/295673.root","/mnt/d/18q/new_root/295754.root","/mnt/d/18q/new_root/296065.root","/mnt/d/18q/new_root/296068.root","/mnt/d/18q/new_root/296133.root","/mnt/d/18q/new_root/296191.root","/mnt/d/18q/new_root/296377.root","/mnt/d/18q/new_root/296379.root","/mnt/d/18q/new_root/296423.root","/mnt/d/18q/new_root/296433.root","/mnt/d/18q/new_root/296472.root", "/mnt/d/18r/new_root/296690.root", "/mnt/d/18r/new_root/296794.root", "/mnt/d/18r/new_root/296894.root", "/mnt/d/18r/new_root/296941.root", "/mnt/d/18r/new_root/297031.root", "/mnt/d/18r/new_root/297085.root", "/mnt/d/18r/new_root/297118.root", "/mnt/d/18r/new_root/297129.root", "/mnt/d/18r/new_root/297372.root", "/mnt/d/18r/new_root/297415.root", "/mnt/d/18r/new_root/297441.root", "/mnt/d/18r/new_root/297446.root", "/mnt/d/18r/new_root/297479.root", "/mnt/d/18r/new_root/297544.root",])
+    # analysis = ana_SEMICENTRAL
+    # for species in [pt.INCLUSIVE]:
+    #     print(f"Plotting and fitting for {species.name} in {analysis.analysisType.name}")
+    #     fit_and_plot(analysis, species)
+    # del(analysis)
+    ana_CENTRAL = Analysis(at.CENTRAL, ["/mnt/d/18q/new_root/296510.root","/mnt/d/18q/new_root/296550.root","/mnt/d/18q/new_root/296551.root","/mnt/d/18q/new_root/295673.root","/mnt/d/18q/new_root/295754.root","/mnt/d/18q/new_root/296065.root","/mnt/d/18q/new_root/296068.root","/mnt/d/18q/new_root/296133.root","/mnt/d/18q/new_root/296191.root","/mnt/d/18q/new_root/296377.root","/mnt/d/18q/new_root/296379.root","/mnt/d/18q/new_root/296423.root","/mnt/d/18q/new_root/296433.root","/mnt/d/18q/new_root/296472.root", "/mnt/d/18r/new_root/296690.root", "/mnt/d/18r/new_root/296794.root", "/mnt/d/18r/new_root/296894.root", "/mnt/d/18r/new_root/296941.root", "/mnt/d/18r/new_root/297031.root", "/mnt/d/18r/new_root/297085.root", "/mnt/d/18r/new_root/297118.root", "/mnt/d/18r/new_root/297129.root", "/mnt/d/18r/new_root/297372.root", "/mnt/d/18r/new_root/297415.root", "/mnt/d/18r/new_root/297441.root", "/mnt/d/18r/new_root/297446.root", "/mnt/d/18r/new_root/297479.root", "/mnt/d/18r/new_root/297544.root",])
+    analysis = ana_CENTRAL
+    for species in [pt.INCLUSIVE]:
+        print(f"Plotting and fitting for {species.name} in {analysis.analysisType.name}")
         fit_and_plot(analysis, species)
+    del(analysis)
                 
 
 

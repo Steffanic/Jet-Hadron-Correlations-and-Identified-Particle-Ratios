@@ -5,14 +5,14 @@
                 "p0": {
                     "mu_proton": 2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.4,
+                    "mu_kaon": -2,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 3.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.01,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -20,33 +20,33 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 1.2,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_15_2": {
                 "p0": {
-                    "mu_proton": -2.3,
+                    "mu_proton": -1.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.7,
+                    "mu_kaon": -2.3,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 2.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -54,53 +54,53 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_2_3": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.001,
-                    "kaon_in_proton": 0.02,
+                    "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
                     "pion_in_pion": 0.07,
                     "kaon_in_pion": 0.0001,
 
-                    "proton_in_kaon": 0.001,
+                    "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.03,
+                    "kaon_in_kaon": 0.04,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.02,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_3_4": {
@@ -109,9 +109,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.015,
@@ -123,29 +123,29 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.03,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_4_5": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.02,
@@ -163,23 +163,23 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_5_6": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -197,23 +197,23 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_6_10": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -231,12 +231,12 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             }
         },
@@ -245,14 +245,14 @@
                 "p0": {
                     "mu_proton": 2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.3,
+                    "mu_kaon": -2.0,
 
                     "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.01,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -260,33 +260,33 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 1.2,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_15_2": {
                 "p0": {
-                    "mu_proton": -2.3,
+                    "mu_proton": -1.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.7,
+                    "mu_kaon": -2.3,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 2.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -294,53 +294,53 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_2_3": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.4,
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.001,
-                    "kaon_in_proton": 0.02,
+                    "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
                     "pion_in_pion": 0.07,
                     "kaon_in_pion": 0.0001,
 
-                    "proton_in_kaon": 0.001,
+                    "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.03,
+                    "kaon_in_kaon": 0.04,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.02,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_3_4": {
@@ -349,9 +349,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.015,
@@ -363,29 +363,29 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.03,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_4_5": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.02,
@@ -403,23 +403,23 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_5_6": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -437,23 +437,23 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_6_10": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -471,12 +471,12 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             }
         },
@@ -485,14 +485,14 @@
                 "p0": {
                     "mu_proton": 2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.3,
+                    "mu_kaon": -2.0,
 
                     "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.01,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -500,33 +500,33 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 1.2,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_15_2": {
                 "p0": {
-                    "mu_proton": -2.3,
+                    "mu_proton": -1.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.7,
+                    "mu_kaon": -2.3,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 2.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -534,40 +534,40 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_2_3": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.4,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.001,
-                    "kaon_in_proton": 0.02,
+                    "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
                     "pion_in_pion": 0.07,
                     "kaon_in_pion": 0.0001,
 
-                    "proton_in_kaon": 0.001,
+                    "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
                     "kaon_in_kaon": 0.03,
 
@@ -575,12 +575,12 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.02,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_3_4": {
@@ -589,9 +589,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.015,
@@ -609,23 +609,23 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_4_5": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.02,
@@ -643,23 +643,23 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_5_6": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -677,23 +677,23 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_6_10": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -711,12 +711,12 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             }
         },
@@ -725,14 +725,14 @@
                 "p0": {
                     "mu_proton": 2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.3,
+                    "mu_kaon": -2.0,
 
                     "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.01,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -740,33 +740,33 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 1.2,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_15_2": {
                 "p0": {
-                    "mu_proton": -2.3,
+                    "mu_proton": -1.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.7,
+                    "mu_kaon": -2.3,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 2.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -774,40 +774,40 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_2_3": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.4,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.001,
-                    "kaon_in_proton": 0.02,
+                    "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
                     "pion_in_pion": 0.07,
                     "kaon_in_pion": 0.0001,
 
-                    "proton_in_kaon": 0.001,
+                    "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
                     "kaon_in_kaon": 0.03,
 
@@ -815,12 +815,12 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.02,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_3_4": {
@@ -829,9 +829,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.015,
@@ -849,23 +849,23 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_4_5": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.02,
@@ -883,23 +883,23 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_5_6": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -917,23 +917,23 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_6_10": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -951,12 +951,12 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             }
         }
@@ -967,14 +967,14 @@
                 "p0": {
                     "mu_proton": 2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.4,
+                    "mu_kaon": -1.8,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
+                    "sigma_proton": 3.0,
+                    "sigma_pion": 1.0,
                     "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.01,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -982,33 +982,67 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 1.2,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_15_2": {
                 "p0": {
-                    "mu_proton": -2.3,
+                    "mu_proton": -0.6,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.7,
+                    "mu_kaon": -2.5,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 2.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
+                    "kaon_in_proton": 0.0001,
+
+                    "proton_in_pion": 0.0001,
+                    "pion_in_pion": 0.07,
+                    "kaon_in_pion": 0.0001,
+
+                    "proton_in_kaon": 0.0001,
+                    "pion_in_kaon": 0.0001,
+                    "kaon_in_kaon": 0.07,
+
+                    "proton_in_inclusive": 0.01,
+                    "pion_in_inclusive": 0.05,
+                    "kaon_in_inclusive": 0.03,
+                    
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
+                },
+                "bounds": [
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
+                ]
+            },
+            "PT_2_3": {
+                "p0": {
+                    "mu_proton": -2.4,
+                    "mu_pion": 0.0,
+                    "mu_kaon": -2.6,
+
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
+
+                    "proton_in_proton": 0.07,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -1021,48 +1055,14 @@
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
-                    "kaon_in_inclusive": 0.03,
-                    
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
-                },
-                "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
-                ]
-            },
-            "PT_2_3": {
-                "p0": {
-                    "mu_proton": -2.7,
-                    "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
-
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
-
-                    "proton_in_proton": 0.07,
-                    "pion_in_proton": 0.001,
-                    "kaon_in_proton": 0.02,
-
-                    "proton_in_pion": 0.0001,
-                    "pion_in_pion": 0.07,
-                    "kaon_in_pion": 0.0001,
-
-                    "proton_in_kaon": 0.001,
-                    "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.03,
-
-                    "proton_in_inclusive": 0.01,
-                    "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.02,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_3_4": {
@@ -1071,12 +1071,12 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.015,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -1085,32 +1085,32 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.04,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_4_5": {
                 "p0": {
                     "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.3,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.01,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -1119,63 +1119,63 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
+                    "kaon_in_kaon": 0.03,
+
+                    "proton_in_inclusive": 0.01,
+                    "pion_in_inclusive": 0.05,
+                    "kaon_in_inclusive": 0.03,
+                    
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
+                },
+                "bounds": [
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
+                ]
+            },
+            "PT_5_6": {
+                "p0": {
+                    "mu_proton": -2.5,
+                    "mu_pion": 0.0,
+                    "mu_kaon": -2.4,
+
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
+
+                    "proton_in_proton": 0.03,
+                    "pion_in_proton": 0.04,
+                    "kaon_in_proton": 0.0001,
+
+                    "proton_in_pion": 0.0001,
+                    "pion_in_pion": 0.07,
+                    "kaon_in_pion": 0.0001,
+
+                    "proton_in_kaon": 0.0001,
+                    "pion_in_kaon": 0.06,
                     "kaon_in_kaon": 0.02,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
-                ]
-            },
-            "PT_5_6": {
-                "p0": {
-                    "mu_proton": -2.9,
-                    "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
-
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
-
-                    "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.04,
-                    "kaon_in_proton": 0.0001,
-
-                    "proton_in_pion": 0.0001,
-                    "pion_in_pion": 0.07,
-                    "kaon_in_pion": 0.0001,
-
-                    "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.06,
-                    "kaon_in_kaon": 0.01,
-
-                    "proton_in_inclusive": 0.01,
-                    "pion_in_inclusive": 0.05,
-                    "kaon_in_inclusive": 0.03,
-                    
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
-                },
-                "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_6_10": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -1193,12 +1193,12 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             }
         },
@@ -1207,14 +1207,14 @@
                 "p0": {
                     "mu_proton": 2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.3,
+                    "mu_kaon": -1.8,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 3.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.01,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -1222,33 +1222,33 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 1.2,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_15_2": {
                 "p0": {
-                    "mu_proton": -2.3,
+                    "mu_proton": -0.6,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.7,
+                    "mu_kaon": -2.5,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 2.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -1256,53 +1256,53 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_2_3": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.4,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.07,
-                    "pion_in_proton": 0.001,
-                    "kaon_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
+                    "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
                     "pion_in_pion": 0.07,
                     "kaon_in_pion": 0.0001,
 
-                    "proton_in_kaon": 0.001,
-                    "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.03,
+                    "proton_in_kaon": 0.0001,
+                    "pion_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.02,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_3_4": {
@@ -1311,12 +1311,12 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.015,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -1325,29 +1325,29 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.04,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_4_5": {
                 "p0": {
                     "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.02,
@@ -1365,23 +1365,23 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_5_6": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -1393,29 +1393,29 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.06,
-                    "kaon_in_kaon": 0.01,
+                    "kaon_in_kaon": 0.02,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_6_10": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -1433,12 +1433,12 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             }
         },
@@ -1447,14 +1447,14 @@
                 "p0": {
                     "mu_proton": 2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.3,
+                    "mu_kaon": -1.8,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 3.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.01,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -1462,33 +1462,33 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 1.2,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_15_2": {
                 "p0": {
-                    "mu_proton": -2.3,
+                    "mu_proton": -0.6,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.7,
+                    "mu_kaon": -2.5,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 2.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -1496,53 +1496,53 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_2_3": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.4,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.07,
-                    "pion_in_proton": 0.001,
-                    "kaon_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
+                    "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
                     "pion_in_pion": 0.07,
                     "kaon_in_pion": 0.0001,
 
-                    "proton_in_kaon": 0.001,
-                    "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.03,
+                    "proton_in_kaon": 0.0001,
+                    "pion_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.02,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_3_4": {
@@ -1551,12 +1551,12 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.015,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -1565,29 +1565,29 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.04,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_4_5": {
                 "p0": {
                     "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.02,
@@ -1599,63 +1599,63 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
+                    "kaon_in_kaon": 0.03,
+
+                    "proton_in_inclusive": 0.01,
+                    "pion_in_inclusive": 0.05,
+                    "kaon_in_inclusive": 0.03,
+                    
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
+                },
+                "bounds": [
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
+                ]
+            },
+            "PT_5_6": {
+                "p0": {
+                    "mu_proton": -2.5,
+                    "mu_pion": 0.0,
+                    "mu_kaon": -2.4,
+
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
+
+                    "proton_in_proton": 0.03,
+                    "pion_in_proton": 0.04,
+                    "kaon_in_proton": 0.0001,
+
+                    "proton_in_pion": 0.0001,
+                    "pion_in_pion": 0.07,
+                    "kaon_in_pion": 0.0001,
+
+                    "proton_in_kaon": 0.0001,
+                    "pion_in_kaon": 0.06,
                     "kaon_in_kaon": 0.02,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
-                ]
-            },
-            "PT_5_6": {
-                "p0": {
-                    "mu_proton": -2.9,
-                    "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
-
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
-
-                    "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.04,
-                    "kaon_in_proton": 0.0001,
-
-                    "proton_in_pion": 0.0001,
-                    "pion_in_pion": 0.07,
-                    "kaon_in_pion": 0.0001,
-
-                    "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.06,
-                    "kaon_in_kaon": 0.01,
-
-                    "proton_in_inclusive": 0.01,
-                    "pion_in_inclusive": 0.05,
-                    "kaon_in_inclusive": 0.03,
-                    
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
-                },
-                "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_6_10": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -1673,28 +1673,28 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             }
         },
         "background": {
             "PT_1_15": {
                 "p0": {
-                    "mu_proton": 2.7,
+                    "mu_proton": 1.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.3,
+                    "mu_kaon": -1.8,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 3.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.01,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -1702,33 +1702,33 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 1.2,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_15_2": {
                 "p0": {
-                    "mu_proton": -2.3,
+                    "mu_proton": -2.0,
                     "mu_pion": 0.0,
                     "mu_kaon": -2.7,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 2.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -1736,53 +1736,53 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_2_3": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.4,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.07,
-                    "pion_in_proton": 0.001,
-                    "kaon_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
+                    "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
                     "pion_in_pion": 0.07,
                     "kaon_in_pion": 0.0001,
 
-                    "proton_in_kaon": 0.001,
-                    "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.03,
+                    "proton_in_kaon": 0.0001,
+                    "pion_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.02,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_3_4": {
@@ -1791,12 +1791,12 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.015,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -1805,29 +1805,29 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.04,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_4_5": {
                 "p0": {
                     "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.02,
@@ -1839,63 +1839,63 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
+                    "kaon_in_kaon": 0.03,
+
+                    "proton_in_inclusive": 0.01,
+                    "pion_in_inclusive": 0.05,
+                    "kaon_in_inclusive": 0.03,
+                    
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
+                },
+                "bounds": [
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
+                ]
+            },
+            "PT_5_6": {
+                "p0": {
+                    "mu_proton": -2.5,
+                    "mu_pion": 0.0,
+                    "mu_kaon": -2.4,
+
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
+
+                    "proton_in_proton": 0.03,
+                    "pion_in_proton": 0.04,
+                    "kaon_in_proton": 0.0001,
+
+                    "proton_in_pion": 0.0001,
+                    "pion_in_pion": 0.07,
+                    "kaon_in_pion": 0.0001,
+
+                    "proton_in_kaon": 0.0001,
+                    "pion_in_kaon": 0.06,
                     "kaon_in_kaon": 0.02,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
-                ]
-            },
-            "PT_5_6": {
-                "p0": {
-                    "mu_proton": -2.9,
-                    "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
-
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
-
-                    "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.04,
-                    "kaon_in_proton": 0.0001,
-
-                    "proton_in_pion": 0.0001,
-                    "pion_in_pion": 0.07,
-                    "kaon_in_pion": 0.0001,
-
-                    "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.06,
-                    "kaon_in_kaon": 0.01,
-
-                    "proton_in_inclusive": 0.01,
-                    "pion_in_inclusive": 0.05,
-                    "kaon_in_inclusive": 0.03,
-                    
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
-                },
-                "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_6_10": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -1913,12 +1913,12 @@
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             }
         }
@@ -1929,14 +1929,14 @@
                 "p0": {
                     "mu_proton": 2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.4,
+                    "mu_kaon": -1.5,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 2.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.01,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -1944,33 +1944,33 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 1.2,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_15_2": {
                 "p0": {
-                    "mu_proton": -2.3,
+                    "mu_proton": -0.6,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.7,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 2.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -1978,67 +1978,67 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_2_3": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.4,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.07,
-                    "pion_in_proton": 0.001,
-                    "kaon_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
+                    "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
                     "pion_in_pion": 0.07,
                     "kaon_in_pion": 0.0001,
 
-                    "proton_in_kaon": 0.001,
-                    "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.03,
+                    "proton_in_kaon": 0.0001,
+                    "pion_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.02,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_3_4": {
                 "p0": {
                     "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.015,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2047,32 +2047,32 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.04,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_4_5": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.8,
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.01,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2080,67 +2080,67 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.05,
+                    "pion_in_kaon": 0.06,
+                    "kaon_in_kaon": 0.03,
+
+                    "proton_in_inclusive": 0.01,
+                    "pion_in_inclusive": 0.05,
+                    "kaon_in_inclusive": 0.03,
+                    
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
+                },
+                "bounds": [
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
+                ]
+            },
+            "PT_5_6": {
+                "p0": {
+                    "mu_proton": -2.5,
+                    "mu_pion": 0.0,
+                    "mu_kaon": -2.5,
+
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
+
+                    "proton_in_proton": 0.05,
+                    "pion_in_proton": 0.03,
+                    "kaon_in_proton": 0.0001,
+
+                    "proton_in_pion": 0.0001,
+                    "pion_in_pion": 0.07,
+                    "kaon_in_pion": 0.0001,
+
+                    "proton_in_kaon": 0.0001,
+                    "pion_in_kaon": 0.06,
                     "kaon_in_kaon": 0.02,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
-                ]
-            },
-            "PT_5_6": {
-                "p0": {
-                    "mu_proton": -2.9,
-                    "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
-
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
-
-                    "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.04,
-                    "kaon_in_proton": 0.0001,
-
-                    "proton_in_pion": 0.0001,
-                    "pion_in_pion": 0.07,
-                    "kaon_in_pion": 0.0001,
-
-                    "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.06,
-                    "kaon_in_kaon": 0.01,
-
-                    "proton_in_inclusive": 0.01,
-                    "pion_in_inclusive": 0.05,
-                    "kaon_in_inclusive": 0.03,
-                    
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
-                },
-                "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_6_10": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.4,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.04,
+                    "pion_in_proton": 0.05,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2149,18 +2149,18 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.06,
-                    "kaon_in_kaon": 0.01,
+                    "kaon_in_kaon": 0.02,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             }
         },
@@ -2169,14 +2169,14 @@
                 "p0": {
                     "mu_proton": 2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.3,
+                    "mu_kaon": -1.5,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 3.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.01,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2184,33 +2184,33 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 1.2,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_15_2": {
                 "p0": {
-                    "mu_proton": -2.3,
+                    "mu_proton": -0.6,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.7,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 2.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2218,67 +2218,67 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_2_3": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.4,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.07,
-                    "pion_in_proton": 0.001,
-                    "kaon_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
+                    "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
                     "pion_in_pion": 0.07,
                     "kaon_in_pion": 0.0001,
 
-                    "proton_in_kaon": 0.001,
-                    "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.03,
+                    "proton_in_kaon": 0.0001,
+                    "pion_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.02,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_3_4": {
                 "p0": {
                     "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.015,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2287,32 +2287,32 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.04,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_4_5": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.8,
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.01,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2320,67 +2320,67 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.05,
+                    "pion_in_kaon": 0.06,
+                    "kaon_in_kaon": 0.03,
+
+                    "proton_in_inclusive": 0.01,
+                    "pion_in_inclusive": 0.05,
+                    "kaon_in_inclusive": 0.03,
+                    
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
+                },
+                "bounds": [
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
+                ]
+            },
+            "PT_5_6": {
+                "p0": {
+                    "mu_proton": -2.5,
+                    "mu_pion": 0.0,
+                    "mu_kaon": -2.5,
+
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
+
+                    "proton_in_proton": 0.05,
+                    "pion_in_proton": 0.03,
+                    "kaon_in_proton": 0.0001,
+
+                    "proton_in_pion": 0.0001,
+                    "pion_in_pion": 0.07,
+                    "kaon_in_pion": 0.0001,
+
+                    "proton_in_kaon": 0.0001,
+                    "pion_in_kaon": 0.06,
                     "kaon_in_kaon": 0.02,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
-                ]
-            },
-            "PT_5_6": {
-                "p0": {
-                    "mu_proton": -2.9,
-                    "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
-
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
-
-                    "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.04,
-                    "kaon_in_proton": 0.0001,
-
-                    "proton_in_pion": 0.0001,
-                    "pion_in_pion": 0.07,
-                    "kaon_in_pion": 0.0001,
-
-                    "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.06,
-                    "kaon_in_kaon": 0.01,
-
-                    "proton_in_inclusive": 0.01,
-                    "pion_in_inclusive": 0.05,
-                    "kaon_in_inclusive": 0.03,
-                    
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
-                },
-                "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_6_10": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.4,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.04,
+                    "pion_in_proton": 0.05,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2389,18 +2389,18 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.06,
-                    "kaon_in_kaon": 0.01,
+                    "kaon_in_kaon": 0.02,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             }
         },
@@ -2409,14 +2409,14 @@
                 "p0": {
                     "mu_proton": 2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.3,
+                    "mu_kaon": -1.5,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 3.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.01,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2424,33 +2424,33 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 1.2,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_15_2": {
                 "p0": {
-                    "mu_proton": -2.3,
+                    "mu_proton": -0.6,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.7,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 2.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2458,67 +2458,67 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_2_3": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.4,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.07,
-                    "pion_in_proton": 0.001,
-                    "kaon_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
+                    "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
                     "pion_in_pion": 0.07,
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.001,
-                    "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.03,
+                    "pion_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.02,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_3_4": {
                 "p0": {
                     "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.015,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2527,32 +2527,32 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.04,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_4_5": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.8,
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.01,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2560,67 +2560,67 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.05,
+                    "pion_in_kaon": 0.055,
+                    "kaon_in_kaon": 0.035,
+
+                    "proton_in_inclusive": 0.01,
+                    "pion_in_inclusive": 0.05,
+                    "kaon_in_inclusive": 0.03,
+                    
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
+                },
+                "bounds": [
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
+                ]
+            },
+            "PT_5_6": {
+                "p0": {
+                    "mu_proton": -2.5,
+                    "mu_pion": 0.0,
+                    "mu_kaon": -2.5,
+
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
+
+                    "proton_in_proton": 0.05,
+                    "pion_in_proton": 0.03,
+                    "kaon_in_proton": 0.0001,
+
+                    "proton_in_pion": 0.0001,
+                    "pion_in_pion": 0.07,
+                    "kaon_in_pion": 0.0001,
+
+                    "proton_in_kaon": 0.0001,
+                    "pion_in_kaon": 0.06,
                     "kaon_in_kaon": 0.02,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
-                ]
-            },
-            "PT_5_6": {
-                "p0": {
-                    "mu_proton": -2.9,
-                    "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
-
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
-
-                    "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.04,
-                    "kaon_in_proton": 0.0001,
-
-                    "proton_in_pion": 0.0001,
-                    "pion_in_pion": 0.07,
-                    "kaon_in_pion": 0.0001,
-
-                    "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.06,
-                    "kaon_in_kaon": 0.01,
-
-                    "proton_in_inclusive": 0.01,
-                    "pion_in_inclusive": 0.05,
-                    "kaon_in_inclusive": 0.03,
-                    
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
-                },
-                "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_6_10": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.4,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.04,
+                    "pion_in_proton": 0.05,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2629,34 +2629,34 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.06,
-                    "kaon_in_kaon": 0.01,
+                    "kaon_in_kaon": 0.02,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             }
         },
         "background": {
             "PT_1_15": {
                 "p0": {
-                    "mu_proton": 2.7,
+                    "mu_proton": 1.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.3,
+                    "mu_kaon": -2.0,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 3.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.01,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2664,33 +2664,33 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 1.2,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_15_2": {
                 "p0": {
-                    "mu_proton": -2.3,
+                    "mu_proton": -1.5,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.7,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 4.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 2.0,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.8,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2698,67 +2698,67 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.01,
+                    "pion_in_kaon": 0.0001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5, 5, 5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_2_3": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.4,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.07,
-                    "pion_in_proton": 0.001,
-                    "kaon_in_proton": 0.02,
+                    "pion_in_proton": 0.0001,
+                    "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
                     "pion_in_pion": 0.07,
                     "kaon_in_pion": 0.0001,
 
-                    "proton_in_kaon": 0.001,
-                    "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.03,
+                    "proton_in_kaon": 0.0001,
+                    "pion_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.02,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_3_4": {
                 "p0": {
                     "mu_proton": -2.7,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.015,
+                    "pion_in_proton": 0.0001,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2767,32 +2767,32 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
-                    "kaon_in_kaon": 0.02,
+                    "kaon_in_kaon": 0.04,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_4_5": {
                 "p0": {
-                    "mu_proton": -2.7,
+                    "mu_proton": -2.8,
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.6,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.6,
 
                     "proton_in_proton": 0.06,
-                    "pion_in_proton": 0.02,
+                    "pion_in_proton": 0.01,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2801,66 +2801,66 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.05,
+                    "kaon_in_kaon": 0.03,
+
+                    "proton_in_inclusive": 0.01,
+                    "pion_in_inclusive": 0.05,
+                    "kaon_in_inclusive": 0.03,
+                    
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
+                },
+                "bounds": [
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
+                ]
+            },
+            "PT_5_6": {
+                "p0": {
+                    "mu_proton": -2.5,
+                    "mu_pion": 0.0,
+                    "mu_kaon": -2.5,
+
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
+
+                    "proton_in_proton": 0.05,
+                    "pion_in_proton": 0.03,
+                    "kaon_in_proton": 0.0001,
+
+                    "proton_in_pion": 0.0001,
+                    "pion_in_pion": 0.07,
+                    "kaon_in_pion": 0.0001,
+
+                    "proton_in_kaon": 0.0001,
+                    "pion_in_kaon": 0.06,
                     "kaon_in_kaon": 0.02,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
-                ]
-            },
-            "PT_5_6": {
-                "p0": {
-                    "mu_proton": -2.9,
-                    "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
-
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
-
-                    "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.04,
-                    "kaon_in_proton": 0.0001,
-
-                    "proton_in_pion": 0.0001,
-                    "pion_in_pion": 0.07,
-                    "kaon_in_pion": 0.0001,
-
-                    "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.06,
-                    "kaon_in_kaon": 0.01,
-
-                    "proton_in_inclusive": 0.01,
-                    "pion_in_inclusive": 0.05,
-                    "kaon_in_inclusive": 0.03,
-                    
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
-                },
-                "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             },
             "PT_6_10": {
                 "p0": {
-                    "mu_proton": -2.9,
+                    "mu_proton": -2.4,
                     "mu_pion": 0.0,
-                    "mu_kaon": -2.5,
+                    "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.0,
-                    "sigma_pion": 0.8,
-                    "sigma_kaon": 1.0,
+                    "sigma_proton": 1.4,
+                    "sigma_pion": 1.0,
+                    "sigma_kaon": 1.4,
 
                     "proton_in_proton": 0.03,
-                    "pion_in_proton": 0.04,
+                    "pion_in_proton": 0.05,
                     "kaon_in_proton": 0.0001,
 
                     "proton_in_pion": 0.0001,
@@ -2869,18 +2869,18 @@
 
                     "proton_in_kaon": 0.0001,
                     "pion_in_kaon": 0.06,
-                    "kaon_in_kaon": 0.01,
+                    "kaon_in_kaon": 0.02,
 
                     "proton_in_inclusive": 0.01,
                     "pion_in_inclusive": 0.05,
                     "kaon_in_inclusive": 0.03,
                     
-                    "alpha_proton": 0.7,
-                    "alpha_kaon": 0.5
+                    "alpha_proton": 0.0,
+                    "alpha_kaon": 0.0
                 },
                 "bounds": [
-                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3, -3],
-                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3, 3]
+                    [-6, -1.0, -6, 1e-5, 1e-5, 1e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2, -2],
+                    [6, 1.0, 6, 5,5,5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2, 2]
                 ]
             }
         }
