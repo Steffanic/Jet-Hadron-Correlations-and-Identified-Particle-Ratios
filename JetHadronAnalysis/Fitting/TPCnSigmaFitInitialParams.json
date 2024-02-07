@@ -7,7 +7,7 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2,
 
-                    "sigma_proton": 3.0,
+                    "sigma_proton": 1.8,
                     "sigma_pion": 1.0,
                     "sigma_kaon": 1.8,
 
@@ -75,9 +75,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.001,
@@ -109,9 +109,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.015,
@@ -143,9 +143,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.02,
@@ -177,9 +177,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -211,9 +211,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -315,9 +315,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.001,
@@ -349,9 +349,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.015,
@@ -383,9 +383,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.02,
@@ -417,9 +417,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -451,9 +451,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -555,9 +555,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.001,
@@ -589,9 +589,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.015,
@@ -623,9 +623,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.02,
@@ -657,9 +657,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -691,9 +691,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -795,9 +795,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.001,
@@ -829,9 +829,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.015,
@@ -863,9 +863,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.02,
@@ -897,9 +897,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -931,9 +931,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.7,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -969,7 +969,7 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -1.8,
 
-                    "sigma_proton": 3.0,
+                    "sigma_proton": 1.8,
                     "sigma_pion": 1.0,
                     "sigma_kaon": 1.0,
 
@@ -1037,9 +1037,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.0001,
@@ -1071,9 +1071,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.0001,
@@ -1105,9 +1105,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.3,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.01,
@@ -1139,9 +1139,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -1173,9 +1173,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -1209,7 +1209,7 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -1.8,
 
-                    "sigma_proton": 3.0,
+                    "sigma_proton": 1.8,
                     "sigma_pion": 1.0,
                     "sigma_kaon": 1.8,
 
@@ -1277,9 +1277,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.0001,
@@ -1311,9 +1311,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.0001,
@@ -1345,9 +1345,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.02,
@@ -1379,9 +1379,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -1413,9 +1413,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -1449,7 +1449,7 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -1.8,
 
-                    "sigma_proton": 3.0,
+                    "sigma_proton": 1.8,
                     "sigma_pion": 1.0,
                     "sigma_kaon": 1.8,
 
@@ -1517,9 +1517,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.0001,
@@ -1551,9 +1551,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.0001,
@@ -1585,9 +1585,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.02,
@@ -1619,9 +1619,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -1653,9 +1653,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -1689,7 +1689,7 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -1.8,
 
-                    "sigma_proton": 3.0,
+                    "sigma_proton": 1.8,
                     "sigma_pion": 1.0,
                     "sigma_kaon": 1.8,
 
@@ -1757,9 +1757,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.0001,
@@ -1791,9 +1791,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.0001,
@@ -1825,9 +1825,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.02,
@@ -1859,9 +1859,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -1893,9 +1893,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.04,
@@ -1999,9 +1999,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.6,
-                    "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_proton": 1.0,
+                    "sigma_pion": 0.8,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.0001,
@@ -2033,9 +2033,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.0001,
@@ -2067,9 +2067,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.01,
@@ -2101,9 +2101,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.05,
                     "pion_in_proton": 0.03,
@@ -2135,9 +2135,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.05,
@@ -2171,7 +2171,7 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -1.5,
 
-                    "sigma_proton": 3.0,
+                    "sigma_proton": 1.8,
                     "sigma_pion": 1.0,
                     "sigma_kaon": 1.8,
 
@@ -2239,9 +2239,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.6,
-                    "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_proton": 1.0,
+                    "sigma_pion": 0.8,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.0001,
@@ -2273,9 +2273,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.0001,
@@ -2307,9 +2307,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.01,
@@ -2341,9 +2341,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.05,
                     "pion_in_proton": 0.03,
@@ -2375,9 +2375,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.05,
@@ -2411,7 +2411,7 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -1.5,
 
-                    "sigma_proton": 3.0,
+                    "sigma_proton": 1.8,
                     "sigma_pion": 1.0,
                     "sigma_kaon": 1.8,
 
@@ -2479,9 +2479,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.6,
-                    "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_proton": 1.0,
+                    "sigma_pion": 0.8,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.0001,
@@ -2513,9 +2513,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.0001,
@@ -2547,9 +2547,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.01,
@@ -2581,9 +2581,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.05,
                     "pion_in_proton": 0.03,
@@ -2615,9 +2615,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.05,
@@ -2651,7 +2651,7 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.0,
 
-                    "sigma_proton": 3.0,
+                    "sigma_proton": 1.8,
                     "sigma_pion": 1.0,
                     "sigma_kaon": 1.8,
 
@@ -2719,9 +2719,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.6,
-                    "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_proton": 1.0,
+                    "sigma_pion": 0.8,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.07,
                     "pion_in_proton": 0.0001,
@@ -2732,7 +2732,7 @@
                     "kaon_in_pion": 0.0001,
 
                     "proton_in_kaon": 0.0001,
-                    "pion_in_kaon": 0.02,
+                    "pion_in_kaon": 0.001,
                     "kaon_in_kaon": 0.07,
 
                     "proton_in_inclusive": 0.01,
@@ -2753,9 +2753,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.4,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.0001,
@@ -2787,9 +2787,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.6,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.6,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.06,
                     "pion_in_proton": 0.01,
@@ -2821,9 +2821,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.5,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.05,
                     "pion_in_proton": 0.03,
@@ -2855,9 +2855,9 @@
                     "mu_pion": 0.0,
                     "mu_kaon": -2.6,
 
-                    "sigma_proton": 1.4,
+                    "sigma_proton": 1.0,
                     "sigma_pion": 1.0,
-                    "sigma_kaon": 1.4,
+                    "sigma_kaon": 1.0,
 
                     "proton_in_proton": 0.03,
                     "pion_in_proton": 0.05,

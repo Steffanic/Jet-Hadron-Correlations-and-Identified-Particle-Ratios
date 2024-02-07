@@ -1,0 +1,59 @@
+This is BibTeX, Version 0.99d (TeX Live 2022/dev/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: my-dissertation.aux
+A level-1 auxiliary file: front-matter/dedication.aux
+A level-1 auxiliary file: front-matter/acknowledgements.aux
+A level-1 auxiliary file: front-matter/quote.aux
+A level-1 auxiliary file: front-matter/abstract.aux
+A level-1 auxiliary file: front-matter/nomenclature.aux
+A level-1 auxiliary file: chapters/chapter-1.aux
+A level-1 auxiliary file: chapters/chapter-3.aux
+A level-1 auxiliary file: chapters/chapter-4.aux
+The style file: plain.bst
+A level-1 auxiliary file: back-matter/vita.aux
+Database file #1: references/references-dissertation.bib
+Warning--I didn't find a database entry for "ALICEreco"
+Warning--I didn't find a database entry for "trackVertexReconstruction"
+Warning--I didn't find a database entry for "Kalman"
+You've used 11 entries,
+            2118 wiz_defined-function locations,
+            595 strings with 10041 characters,
+and the built_in function-call counts, 11289 in all, are:
+= -- 840
+> -- 1441
+< -- 0
++ -- 575
+- -- 564
+* -- 1271
+:= -- 2137
+add.period$ -- 33
+call.type$ -- 11
+change.case$ -- 313
+chr.to.int$ -- 0
+cite$ -- 11
+duplicate$ -- 117
+empty$ -- 250
+format.name$ -- 564
+if$ -- 1951
+int.to.chr$ -- 0
+int.to.str$ -- 11
+missing$ -- 9
+newline$ -- 58
+num.names$ -- 22
+pop$ -- 295
+preamble$ -- 1
+purify$ -- 304
+quote$ -- 0
+skip$ -- 77
+stack$ -- 0
+substring$ -- 210
+swap$ -- 11
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 44
+warning$ -- 0
+while$ -- 33
+width$ -- 13
+write$ -- 123
+(There were 3 warnings)

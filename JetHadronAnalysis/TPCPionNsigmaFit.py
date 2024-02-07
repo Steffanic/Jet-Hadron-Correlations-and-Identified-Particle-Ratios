@@ -232,13 +232,13 @@ class FitTPCPionNsigma:
         mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak = uncertainties.correlated_values(optimal_params, covariance)
 
         # generate some bootstrap samples of the fit parameters
-        n_samples = 50
+        n_samples =25
         shape_samples = np.random.multivariate_normal(optimal_params, covariance, n_samples) # shape (n_samples, n_params)
         # now just sample apinc, apiinc, akinc with the appropriate subset of covariance matrix
         # this would be covariance[-5:-2, -5:-2] 
         yield_samples = np.random.multivariate_normal([apinc.n, apiinc.n, akinc.n], covariance[-5:-2, -5:-2], n_samples) # shape (n_samples, 3)
 
-        int_x = np.linspace(-100, 100, 1000)
+        int_x = np.linspace(-10, 10, 1000)
         int_y = upiKpInc_generalized_fit(None, int_x, mup, mupi, muk, sigp, sigpi, sigk, app, apip, akp, appi, apipi, akpi, apk, apik, akk, apinc, apiinc, akinc, alphap, alphak) # shape (4*n_x,)
 
         print("Computing bootstrap PID shape errors")
@@ -268,13 +268,13 @@ class FitTPCPionNsigma:
         protonFraction = gincp#1/3*(gpip*pionEnhNorm/(fpip)+gpp*protonEnhNorm/(fpp)+gkp*kaonEnhNorm/(fkp))/sum_of_particles_used#n_enhanced_associated_hadrons[ParticleType.INCLUSIVE]
         kaonFraction = ginck#1/3*(gpik*pionEnhNorm/(fpik)+gpk*protonEnhNorm/(fpk)+gkk*kaonEnhNorm/(fkk))/sum_of_particles_used#n_enhanced_associated_hadrons[ParticleType.INCLUSIVE]
 
-        pionFraction_pid_fit_shape_sys_err = float(np.mean([(sample - gincpi.n)**2 for sample in gincpi_shape_samples]))
-        protonFraction_pid_fit_shape_sys_err = float(np.mean([(sample - gincp.n)**2 for sample in gincp_shape_samples]))
-        kaonFraction_pid_fit_shape_sys_err = float(np.mean([(sample - ginck.n)**2 for sample in ginck_shape_samples]))
+        pionFraction_pid_fit_shape_sys_err = np.sqrt(float(np.mean([(sample - gincpi.n)**2 for sample in gincpi_shape_samples])))
+        protonFraction_pid_fit_shape_sys_err = np.sqrt(float(np.mean([(sample - gincp.n)**2 for sample in gincp_shape_samples])))
+        kaonFraction_pid_fit_shape_sys_err = np.sqrt(float(np.mean([(sample - ginck.n)**2 for sample in ginck_shape_samples])))
 
-        pionFraction_pid_fit_yield_sys_err = float(np.mean([(sample.n - gincpi.n)**2 for sample in gincpi_yield_samples]))
-        protonFraction_pid_fit_yield_sys_err = float(np.mean([(sample.n - gincp.n)**2 for sample in gincp_yield_samples]))
-        kaonFraction_pid_fit_yield_sys_err = float(np.mean([(sample.n - ginck.n)**2 for sample in ginck_yield_samples]))
+        pionFraction_pid_fit_yield_sys_err = np.sqrt(float(np.mean([(sample.n - gincpi.n)**2 for sample in gincpi_yield_samples])))
+        protonFraction_pid_fit_yield_sys_err = np.sqrt(float(np.mean([(sample.n - gincp.n)**2 for sample in gincp_yield_samples])))
+        kaonFraction_pid_fit_yield_sys_err = np.sqrt(float(np.mean([(sample.n - ginck.n)**2 for sample in ginck_yield_samples])))
 
         # save the particle fractions to the database
         if self.databaseConnection is not None:

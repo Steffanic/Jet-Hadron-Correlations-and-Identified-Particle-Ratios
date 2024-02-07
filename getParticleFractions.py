@@ -7,19 +7,19 @@ import warnings
 warnings.filterwarnings("ignore")
 
 if __name__=="__main__":
-    # ana_pp = Analysis(at.PP, ["/mnt/d/pp/17p.root"])
-    # print(f"Starting pp")
-    # for assoc_bin in AssociatedHadronMomentumBin:
-    #     ana_pp.setAssociatedHadronMomentumBin(assoc_bin)
-    #     ana_pp.setRegion(Region.INCLUSIVE)
-    #     print(f"pp, {assoc_bin}, Inclusive, {ana_pp.getPIDFractions()}")
-    #     ana_pp.setRegion(Region.NEAR_SIDE_SIGNAL)
-    #     print(f"pp, {assoc_bin}, Near-side signal, {ana_pp.getPIDFractions()}")
-    #     ana_pp.setRegion(Region.AWAY_SIDE_SIGNAL)
-    #     print(f"pp, {assoc_bin}, Away-side signal, {ana_pp.getPIDFractions()}")
-    #     ana_pp.setRegion(Region.BACKGROUND)
-    #     print(f"pp, {assoc_bin}, Background, {ana_pp.getPIDFractions()}")
-    # 
+    ana_pp = Analysis(at.PP, ["/mnt/d/pp/17p.root"])
+    print(f"Starting pp")
+    for assoc_bin in AssociatedHadronMomentumBin:
+        ana_pp.setAssociatedHadronMomentumBin(assoc_bin)
+        ana_pp.setRegion(Region.INCLUSIVE)
+        print(f"pp, {assoc_bin}, Inclusive, {ana_pp.getPIDFractions()}")
+        ana_pp.setRegion(Region.NEAR_SIDE_SIGNAL)
+        print(f"pp, {assoc_bin}, Near-side signal, {ana_pp.getPIDFractions()}")
+        ana_pp.setRegion(Region.AWAY_SIDE_SIGNAL)
+        print(f"pp, {assoc_bin}, Away-side signal, {ana_pp.getPIDFractions()}")
+        ana_pp.setRegion(Region.BACKGROUND)
+        print(f"pp, {assoc_bin}, Background, {ana_pp.getPIDFractions()}")
+    
     ana_semicentral = Analysis(at.SEMICENTRAL, ["/mnt/d/18q/new_root/296510.root","/mnt/d/18q/new_root/296550.root","/mnt/d/18q/new_root/296551.root","/mnt/d/18q/new_root/295673.root","/mnt/d/18q/new_root/295754.root","/mnt/d/18q/new_root/296065.root","/mnt/d/18q/new_root/296068.root","/mnt/d/18q/new_root/296133.root","/mnt/d/18q/new_root/296191.root","/mnt/d/18q/new_root/296377.root","/mnt/d/18q/new_root/296379.root","/mnt/d/18q/new_root/296423.root","/mnt/d/18q/new_root/296433.root","/mnt/d/18q/new_root/296472.root", "/mnt/d/18r/new_root/296690.root", "/mnt/d/18r/new_root/296794.root", "/mnt/d/18r/new_root/296894.root", "/mnt/d/18r/new_root/296941.root", "/mnt/d/18r/new_root/297031.root", "/mnt/d/18r/new_root/297085.root", "/mnt/d/18r/new_root/297118.root", "/mnt/d/18r/new_root/297129.root", "/mnt/d/18r/new_root/297372.root", "/mnt/d/18r/new_root/297415.root", "/mnt/d/18r/new_root/297441.root", "/mnt/d/18r/new_root/297446.root", "/mnt/d/18r/new_root/297479.root", "/mnt/d/18r/new_root/297544.root", ])
     print(f"Starting semicentral")
     for assoc_bin in AssociatedHadronMomentumBin:

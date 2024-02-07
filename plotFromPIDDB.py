@@ -16,22 +16,28 @@ def plotParticleFractionsByMomentum(analysisType, region, dbCursor):
 
     plt.ylim(0, 1)
     plt.title(f"Particle Fractions by Momentum for {analysisType.name} {region.name}")
+    plt.xlabel("associated hadron p_T")
+    plt.ylabel("Fraction")
     plt.legend()
-    plt.savefig(f"particleFractionsByMomentum{analysisType.name}_{region.name}.png")
+    plt.savefig(f"Plots/{analysisType.name}/particle_fractions_{region.name}.png")
     plt.close()
 
 def plotFitParametersByMomentum(analysisType, parameter, expected_range: list, dbCursor):
     plt.figure()
+    parameterByMomentum_inc = getParameterByMomentum(analysisType = analysisType, region = Region.INCLUSIVE, parameter = parameter, dbCursor=dbCursor)
     parameterByMomentum_ns = getParameterByMomentum(analysisType = analysisType, region = Region.NEAR_SIDE_SIGNAL, parameter = parameter, dbCursor=dbCursor)
     parameterByMomentum_as = getParameterByMomentum(analysisType = analysisType, region = Region.AWAY_SIDE_SIGNAL, parameter = parameter, dbCursor=dbCursor)
     parameterByMomentum_b = getParameterByMomentum(analysisType = analysisType, region = Region.BACKGROUND, parameter = parameter, dbCursor=dbCursor)
+    plt.errorbar(x=[x[0] for x in parameterByMomentum_inc], y=[x[1] for x in parameterByMomentum_inc], yerr=[x[2] for x in parameterByMomentum_inc], fmt='o', label=Region.INCLUSIVE.name)
     plt.errorbar(x=[x[0] for x in parameterByMomentum_ns], y=[x[1] for x in parameterByMomentum_ns], yerr=[x[2] for x in parameterByMomentum_ns], fmt='o', label=Region.NEAR_SIDE_SIGNAL.name)
     plt.errorbar(x=[x[0]+0.1 for x in parameterByMomentum_as], y=[x[1] for x in parameterByMomentum_as], yerr=[x[2] for x in parameterByMomentum_as], fmt='o', label=Region.AWAY_SIDE_SIGNAL.name)
     plt.errorbar(x=[x[0]+0.2 for x in parameterByMomentum_b], y=[x[1] for x in parameterByMomentum_b], yerr=[x[2] for x in parameterByMomentum_b], fmt='o', label=Region.BACKGROUND.name)
     plt.ylim(*expected_range)
-    plt.title(f"{parameter} by Momentum for {analysisType.name}")
+    plt.title(f"{parameter} for {analysisType.name}")
+    plt.xlabel("associated hadron p_T")
+    plt.ylabel(f"{parameter}")
     plt.legend()
-    plt.savefig(f"{parameter}ByMomentum{analysisType.name}.png")
+    plt.savefig(f"Plots/{analysisType.name}/{parameter}.png")
     plt.close()
 
     
@@ -40,6 +46,7 @@ def main():
     conn = sqlite3.connect("PID.db")
     c = conn.cursor()
     for ana_type in AnalysisType:
+        plotParticleFractionsByMomentum(analysisType = ana_type, region = Region.INCLUSIVE, dbCursor=c)
         plotParticleFractionsByMomentum(analysisType = ana_type, region = Region.NEAR_SIDE_SIGNAL, dbCursor=c)
         plotParticleFractionsByMomentum(analysisType = ana_type, region = Region.AWAY_SIDE_SIGNAL, dbCursor=c)
         plotParticleFractionsByMomentum(analysisType = ana_type, region = Region.BACKGROUND, dbCursor=c)

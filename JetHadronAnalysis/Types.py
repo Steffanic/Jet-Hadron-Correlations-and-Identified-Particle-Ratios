@@ -74,12 +74,19 @@ regionDeltaPhiBinCountsDictionary = {
 }
 
 speciesTOFRangeDictionary = {
-    ParticleType.PION: ([-2,2], [-10,-2], [-10,-2]),#  -10 includes the underflow bin
-    ParticleType.KAON: ([-10,10], [-2,2], [-10,-2]),
-    ParticleType.PROTON: ([-10,10], [-10,10], [-2,2]),
+    ParticleType.PION: ([-3,3], [-10,-1], [-10,-1]),#  -10 includes the underflow bin
+    ParticleType.KAON: ([-10,10], [-3,3], [-10,-1]),
+    ParticleType.PROTON: ([-10,10], [-10,10], [-3,3]),
     ParticleType.INCLUSIVE: ([-10,10], [-10,10], [-10,10]),
 }
 
+# Tuples are (min_pi, max_pi), (min_k, max_k), (min_p, max_p)
+OtherTOFRangeDictionary = {
+    OtherTOFRangeTags.P_HI: [(-10,10), (-10,10), (2,10)],
+    OtherTOFRangeTags.P_LO_K_HI: [(-10,10), (2,10), (-10,-2)],
+    OtherTOFRangeTags.PI_LO_P_LO_K_LO: [(-10,-2), (-10,-2), (-10,-2)],
+    OtherTOFRangeTags.PI_HI_P_LO_K_LO: [(2,10), (-10,-2), (-10,-2)]
+}
 triggerJetMomentumBinRangeDictionary = {
     TriggerJetMomentumBin.PT_20_40: (20, 40),
     TriggerJetMomentumBin.PT_40_60: (40, 60)
@@ -100,12 +107,4 @@ eventPlaneAngleBinRangeDictionary = {
     ReactionPlaneBin.MID_PLANE: (pi / 6, pi / 3),
     ReactionPlaneBin.OUT_PLANE: (pi / 3, pi / 2),
     ReactionPlaneBin.INCLUSIVE: (0, pi / 2)
-}
-
-# Tuples are (min_pi, max_pi), (min_k, max_k), (min_p, max_p)
-OtherTOFRangeDictionary = {
-    OtherTOFRangeTags.P_HI: [(-10,10), (-10,10), (2,10)],
-    OtherTOFRangeTags.P_LO_K_HI: [(-10,10), (2,10), (-10,-2)],
-    OtherTOFRangeTags.PI_LO_P_LO_K_LO: [(-10,-2), (-10,-2), (-10,-2)],
-    OtherTOFRangeTags.PI_HI_P_LO_K_LO: [(2,10), (-10,-2), (-10,-2)]
 }

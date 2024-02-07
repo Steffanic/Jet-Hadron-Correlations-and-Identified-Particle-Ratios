@@ -327,8 +327,8 @@ class Analysis:
             return particle_fractions, particle_fraction_errors, pid_fit_shape_sys_err, pid_fit_yield_sys_err, None, None
         # set the region to inclusive to fit the shape parameters first saving the current region to reset it later
         fitter = FitTPCPionNsigma(self.analysisType, self.currentRegion, self.currentAssociatedHadronMomentumBin)
-        currentRegion = self.currentRegion
-        self.setRegion(Region.INCLUSIVE)
+        # currentRegion = self.currentRegion
+        # self.setRegion(Region.INCLUSIVE)
         # get the projections
         pionEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PION)
         protonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PROTON)
@@ -344,15 +344,15 @@ class Analysis:
 
         chi2OverNDF_shape = fitter.chi2OverNDF(optimal_params, covariance, x, y, yerr)
         # now set the region back to what it was before so we can fit the inclusive yield
-        self.setRegion(currentRegion)
+        # self.setRegion(currentRegion)
         # get the inclusive yield
 
-        pionEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PION)
-        protonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PROTON)
-        kaonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.KAON)
-        inclusiveEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.INCLUSIVE)
-
-        x, y, yerr = FitTPCPionNsigma.prepareData(pionEnhancedTPCnSigma, protonEnhancedTPCnSigma, kaonEnhancedTPCnSigma, inclusiveEnhancedTPCnSigma)
+#         pionEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PION)
+#         protonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.PROTON)
+#         kaonEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.KAON)
+#         inclusiveEnhancedTPCnSigma = self.getEnhancedTPCnSigmaProjection(ParticleType.INCLUSIVE)
+# 
+#         x, y, yerr = FitTPCPionNsigma.prepareData(pionEnhancedTPCnSigma, protonEnhancedTPCnSigma, kaonEnhancedTPCnSigma, inclusiveEnhancedTPCnSigma)
 
         x_inc = x
         y_inc = y[3]
@@ -367,7 +367,7 @@ class Analysis:
 
         # lets calculate a bootstrap estimeate of the systematic fit error
         # first lets get the number of bootstrap samples
-        number_of_bootstrap_samples = 1000
+        number_of_bootstrap_samples = 10
 
         # now lets get the bootstrap samples
         param_value_samples = np.random.multivariate_normal(optimal_params, covariance, number_of_bootstrap_samples)
